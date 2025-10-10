@@ -1,94 +1,130 @@
-# 10x Astro Starter
+# QA Toolsmith (MVP)
 
-A modern, opinionated starter template for building fast, accessible, and AI-friendly web applications.
+[![CI](https://github.com/<USERNAME>/<REPO>/actions/workflows/ci.yml/badge.svg)](https://github.com/<USERNAME>/<REPO>/actions)  
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+## Table of Contents
+
+1. [Project Description](#project-description)  
+2. [Tech Stack](#tech-stack)  
+3. [Getting Started Locally](#getting-started-locally)  
+4. [Available Scripts](#available-scripts)  
+5. [Project Scope](#project-scope)  
+6. [Project Status](#project-status)  
+7. [License](#license)  
+
+## Project Description
+
+QA Toolsmith is an open-source, lightweight web application that standardizes and automates common tasks for software testers. The MVP offers:
+
+- Email/password authentication with Admin and User roles  
+- Defect report templates (UI/API bugs) with Markdown export  
+- Exploration Chart (timer, tagged notes, keyboard shortcuts, Markdown export)  
+- Minimal Knowledge Base (CRUD, tags, full-text search, JSON export)  
+- Synthetic test data generators & validators (IBAN DE/AT, phone, address, license plates, email, companies, credit cards, GUIDs, strings)  
+- Optional AI assistant to polish content (per-user daily limit, dry-run/manual fallback)  
+- Unit tests, E2E tests, and GitHub Actions CI/CD pipeline  
 
 ## Tech Stack
 
-- [Astro](https://astro.build/) v5.5.5 - Modern web framework for building fast, content-focused websites
-- [React](https://react.dev/) v19.0.0 - UI library for building interactive components
-- [TypeScript](https://www.typescriptlang.org/) v5 - Type-safe JavaScript
-- [Tailwind CSS](https://tailwindcss.com/) v4.0.17 - Utility-first CSS framework
+- **Frontend**  
+  - Astro 5  
+  - React 19  
+  - TypeScript 5  
+  - Tailwind CSS 4  
+  - Shadcn/ui  
+- **Backend**  
+  - Supabase (PostgreSQL, Auth, SDK)  
+- **AI Integration**  
+  - Openrouter.ai (supports OpenAI, Anthropic, Google, etc.)  
+- **CI/CD & Hosting**  
+  - GitHub Actions  
+  - Docker (DigitalOcean)  
 
-## Prerequisites
+## Getting Started Locally
 
-- Node.js v22.14.0 (as specified in `.nvmrc`)
-- npm (comes with Node.js)
+### Prerequisites
 
-## Getting Started
+- Node.js v22.14.0 (see `.nvmrc`)  
+- npm (included with Node.js)  
 
-1. Clone the repository:
+### Installation
 
 ```bash
-git clone https://github.com/przeprogramowani/10x-astro-starter.git
-cd 10x-astro-starter
-```
-
-2. Install dependencies:
-
-```bash
+git clone https://github.com/<USERNAME>/<REPO>.git
+cd <REPO>
 npm install
 ```
 
-3. Run the development server:
+### Development
 
 ```bash
 npm run dev
 ```
 
-4. Build for production:
+### Production Build
 
 ```bash
 npm run build
+npm run preview
 ```
 
 ## Available Scripts
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm run lint` - Run ESLint
-- `npm run lint:fix` - Fix ESLint issues
+- `npm run dev` — Start development server  
+- `npm run build` — Build for production  
+- `npm run preview` — Preview production build  
+- `npm run astro` — Run Astro CLI commands  
+- `npm run lint` — Run ESLint checks  
+- `npm run lint:fix` — Automatically fix lint issues  
+- `npm run format` — Format files with Prettier  
 
-## Project Structure
+## Project Scope
 
-```md
-.
-├── src/
-│   ├── layouts/    # Astro layouts
-│   ├── pages/      # Astro pages
-│   │   └── api/    # API endpoints
-│   ├── components/ # UI components (Astro & React)
-│   └── assets/     # Static assets
-├── public/         # Public assets
-```
+### 1. Authentication & Roles
+- Email/password sign-in/out  
+- Admin & User roles (first Admin seeded)  
+- Login rate limiting and temporary lockout  
 
-## AI Development Support
+### 2. Defect Report Templates
+- UI & API bug presets with required fields  
+- Global templates managed by Admin; Users can fork & customize  
+- Markdown export & "Copy to clipboard" button  
 
-This project is configured with AI development tools to enhance the development experience, providing guidelines for:
+### 3. Exploration Chart
+- Charters with Goal, Hypotheses, Notes (tags: bug / idea / question / risk)  
+- Start/Stop timer, keyboard shortcuts (Alt+N, Alt+T, Alt+S)  
+- Autosave (localStorage every 5 s, DB on close)  
+- Markdown export & session history  
 
-- Project structure
-- Coding practices
-- Frontend development
-- Styling with Tailwind
-- Accessibility best practices
-- Astro and React guidelines
+### 4. Knowledge Base
+- CRUD for links with canonicalization & deduplication  
+- Multiple notes per link, tag support  
+- Full-text search (Postgres FTS) & tag filtering  
+- JSON export of entries  
 
-### Cursor IDE
+### 5. Data Generators & Validators
+- IBAN generator & validator (DE/AT)  
+- Phone numbers, addresses, license plates, emails, company names, credit cards, GUIDs, random strings  
+- Optional seed for deterministic results  
 
-The project includes AI rules in `.cursor/rules/` directory that help Cursor IDE understand the project structure and provide better code suggestions.
+### 6. AI Assistant
+- “Improve / Expand” actions for descriptions, steps, notes  
+- Diff preview with accept/reject  
+- Per-user daily limit (`AI_MAX_REQUESTS_PER_USER_PER_DAY`), dry-run & manual fallback  
 
-### GitHub Copilot
+### 7. Testing & CI/CD
+- **Unit tests**: IBAN validator, generator & edge cases (property-based, 1 000 cases)  
+- **E2E tests**: Playwright (login → KB CRUD)  
+- **Smoke tests**: GET /health, homepage render, login, sample CRUD  
+- **CI/CD**: GitHub Actions pipeline for lint, unit, E2E  
 
-AI instructions for GitHub Copilot are available in `.github/copilot-instructions.md`
+## Project Status
 
-### Windsurf
-
-The `.windsurfrules` file contains AI configuration for Windsurf.
-
-## Contributing
-
-Please follow the AI guidelines and coding practices defined in the AI configuration files when contributing to this project.
+- **MVP Complete** (v0.0.1)  
+- Actively maintained feature set for testers’ core workflows  
 
 ## License
 
-MIT
+This project is licensed under the **MIT License**.  
+See the [LICENSE](LICENSE) file for details.
