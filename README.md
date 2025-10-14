@@ -10,8 +10,9 @@
 3. [Getting Started Locally](#getting-started-locally)  
 4. [Available Scripts](#available-scripts)  
 5. [Project Scope](#project-scope)  
-6. [Project Status](#project-status)  
-7. [License](#license)  
+6. [API Documentation](#api-documentation)  
+7. [Project Status](#project-status)  
+8. [License](#license)  
 
 ## Project Description
 
@@ -118,6 +119,12 @@ npm run preview
 - **E2E tests**: Playwright (login → KB CRUD)  
 - **Smoke tests**: GET /health, homepage render, login, sample CRUD  
 - **CI/CD**: GitHub Actions pipeline for lint, unit, E2E  
+
+## API Documentation
+
+The QA Toolsmith API provides several endpoints for interacting with the application programmatically. Detailed documentation for each endpoint can be found in the [docs/api](docs/api) directory.
+
+- **Health Check**: `GET /api/health` - Simple application health check endpoint
 
 ## Project Status
 
