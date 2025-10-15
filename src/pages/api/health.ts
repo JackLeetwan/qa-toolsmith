@@ -1,11 +1,11 @@
 import type { APIRoute } from "astro";
-import { HealthService } from "../../lib/services/health.service";
+import { getHealth } from "../../lib/services/health.service";
 
 export const prerender = false;
 
 export const GET: APIRoute = async () => {
   try {
-    const health = HealthService.getHealth();
+    const health = getHealth();
     return new Response(JSON.stringify(health), {
       status: 200,
       headers: {
