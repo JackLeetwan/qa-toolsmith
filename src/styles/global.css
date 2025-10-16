@@ -2,11 +2,51 @@
 @import "tw-animate-css";
 
 @theme {
-  --radius: 0.625rem;
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  /* Geist Typography */
+  --font-sans: "Geist Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "Geist Mono", "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", monospace;
+  
+  /* Typography sizes */
+  --text-xs: 0.75rem;    /* 12px */
+  --text-sm: 0.875rem;   /* 14px */
+  --text-base: 1rem;     /* 16px */
+  --text-lg: 1.125rem;   /* 18px */
+  --text-xl: 1.25rem;    /* 20px */
+  --text-2xl: 1.5rem;    /* 24px */
+  --text-3xl: 1.875rem;  /* 30px */
+  --text-4xl: 2.25rem;   /* 36px */
+  
+  /* Line heights for better readability */
+  --leading-tight: 1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.75;
+
+  /* Geist Border Radius - more subtle */
+  --radius: 0.375rem;     /* 6px */
+  --radius-sm: 0.25rem;   /* 4px */
+  --radius-md: 0.375rem;  /* 6px */
+  --radius-lg: 0.5rem;    /* 8px */
+  --radius-xl: 0.75rem;   /* 12px */
+
+  /* Geist Spacing System */
+  --spacing-0: 0;
+  --spacing-1: 0.25rem;   /* 4px */
+  --spacing-2: 0.5rem;    /* 8px */
+  --spacing-3: 0.75rem;   /* 12px */
+  --spacing-4: 1rem;      /* 16px */
+  --spacing-5: 1.25rem;   /* 20px */
+  --spacing-6: 1.5rem;    /* 24px */
+  --spacing-8: 2rem;      /* 32px */
+  --spacing-10: 2.5rem;   /* 40px */
+  --spacing-12: 3rem;     /* 48px */
+  --spacing-16: 4rem;     /* 64px */
+  --spacing-20: 5rem;     /* 80px */
+
+  /* Geist Shadows - subtle and modern */
+  --shadow-sm: 0 1px 2px 0 oklch(0 0 0 / 0.05);
+  --shadow: 0 1px 3px 0 oklch(0 0 0 / 0.1), 0 1px 2px -1px oklch(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px oklch(0 0 0 / 0.1), 0 2px 4px -2px oklch(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px oklch(0 0 0 / 0.1), 0 4px 6px -4px oklch(0 0 0 / 0.1);
 
   /* Define colors that use CSS variables */
   --color-background: var(--background);
@@ -35,63 +75,63 @@
   --color-chart-5: var(--chart-5);
 }
 
-/* Light mode colors */
+/* Light mode colors - Geist Design System */
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
+  --background: oklch(0.99 0 0);           /* Softer white background */
+  --foreground: oklch(0.15 0 0);           /* Darker text for better contrast */
+  --card: oklch(1 0 0);                    /* Pure white cards */
+  --card-foreground: oklch(0.15 0 0);      /* Dark text on cards */
+  --popover: oklch(1 0 0);                 /* Pure white popovers */
+  --popover-foreground: oklch(0.15 0 0);   /* Dark text on popovers */
+  --primary: oklch(0.5 0.1 240);           /* Geist blue primary */
+  --primary-foreground: oklch(0.99 0 0);   /* White text on primary */
+  --secondary: oklch(0.96 0 0);            /* Subtle secondary background */
+  --secondary-foreground: oklch(0.15 0 0); /* Dark text on secondary */
+  --muted: oklch(0.96 0 0);                /* More subtle muted background */
+  --muted-foreground: oklch(0.45 0 0);     /* Better contrast for muted text */
+  --accent: oklch(0.96 0 0);               /* Subtle accent background */
+  --accent-foreground: oklch(0.15 0 0);    /* Dark text on accent */
+  --destructive: oklch(0.577 0.245 27.325); /* Keep existing red */
+  --destructive-foreground: oklch(0.99 0 0); /* White text on destructive */
+  --border: oklch(0.9 0 0);                /* More visible borders */
+  --input: oklch(0.9 0 0);                 /* More visible input borders */
+  --ring: oklch(0.5 0.1 240);              /* Geist blue focus ring */
+  --chart-1: oklch(0.5 0.1 240);           /* Geist blue for charts */
+  --chart-2: oklch(0.6 0.12 200);          /* Teal for charts */
+  --chart-3: oklch(0.7 0.15 120);          /* Green for charts */
+  --chart-4: oklch(0.8 0.18 60);           /* Yellow for charts */
+  --chart-5: oklch(0.65 0.2 300);          /* Purple for charts */
 }
 
-/* Dark mode colors */
+/* Dark mode colors - Geist Design System */
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
+  --background: oklch(0.12 0 0);           /* Lighter gray background */
+  --foreground: oklch(0.95 0 0);           /* Softer white text */
+  --card: oklch(0.16 0 0);                 /* Slightly lighter cards */
+  --card-foreground: oklch(0.95 0 0);      /* White text on cards */
+  --popover: oklch(0.16 0 0);              /* Slightly lighter popovers */
+  --popover-foreground: oklch(0.95 0 0);   /* White text on popovers */
+  --primary: oklch(0.6 0.12 240);          /* Brighter Geist blue for dark mode */
+  --primary-foreground: oklch(0.12 0 0);   /* Dark text on primary */
+  --secondary: oklch(0.2 0 0);             /* Lighter secondary background */
+  --secondary-foreground: oklch(0.95 0 0); /* White text on secondary */
+  --muted: oklch(0.18 0 0);                /* Lighter muted background */
+  --muted-foreground: oklch(0.65 0 0);     /* Better contrast for muted text */
+  --accent: oklch(0.2 0 0);                /* Lighter accent background */
+  --accent-foreground: oklch(0.95 0 0);    /* White text on accent */
+  --destructive: oklch(0.704 0.191 22.216); /* Keep existing red */
+  --destructive-foreground: oklch(0.95 0 0); /* White text on destructive */
+  --border: oklch(0.25 0 0);               /* More visible borders */
+  --input: oklch(0.25 0 0);                /* More visible input borders */
+  --ring: oklch(0.6 0.12 240);             /* Brighter Geist blue focus ring */
+  --chart-1: oklch(0.6 0.12 240);          /* Geist blue for charts */
+  --chart-2: oklch(0.7 0.15 200);          /* Teal for charts */
+  --chart-3: oklch(0.75 0.18 120);         /* Green for charts */
+  --chart-4: oklch(0.8 0.2 60);            /* Yellow for charts */
+  --chart-5: oklch(0.7 0.22 300);          /* Purple for charts */
 }
 
-/* Base styles */
+/* Base styles - Geist Design System */
 * {
   border-color: var(--border);
 }
@@ -99,5 +139,38 @@
 body {
   background-color: var(--background);
   color: var(--foreground);
+  font-family: var(--font-sans);
+  line-height: var(--leading-normal);
   transition: background-color 0.2s ease, color 0.2s ease;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Improved focus states for accessibility */
+*:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* Better text rendering */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  line-height: var(--leading-tight);
+  letter-spacing: -0.025em;
+}
+
+/* Code elements use Geist Mono */
+code, pre, kbd, samp {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+}
+
+/* Improved button and interactive element focus */
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[role="button"]:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
 }
