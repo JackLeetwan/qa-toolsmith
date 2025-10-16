@@ -1,0 +1,60 @@
+---
+import GeneratorLayout from "../../layouts/GeneratorLayout.astro";
+import GenericGeneratorView from "../../components/generators/generic/GenericGeneratorView";
+import type { GeneratorKind } from "../../types/types";
+
+export const prerender = false;
+
+// Extract kind from params
+const { kind } = Astro.params;
+
+// Valid generator kinds (excluding 'iban' which has its own route)
+const validKinds: GeneratorKind[] = ["phone", "address", "plates", "email", "company", "card", "guid", "string"];
+
+// Validate kind
+if (!kind || !validKinds.includes(kind as GeneratorKind)) {
+  return Astro.redirect("/generators");
+}
+
+// Map kind to user-friendly titles and descriptions
+const generatorMeta: Record<GeneratorKind, { title: string; description: string }> = {
+  phone: {
+    title: "Phone Number Generator",
+    description: "Generate realistic phone numbers (mobile or landline) for Poland, Germany, and Austria.",
+  },
+  address: {
+    title: "Address Generator",
+    description: "Generate realistic addresses (home or business) with street, city, and postal code.",
+  },
+  plates: {
+    title: "License Plate Generator",
+    description: "Generate valid license plate numbers in country-specific formats.",
+  },
+  email: {
+    title: "Email Generator",
+    description: "Generate realistic email addresses for testing purposes.",
+  },
+  company: {
+    title: "Company Name Generator",
+    description: "Generate realistic company names and registration details.",
+  },
+  card: {
+    title: "Payment Card Generator",
+    description: "Generate valid test payment card numbers (Visa, Mastercard) with Luhn checksum.",
+  },
+  guid: {
+    title: "GUID Generator",
+    description: "Generate UUIDs/GUIDs (v4) for testing and development.",
+  },
+  string: {
+    title: "Random String Generator",
+    description: "Generate random strings with configurable length and character sets.",
+  },
+};
+
+const meta = generatorMeta[kind as GeneratorKind];
+---
+
+<GeneratorLayout title={meta.title} description={meta.description}>
+  <GenericGeneratorView kind={kind as GeneratorKind} client:load />
+</GeneratorLayout>

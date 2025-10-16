@@ -78,6 +78,7 @@ Aktualizacja własnego profilu zalogowanego użytkownika w zakresie **nieuprzywi
   ```
 
 - **Błędy (format spójny z ErrorResponse):**
+
   ```json
   {
     "error": {

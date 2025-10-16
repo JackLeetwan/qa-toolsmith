@@ -56,6 +56,42 @@ export type IbanCountry = "DE" | "AT" | "PL";
 export type LocalDataCountry = "PL" | "DE" | "AT";
 export type GeneratorKind = "address" | "phone" | "plates" | "email" | "company" | "card" | "guid" | "string";
 
+/** UI-specific types for Generators view */
+export type OutputFormat = "text" | "json";
+
+export interface GeneratorMeta {
+  kind: GeneratorKind | "iban";
+  name: string;
+  description: string;
+  href: string;
+  icon: string; // lucide icon name
+  example?: string;
+}
+
+export interface HistoryItem<T> {
+  ts: number; // epoch ms
+  data: T;
+  note?: string;
+}
+
+export interface UIError {
+  code: string;
+  message: string;
+}
+
+export interface IbanViewState {
+  mode: "generate" | "validate";
+  country: IbanCountry;
+  seed?: string | number;
+  format: OutputFormat;
+  result?: IbanGeneratorResponse;
+  validation?: IbanValidationResponse;
+  inputIban?: string;
+  history: HistoryItem<IbanGeneratorResponse>[];
+  isLoading: boolean;
+  error?: UIError;
+}
+
 /** AI assistant */
 export type AIContext = "template" | "charter" | "kb";
 export type AIField = "description" | "steps" | "hypotheses" | "notes";
