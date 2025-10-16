@@ -344,6 +344,84 @@ export interface AILimitsDTO {
 }
 
 /* -------------------------------------------------------
+ * OpenRouter Service Types
+ * ----------------------------------------------------- */
+
+export interface OpenRouterConfig {
+  apiKey: string;
+  baseUrl?: string;
+  defaultModel?: string;
+  maxRetries?: number;
+  timeout?: number;
+  rateLimitConfig?: RateLimitConfig;
+  usageConfig?: UsageConfig;
+  messageConfig?: MessageConfig;
+  responseConfig?: ResponseConfig;
+  supabaseClient?: unknown; // Supabase client for database integration
+}
+
+export interface ModelParams {
+  temperature?: number;
+  max_tokens?: number;
+  top_p?: number;
+  frequency_penalty?: number;
+  presence_penalty?: number;
+}
+
+export interface JSONSchema {
+  type: "object";
+  properties: Record<string, unknown>;
+  required?: string[];
+  additionalProperties?: boolean;
+}
+
+export interface RateLimitConfig {
+  requestsPerMinute: number;
+  burstLimit: number;
+}
+
+export interface UsageConfig {
+  dailyLimit: number;
+  resetHour: number;
+}
+
+export interface MessageConfig {
+  maxTokens: number;
+  systemPromptTemplate: string;
+}
+
+export interface ResponseConfig {
+  enableStructuredOutput: boolean;
+  defaultSchema?: JSONSchema;
+}
+
+export interface ModelInfo {
+  id: string;
+  name: string;
+  description: string;
+  pricing: {
+    prompt: number;
+    completion: number;
+  };
+}
+
+export interface UsageInfo {
+  prompt: number;
+  completion: number;
+  total: number;
+}
+
+export interface ValidationResult {
+  valid: boolean;
+  errors?: string[];
+}
+
+export interface Message {
+  role: "system" | "user" | "assistant";
+  content: string;
+}
+
+/* -------------------------------------------------------
  * Events & Stats
  * ----------------------------------------------------- */
 
