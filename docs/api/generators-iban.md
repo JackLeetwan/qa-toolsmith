@@ -14,10 +14,10 @@ The IBAN generator endpoint produces valid IBAN (International Bank Account Numb
 
 ## Query Parameters
 
-| Parameter | Type | Required | Description | Example |
-|-----------|------|----------|-------------|---------|
-| `country` | string | ✅ Yes | Country code: `DE`, `AT`, or `PL` | `?country=DE` |
-| `seed` | string | ❌ No | Deterministic seed for reproducible IBANs (max 64 chars, alphanumeric + `.`, `_`, `-`) | `?country=DE&seed=test123` |
+| Parameter | Type   | Required | Description                                                                            | Example                    |
+| --------- | ------ | -------- | -------------------------------------------------------------------------------------- | -------------------------- |
+| `country` | string | ✅ Yes   | Country code: `DE`, `AT`, or `PL`                                                      | `?country=DE`              |
+| `seed`    | string | ❌ No    | Deterministic seed for reproducible IBANs (max 64 chars, alphanumeric + `.`, `_`, `-`) | `?country=DE&seed=test123` |
 
 ---
 
@@ -26,6 +26,7 @@ The IBAN generator endpoint produces valid IBAN (International Bank Account Numb
 ### ✅ Success Response (200 OK)
 
 **Without seed (random IBAN):**
+
 ```http
 GET /api/generators/iban?country=DE
 
@@ -40,6 +41,7 @@ Cache-Control: no-store
 ```
 
 **With seed (deterministic IBAN):**
+
 ```http
 GET /api/generators/iban?country=AT&seed=mytest
 
@@ -140,16 +142,19 @@ Content-Type: application/json
 ### cURL
 
 **Random IBAN (Germany):**
+
 ```bash
 curl -X GET "http://localhost:3000/api/generators/iban?country=DE"
 ```
 
 **Deterministic IBAN (Austria with seed):**
+
 ```bash
 curl -X GET "http://localhost:3000/api/generators/iban?country=AT&seed=testuser123"
 ```
 
 **Polish IBAN:**
+
 ```bash
 curl -X GET "http://localhost:3000/api/generators/iban?country=PL"
 ```
@@ -158,16 +163,16 @@ curl -X GET "http://localhost:3000/api/generators/iban?country=PL"
 
 ```javascript
 // Random IBAN
-fetch('http://localhost:3000/api/generators/iban?country=DE')
-  .then(response => response.json())
-  .then(data => console.log('Generated IBAN:', data.iban))
-  .catch(error => console.error('Error:', error));
+fetch("http://localhost:3000/api/generators/iban?country=DE")
+  .then((response) => response.json())
+  .then((data) => console.log("Generated IBAN:", data.iban))
+  .catch((error) => console.error("Error:", error));
 
 // Deterministic IBAN with seed
-fetch('http://localhost:3000/api/generators/iban?country=DE&seed=my-test-seed')
-  .then(response => response.json())
-  .then(data => console.log('Generated IBAN:', data.iban, 'Seed:', data.seed))
-  .catch(error => console.error('Error:', error));
+fetch("http://localhost:3000/api/generators/iban?country=DE&seed=my-test-seed")
+  .then((response) => response.json())
+  .then((data) => console.log("Generated IBAN:", data.iban, "Seed:", data.seed))
+  .catch((error) => console.error("Error:", error));
 ```
 
 ### Python (Requests)
@@ -194,16 +199,17 @@ print(f"Generated IBAN: {data['iban']} with seed: {data['seed']}")
 **Tab: GET/POST selector** → `GET`
 
 **URL:**
+
 ```
 http://localhost:3000/api/generators/iban?country=DE&seed=mytest
 ```
 
 **Or use Postman Params tab:**
 
-| Key | Value |
-|-----|-------|
-| `country` | `DE` |
-| `seed` | `mytest` |
+| Key       | Value    |
+| --------- | -------- |
+| `country` | `DE`     |
+| `seed`    | `mytest` |
 
 **Send** ✈️
 
@@ -224,16 +230,20 @@ All generated IBANs have valid checksums and can be used for testing purposes.
 ## Caching Behavior
 
 ### Random IBAN (no seed)
+
 ```
 Cache-Control: no-store
 ```
+
 - Response is **never cached** (each request generates different IBAN)
 
 ### Deterministic IBAN (with seed)
+
 ```
 Cache-Control: public, max-age=31536000, immutable
 ETag: "encoded-hash"
 ```
+
 - Response is **cached for 1 year** (same seed always produces same IBAN)
 - Safe for CDN caching
 
@@ -242,6 +252,7 @@ ETag: "encoded-hash"
 ## Use Cases
 
 ### 1. QA Test Data Generation
+
 ```bash
 # Generate multiple test IBANs for Germany
 for i in {1..5}; do
@@ -250,19 +261,18 @@ done
 ```
 
 ### 2. Reproducible Fixtures (with seed)
+
 ```bash
 # Always generates same IBAN for consistent test data
 curl "http://localhost:3000/api/generators/iban?country=DE&seed=fixture-001"
 ```
 
 ### 3. Multi-country Testing
+
 ```javascript
-const countries = ['DE', 'AT', 'PL'];
+const countries = ["DE", "AT", "PL"];
 const ibans = await Promise.all(
-  countries.map(country =>
-    fetch(`/api/generators/iban?country=${country}`)
-      .then(r => r.json())
-  )
+  countries.map((country) => fetch(`/api/generators/iban?country=${country}`).then((r) => r.json()))
 );
 console.log(ibans);
 ```
@@ -287,10 +297,10 @@ console.log(ibans);
 
 ## Error Codes
 
-| Code | Status | Description |
-|------|--------|-------------|
-| `VALIDATION_ERROR` | 400 | Invalid parameter (missing country, invalid format, invalid seed) |
-| `INTERNAL` | 500 | Unexpected server error |
+| Code               | Status | Description                                                       |
+| ------------------ | ------ | ----------------------------------------------------------------- |
+| `VALIDATION_ERROR` | 400    | Invalid parameter (missing country, invalid format, invalid seed) |
+| `INTERNAL`         | 500    | Unexpected server error                                           |
 
 ---
 

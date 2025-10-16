@@ -52,7 +52,11 @@ export async function consume(ip: string): Promise<void> {
   // Check limit
   if (entry.count > RATE_LIMIT_MAX) {
     const ttl = Math.ceil((entry.expireAt - now) / 1000);
-    const error: any = new Error("rate_limited");
+    const error = new Error("rate_limited") as Error & {
+      status: number;
+      code: string;
+      retryAfter: number;
+    };
     error.status = 429;
     error.code = "RATE_LIMITED";
     error.retryAfter = ttl > 0 ? ttl : 60;

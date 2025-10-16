@@ -54,14 +54,21 @@ export async function loginWithPassword(cmd: LoginCommand): Promise<LoginSession
       // Map Supabase error codes to application errors
       if (error.status === 400 || error.status === 401) {
         // Invalid email/password or user not found
-        const authError: any = new Error("invalid_credentials");
+        const authError = new Error("invalid_credentials") as Error & {
+          status: number;
+          code: string;
+        };
         authError.status = 401;
         authError.code = "INVALID_CREDENTIALS";
         throw authError;
       }
 
       // Unexpected error from auth provider
-      const providerError: any = new Error("auth_provider_error");
+      const providerError = new Error("auth_provider_error") as Error & {
+        status: number;
+        code: string;
+        originalError: typeof error;
+      };
       providerError.status = 500;
       providerError.code = "INTERNAL";
       providerError.originalError = error;
@@ -69,7 +76,10 @@ export async function loginWithPassword(cmd: LoginCommand): Promise<LoginSession
     }
 
     if (!data.session) {
-      const sessionError: any = new Error("no_session_returned");
+      const sessionError = new Error("no_session_returned") as Error & {
+        status: number;
+        code: string;
+      };
       sessionError.status = 500;
       sessionError.code = "INTERNAL";
       throw sessionError;
@@ -80,14 +90,19 @@ export async function loginWithPassword(cmd: LoginCommand): Promise<LoginSession
       expires_in: data.session.expires_in || 3600,
       user_id: data.session.user.id,
     };
-  } catch (err: any) {
+  } catch (err: unknown) {
     // If already wrapped with our error code, rethrow
-    if (err.code && err.status) {
+    const typedErr = err as Error & { code?: string; status?: number };
+    if (typedErr.code && typedErr.status) {
       throw err;
     }
 
     // Unexpected error
-    const unexpectedError: any = new Error("unexpected_error");
+    const unexpectedError = new Error("unexpected_error") as Error & {
+      status: number;
+      code: string;
+      originalError: unknown;
+    };
     unexpectedError.status = 500;
     unexpectedError.code = "INTERNAL";
     unexpectedError.originalError = err;

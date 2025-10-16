@@ -1,6 +1,7 @@
 # API Endpoint Implementation Plan: GET `/templates`
 
 ## 1. Przegląd punktu końcowego
+
 Zwraca „efektywną" listę szablonów widocznych dla zalogowanego użytkownika: **globalne** (`scope='global'`) oraz **własne** użytkownika (`scope='user' AND owner_id=current_user`). Globalny szablon może być **nadpisany** przez użytkownika forkiem (po `origin_template_id`) lub przez szablon o tej samej nazwie – w „efektywnej" liście pokażemy tylko wariant użytkownika.
 
 Zgodny ze stackiem: **Astro (API route)** ↔ **Supabase (PostgREST / RPC)** z **RLS**.
@@ -8,6 +9,7 @@ Zgodny ze stackiem: **Astro (API route)** ↔ **Supabase (PostgREST / RPC)** z *
 **JSON API Convention:** All responses use **snake_case** (REST standard).
 
 ## 2. Szczegóły żądania
+
 - **Metoda HTTP:** `GET`
 - **URL:** `/templates`
 - **Parametry zapytania (opcjonalne):**
@@ -19,9 +21,14 @@ Zgodny ze stackiem: **Astro (API route)** ↔ **Supabase (PostgREST / RPC)** z *
   - `Accept: application/json`
 
 ## 3. Wykorzystywane typy
+
 - **TemplateListItemDTO** (z `types.ts` — keyset page item)
+
   ```ts
-  export type TemplateListItemDTO = Omit<TemplateEffectiveRow, "fields" | "scope" | "preset" | "required_fields" | "is_readonly" | "origin_template_id"> & {
+  export type TemplateListItemDTO = Omit<
+    TemplateEffectiveRow,
+    "fields" | "scope" | "preset" | "required_fields" | "is_readonly" | "origin_template_id"
+  > & {
     fields: TemplateField[] | null;
     scope: TemplateScope | null;
     preset: TemplatePreset | null;
@@ -32,16 +39,18 @@ Zgodny ze stackiem: **Astro (API route)** ↔ **Supabase (PostgREST / RPC)** z *
   ```
 
 - **TemplateListResponse** (z `types.ts`)
+
   ```ts
   export type TemplateListResponse = KeysetPage<TemplateListItemDTO>;
-  
+
   export interface KeysetPage<T> {
     items: T[];
-    next_cursor?: string;  // base64(updated_at|id)
+    next_cursor?: string; // base64(updated_at|id)
   }
   ```
 
 ## 3. Szczegóły odpowiedzi
+
 - **200 OK**
   - `application/json` → `TemplateListResponse`
   - **Pola zwracane w snake_case** (JSON REST convention)
@@ -50,14 +59,22 @@ Zgodny ze stackiem: **Astro (API route)** ↔ **Supabase (PostgREST / RPC)** z *
     {
       "items": [
         {
-          "id":"7f8…","name":"UI bug","scope":"global","owner_id":null,
-          "preset":"ui_bug","fields":[{"key":"steps","type":"text","label":"Steps"}],
-          "required_fields":["title","steps"],"attachments":[],
-          "origin_template_id":null,"is_readonly":true,"version":1,
-          "created_at":"2025-10-10T09:10:11Z","updated_at":"2025-10-10T09:10:11Z"
+          "id": "7f8…",
+          "name": "UI bug",
+          "scope": "global",
+          "owner_id": null,
+          "preset": "ui_bug",
+          "fields": [{ "key": "steps", "type": "text", "label": "Steps" }],
+          "required_fields": ["title", "steps"],
+          "attachments": [],
+          "origin_template_id": null,
+          "is_readonly": true,
+          "version": 1,
+          "created_at": "2025-10-10T09:10:11Z",
+          "updated_at": "2025-10-10T09:10:11Z"
         }
       ],
-      "next_cursor":"YmFzZTY0…"
+      "next_cursor": "YmFzZTY0…"
     }
     ```
 - **401 Unauthorized** — brak/nieprawidłowy JWT.
@@ -65,6 +82,7 @@ Zgodny ze stackiem: **Astro (API route)** ↔ **Supabase (PostgREST / RPC)** z *
 - **500 Internal Server Error** — błąd serwera/bazy.
 
 ## 4. Przepływ danych
+
 1. **Auth**: Astro API route weryfikuje JWT (Supabase client) i pozyskuje `userId` = `auth.uid()`.
 2. **Źródło danych**: zapytanie do Supabase:
    - **Preferowane:** widok lub funkcja `templates_effective` z RLS, eliminująca globalne rekordy nadpisane przez użytkownika.
@@ -92,6 +110,7 @@ Zgodny ze stackiem: **Astro (API route)** ↔ **Supabase (PostgREST / RPC)** z *
 7. **Odpowiedź**: pobierz `limit+1` elementów; jeśli więcej niż `limit` → `next_cursor` z ostatniego rekordu.
 
 **Indeksy (wg planu DB):**
+
 ```sql
 CREATE INDEX IF NOT EXISTS idx_templates_owner_updated_id
   ON public.templates(owner_id, updated_at DESC, id DESC);
@@ -100,6 +119,7 @@ CREATE INDEX IF NOT EXISTS idx_templates_scope_preset_updated
 ```
 
 **RLS (jeżeli czytamy bezpośrednio z `templates`):**
+
 ```sql
 ALTER TABLE public.templates ENABLE ROW LEVEL SECURITY;
 CREATE POLICY read_templates_self_or_global ON public.templates
@@ -107,6 +127,7 @@ FOR SELECT USING (scope = 'global' OR owner_id = auth.uid());
 ```
 
 ## 5. Względy bezpieczeństwa
+
 - **Autoryzacja**: RLS gwarantuje, że użytkownik zobaczy tylko globalne lub własne rekordy.
 - **IDOR**: brak dostępu do cudzych `user` szablonów dzięki RLS.
 - **Walidacja wejścia**: `limit` (≤100), `after` musi dekodować się do `(timestamp, uuid)` i przechodzić regexy.
@@ -115,9 +136,10 @@ FOR SELECT USING (scope = 'global' OR owner_id = auth.uid());
 - **DoS**: twardy limit i proste filtry, brak `OFFSET`.
 
 ## 6. Obsługa błędów
+
 - **Format błędów API (spójny w projekcie):**
   ```json
-  { "error": { "code": "VALIDATION_ERROR", "message": "invalid limit", "details": {"limit":"…"} } }
+  { "error": { "code": "VALIDATION_ERROR", "message": "invalid limit", "details": { "limit": "…" } } }
   ```
 - **Mapowanie:**
   - Walidacja parametrów → `400`.
@@ -126,6 +148,7 @@ FOR SELECT USING (scope = 'global' OR owner_id = auth.uid());
 - **Logowanie:** `level=info`, `requestId`, `userId`, `endpoint`, `params`, `duration_ms`.
 
 ## 7. Rozważania dotyczące wydajności
+
 - **Keyset > OFFSET** dla skalowalności; indeksy z `updated_at DESC, id DESC`.
 - **N+1** nie występuje (pojedyncze źródło).
 - **Rozmiar payloadu**: pola zawsze present (nie opcjonalne filtry w MVP).
@@ -133,6 +156,7 @@ FOR SELECT USING (scope = 'global' OR owner_id = auth.uid());
 - **Plan zapytań**: monitorować `EXPLAIN ANALYZE` przy rosnącej liczbie rekordów.
 
 ## 8. Etapy wdrożenia
+
 1. **DB**: utwórz/zmodyfikuj widok `templates_effective` (jak wyżej) i dopnij indeksy.
    - [ ] Sprawdź czy widok już istnieje w schemacie
    - [ ] Jeśli nie → dodaj SQL migrację z view + indeksami
@@ -154,6 +178,7 @@ FOR SELECT USING (scope = 'global' OR owner_id = auth.uid());
 ## 9. Snake_case Convention (MVP Decision)
 
 **JSON API zwraca snake_case** (REST standard):
+
 - DB: `owner_id`, `required_fields`, `origin_template_id`, `is_readonly`, `created_at`, `updated_at` ✅
 - JSON response: `owner_id`, `required_fields`, `origin_template_id`, `is_readonly`, `created_at`, `updated_at` ✅
 - TypeScript DTOs: snake_case w `types.ts` ✅

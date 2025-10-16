@@ -45,7 +45,10 @@ export async function POST(context: { request: Request }): Promise<Response> {
     // 1. Validate Content-Type
     const contentType = request.headers.get("content-type");
     if (!contentType?.includes("application/json")) {
-      const error: any = new Error("invalid_content_type");
+      const error = new Error("invalid_content_type") as Error & {
+        status: number;
+        code: string;
+      };
       error.status = 400;
       error.code = "VALIDATION_ERROR";
       throw error;
@@ -55,8 +58,11 @@ export async function POST(context: { request: Request }): Promise<Response> {
     let body: unknown;
     try {
       body = await request.json();
-    } catch (parseErr) {
-      const error: any = new Error("invalid_json");
+    } catch {
+      const error = new Error("invalid_json") as Error & {
+        status: number;
+        code: string;
+      };
       error.status = 400;
       error.code = "VALIDATION_ERROR";
       throw error;
@@ -103,8 +109,9 @@ export async function POST(context: { request: Request }): Promise<Response> {
         "X-Request-ID": requestId,
       },
     });
-  } catch (err: any) {
+  } catch (err: unknown) {
     // Map error to HTTP response
+    const typedErr = err as Error & { code?: string; message?: string };
     const { status, body, headers } = errorToHttpResponse(err);
 
     // Audit failure
@@ -113,7 +120,7 @@ export async function POST(context: { request: Request }): Promise<Response> {
       ip,
       userAgent: request.headers.get("user-agent") ?? undefined,
       status: "failure",
-      reason: err.code || err.message || "unknown",
+      reason: typedErr.code || typedErr.message || "unknown",
     });
 
     // Return error response

@@ -12,7 +12,11 @@ export interface AppError extends Error {
  * Check if an error is an AppError with proper structure.
  */
 export function isAppError(err: unknown): err is AppError {
-  return err instanceof Error && typeof (err as any).status === "number" && typeof (err as any).code === "string";
+  return (
+    err instanceof Error &&
+    typeof (err as Record<string, unknown>).status === "number" &&
+    typeof (err as Record<string, unknown>).code === "string"
+  );
 }
 
 /**

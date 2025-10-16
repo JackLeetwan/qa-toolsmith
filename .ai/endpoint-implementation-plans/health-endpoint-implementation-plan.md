@@ -27,6 +27,7 @@ This type is already defined in the `src/types/types.ts` file.
 - Status Code: 200 OK for successful response
 - Content-Type: application/json
 - Response Body:
+
 ```json
 {
   "status": "ok"
@@ -79,16 +80,13 @@ export const prerender = false;
 export const GET: APIRoute = async () => {
   // Simple implementation without additional checks
   const health: HealthDTO = { status: "ok" };
-  
-  return new Response(
-    JSON.stringify(health),
-    {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json"
-      }
-    }
-  );
+
+  return new Response(JSON.stringify(health), {
+    status: 200,
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
 };
 ```
 
@@ -120,37 +118,33 @@ export const prerender = false;
 export const GET: APIRoute = async () => {
   try {
     const health = HealthService.getHealth();
-    
-    return new Response(
-      JSON.stringify(health),
-      {
-        status: 200,
-        headers: {
-          "Content-Type": "application/json"
-        }
-      }
-    );
+
+    return new Response(JSON.stringify(health), {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
   } catch (error) {
     console.error("Health check failed:", error);
-    
+
     return new Response(
       JSON.stringify({
         error: {
           code: "internal_server_error",
-          message: "An unexpected server error occurred"
-        }
+          message: "An unexpected server error occurred",
+        },
       }),
       {
         status: 500,
         headers: {
-          "Content-Type": "application/json"
-        }
+          "Content-Type": "application/json",
+        },
       }
     );
   }
 };
 ```
-
 
 4. Add documentation for the endpoint in README or other appropriate location
 

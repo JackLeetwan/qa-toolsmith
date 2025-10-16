@@ -1,21 +1,24 @@
 # API Endpoint Implementation Plan: POST `/auth/login`
 
 ## 1. Przegląd punktu końcowego
+
 Endpoint logowania proxy'uje żądanie do Supabase Auth (ścieżka **password grant**), stosuje **rate‑limit per IP**, a następnie zwraca **token JWT** oraz rekord **profilu** z tabeli `profiles`. Celem jest bezpieczne, szybkie logowanie oraz spójny kontrakt odpowiedzi dla frontendu (Astro + React). Endpoint działa po stronie serwera (Node/Edge), nigdy w przeglądarce. **MVP Scope:** Bearer JWT only (no cookies, no MFA, no refresh_token).
 
 ## 2. Szczegóły żądania
+
 - **Metoda HTTP:** `POST`
 - **URL:** `/auth/login`
 - **Nagłówki wejściowe:**
   - `Content-Type: application/json`
-  - `X-Request-ID` *(opcjonalny; jeśli brak – generowany serwerowo)*
+  - `X-Request-ID` _(opcjonalny; jeśli brak – generowany serwerowo)_
 - **Body (JSON):**
   - **Wymagane:**
-    - `email: string` *(RFC 5322; przechowywany i przetwarzany w lowercase)*
-    - `password: string` *(min 8, max 128)*
+    - `email: string` _(RFC 5322; przechowywany i przetwarzany w lowercase)_
+    - `password: string` _(min 8, max 128)_
   - **Zakaz:**
-    - Brak pól: `mfa_type`, `mfa_code`, `captcha_token`, `remember_me` *(nie w MVP)*
+    - Brak pól: `mfa_type`, `mfa_code`, `captcha_token`, `remember_me` _(nie w MVP)_
 - **Przykład żądania:**
+
 ```json
 {
   "email": "user@example.com",
@@ -24,7 +27,9 @@ Endpoint logowania proxy'uje żądanie do Supabase Auth (ścieżka **password gr
 ```
 
 ## 3. Wykorzystywane typy (DTO + Command)
+
 **LoginRequest** (z `types.ts`)
+
 ```ts
 export interface LoginRequest {
   email: string;
@@ -32,7 +37,8 @@ export interface LoginRequest {
 }
 ```
 
-**LoginCommand** *(wewnętrzny model do serwisu – wzbogacony o IP/UA)*
+**LoginCommand** _(wewnętrzny model do serwisu – wzbogacony o IP/UA)_
+
 ```ts
 export type LoginCommand = LoginRequest & {
   ip: string;
@@ -40,37 +46,41 @@ export type LoginCommand = LoginRequest & {
 };
 ```
 
-**ProfileDTO** *(odwzorowuje tabelę `profiles`)*
+**ProfileDTO** _(odwzorowuje tabelę `profiles`)_
+
 ```ts
 export interface ProfileDTO {
-  id: string;           // uuid = auth.users.id
-  email: string;        // citext
-  role: 'admin' | 'user';
-  created_at: string;   // ISO
-  updated_at: string;   // ISO
+  id: string; // uuid = auth.users.id
+  email: string; // citext
+  role: "admin" | "user";
+  created_at: string; // ISO
+  updated_at: string; // ISO
 }
 ```
 
 **LoginResponse** (z `types.ts`) — **MVP Minimal**
+
 ```ts
 export interface LoginResponse {
-  access_token: string;  // Supabase JWT
+  access_token: string; // Supabase JWT
   profile: ProfileDTO;
 }
 ```
 
 **ErrorResponse** (z `types.ts`)
+
 ```ts
 export interface ErrorResponse {
   error: {
-    code: string;        // np. "invalid_credentials"
-    message: string;     // opis przyjazny dla użytkownika
+    code: string; // np. "invalid_credentials"
+    message: string; // opis przyjazny dla użytkownika
     details?: Record<string, Json>;
-  }
+  };
 }
 ```
 
 ## 4. Szczegóły odpowiedzi
+
 - **200 OK** – poprawne logowanie
   - Body: `LoginResponse`
   - **BRAK cookies w MVP** (tylko Bearer JWT w response)
@@ -80,6 +90,7 @@ export interface ErrorResponse {
 - **500 Internal Server Error** – błąd serwera / błąd dostawcy (Supabase)
 
 **Przykład 200:**
+
 ```json
 {
   "access_token": "eyJhbGciOi...",
@@ -94,6 +105,7 @@ export interface ErrorResponse {
 ```
 
 ## 5. Przepływ danych
+
 1. **Walidacja wejścia** (Zod/Valibot): email, password; sprawdzenie `Content-Type`.
 2. **Rate‑limit per IP**: `RateLimiterService.consume(ip)` — po przekroczeniu → 429 + `Retry-After`.
 3. **Logowanie do Supabase**: `AuthService.loginWithPassword(cmd)` z kluczem **service role** (server‑side).
@@ -103,6 +115,7 @@ export interface ErrorResponse {
 7. **Odpowiedź 200** (lub odpowiedni kod błędu).
 
 ## 6. Względy bezpieczeństwa
+
 - **Sekrety tylko na serwerze**: Supabase service key nigdy w kliencie.
 - **Brute‑force**: rate‑limit per IP + (opcjonalnie) czasowy lock po N porażkach.
 - **Bearer JWT**: `Authorization: Bearer <token>` w nagłówku; brak cookies w MVP.
@@ -113,27 +126,31 @@ export interface ErrorResponse {
 - **Spójność profilu**: krótki retry po udanym logowaniu (do 2–3 prób) w razie opóźnienia triggera.
 
 ## 7. Obsługa błędów
+
 Zwracaj `ErrorResponse` i właściwe kody:
+
 - **400** — `invalid_body` / `invalid_email` / `invalid_password`
 - **401** — `invalid_credentials`
-- **429** — `rate_limited` *(z nagłówkami `Retry-After`, `X-RateLimit-Remaining`)* 
+- **429** — `rate_limited` _(z nagłówkami `Retry-After`, `X-RateLimit-Remaining`)_
 - **500** — `auth_provider_error` / `unexpected_error`
 
 **Audyt logowań** — zapis do `usage_events`:
+
 ```ts
-await supabase.from('usage_events').insert({
-  user_id: userId ?? null,  // null jeśli login failure
-  kind: 'auth',
-  meta: { 
-    status: 'success' | 'failure',
-    reason: 'invalid_credentials' | 'rate_limited' | null,
-    ip_cidr: '203.0.113.0/24',  // masked
-    user_agent_hash: sha256(userAgent)
-  }
+await supabase.from("usage_events").insert({
+  user_id: userId ?? null, // null jeśli login failure
+  kind: "auth",
+  meta: {
+    status: "success" | "failure",
+    reason: "invalid_credentials" | "rate_limited" | null,
+    ip_cidr: "203.0.113.0/24", // masked
+    user_agent_hash: sha256(userAgent),
+  },
 });
 ```
 
 ## 8. Rozważania dotyczące wydajności
+
 - **Dwuwarstwowy rate‑limit**: middleware (edge/Nginx) + aplikacyjny (memory/Redis).
 - **Połączenia do DB**: pooling.
 - **Lekki payload**: wyłącznie niezbędne pola `profile`.
@@ -141,6 +158,7 @@ await supabase.from('usage_events').insert({
 - **Krótki backoff** przy pobieraniu profilu (np. 2×50 ms) – minimalizacja latencji i flakiness.
 
 ## 9. Etapy wdrożenia (kroki)
+
 1. **Konfiguracja**: sekrety Supabase (service key), Redis dla rate‑limit, CORS, zaufane proxy.
 2. **Serwisy**:
    - `RateLimiterService` (memory/Redis: klucz `rl:login:{ip}`, okno 60 s, limit 10).
@@ -166,7 +184,7 @@ export async function consume(ip: string) {
   const limit = 10;
   if (count > limit) {
     const ttl = await redis.ttl(key);
-    const err: any = new Error('rate_limited');
+    const err: any = new Error("rate_limited");
     err.status = 429;
     err.retryAfter = ttl > 0 ? ttl : 60;
     throw err;
@@ -179,11 +197,11 @@ export async function loginWithPassword(cmd: LoginCommand) {
   const { data, error } = await supabaseAuth.signInWithPassword({ email, password });
   if (error) {
     if (error.status === 400 || error.status === 401) {
-      const e: any = new Error('invalid_credentials');
+      const e: any = new Error("invalid_credentials");
       e.status = 401;
       throw e;
     }
-    const e: any = new Error('auth_provider_error');
+    const e: any = new Error("auth_provider_error");
     e.status = 500;
     throw e;
   }
@@ -193,11 +211,14 @@ export async function loginWithPassword(cmd: LoginCommand) {
 // profileService.ts
 export async function getByUserId(uid: string): Promise<ProfileDTO> {
   for (let i = 0; i < 3; i++) {
-    const row = await db.oneOrNone<ProfileDTO>('select id, email, role, created_at, updated_at from profiles where id=$1', [uid]);
+    const row = await db.oneOrNone<ProfileDTO>(
+      "select id, email, role, created_at, updated_at from profiles where id=$1",
+      [uid]
+    );
     if (row) return row;
-    await new Promise(r => setTimeout(r, 50));
+    await new Promise((r) => setTimeout(r, 50));
   }
-  const e: any = new Error('profile_not_ready');
+  const e: any = new Error("profile_not_ready");
   e.status = 500;
   throw e;
 }
@@ -207,32 +228,34 @@ export default async function handler(req: Request) {
   const requestId = getOrCreateRequestId(req);
   const ip = getTrustedIp(req, trustedProxies);
   try {
-    const body = await validate<LoginRequest>(req);        // Zod
-    await consume(ip);                                      // Rate-limit
+    const body = await validate<LoginRequest>(req); // Zod
+    await consume(ip); // Rate-limit
 
-    const { session } = await loginWithPassword({ ...body, ip, userAgent: req.headers.get('user-agent') ?? undefined });
-    const profile = await getByUserId(session.user.id);    // krótki retry
+    const { session } = await loginWithPassword({ ...body, ip, userAgent: req.headers.get("user-agent") ?? undefined });
+    const profile = await getByUserId(session.user.id); // krótki retry
 
     const resp: LoginResponse = {
       access_token: session.access_token,
-      profile
+      profile,
     };
 
-    return json(resp, { status: 200, headers: { 'X-Request-ID': requestId } });
-
+    return json(resp, { status: 200, headers: { "X-Request-ID": requestId } });
   } catch (err: any) {
     // Log to usage_events with kind='auth'
     await auditLoginAttempt(err, body?.email, ip);
-    
-    return json<ErrorResponse>({
-      error: {
-        code: err.message ?? 'unexpected_error',
-        message: mapErrorToMessage(err),
+
+    return json<ErrorResponse>(
+      {
+        error: {
+          code: err.message ?? "unexpected_error",
+          message: mapErrorToMessage(err),
+        },
+      },
+      {
+        status: err.status ?? 500,
+        headers: { "X-Request-ID": requestId, ...(err.retryAfter ? { "Retry-After": String(err.retryAfter) } : {}) },
       }
-    }, {
-      status: err.status ?? 500,
-      headers: { 'X-Request-ID': requestId, ...(err.retryAfter ? { 'Retry-After': String(err.retryAfter) } : {}) }
-    });
+    );
   }
 }
 ```
@@ -240,6 +263,7 @@ export default async function handler(req: Request) {
 ## Uwagi o MVP Scope
 
 **Nie w MVP (dodać w przyszłości):**
+
 - MFA (TOTP, WebAuthn, recovery codes)
 - Refresh tokens (JWT session-based only)
 - HttpOnly cookies (Bearer JWT in Authorization header)
@@ -247,5 +271,6 @@ export default async function handler(req: Request) {
 - Remember-me (session expires on browser close)
 
 **Audyt bez separate tabeli:**
+
 - Użyj istniejącej `usage_events` z `kind='auth'` (zamiast `auth_login_events`)
 - Trigger DB będzie logować zmiany (jeśli potrzebne)

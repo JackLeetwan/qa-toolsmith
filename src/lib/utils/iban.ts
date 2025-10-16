@@ -13,8 +13,7 @@ export function calculateIbanCheckDigits(country: string, bban: string): string 
 
   // Transliterate: A=10, B=11, ..., Z=35
   let numeric = "";
-  for (let i = 0; i < rearranged.length; i++) {
-    const char = rearranged[i];
+  for (const char of rearranged) {
     if (char >= "0" && char <= "9") {
       numeric += char;
     } else {
@@ -39,8 +38,8 @@ export function calculateIbanCheckDigits(country: string, bban: string): string 
  */
 function computeMod97(numeric: string): number {
   let remainder = 0;
-  for (let i = 0; i < numeric.length; i++) {
-    remainder = (remainder * 10 + parseInt(numeric[i], 10)) % 97;
+  for (const digit of numeric) {
+    remainder = (remainder * 10 + parseInt(digit, 10)) % 97;
   }
   return remainder;
 }

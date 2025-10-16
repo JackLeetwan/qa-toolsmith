@@ -49,6 +49,7 @@ export async function auditLoginAttempt(params: AuditLoginAttemptParams): Promis
     });
   } catch (err) {
     // Audit failure should not crash the request
+    // eslint-disable-next-line no-console
     console.error("[AuditError] Failed to record login attempt:", err);
   }
 }

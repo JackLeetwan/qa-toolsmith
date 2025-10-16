@@ -1,26 +1,30 @@
 # API Endpoint Implementation Plan: GET `/profiles/me`
 
 ## 1. Przegląd punktu końcowego
+
 Zwraca profil aktualnie zalogowanego użytkownika, bazując na sesji Supabase Auth. Dane pochodzą z tabeli `public.profiles` i są ograniczone przez RLS do rekordu użytkownika. Endpoint służy do wypełnienia kontekstu klienta (UI) oraz do serwerowych autoryzacji wtórnych.
 
 ## 2. Szczegóły żądania
+
 - Metoda HTTP: **GET**
 - Struktura URL: **/profiles/me**
 - Parametry:
-  - Wymagane: *(brak)*
-  - Opcjonalne: *(brak)*
+  - Wymagane: _(brak)_
+  - Opcjonalne: _(brak)_
 - Nagłówki istotne:
   - `Authorization: Bearer <access_token>` **lub** cookies Supabase (`sb-access-token`, `sb-refresh-token`) — zależnie od trybu uwierzytelnienia.
   - `Accept: application/json`
-- Request Body: *(brak)*
+- Request Body: _(brak)_
 
 ## 3. Wykorzystywane typy
+
 - **DTO:** `ProfileDTO` (z `types.ts`): `{ id: UUID, email: string, role: "admin"|"user", created_at: ISODateString, updated_at: ISODateString }`.
 - **Typy pomocnicze:** `UUID`, `ISODateString`, `Role`.
 - **Zod schema (nowa):**
   - `ProfileDtoSchema` – waliduje kształt odpowiedzi (mapowanie DB → DTO).
 
 ## 4. Szczegóły odpowiedzi
+
 - **200 OK** — `application/json`:
   ```json
   {
@@ -36,21 +40,23 @@ Zwraca profil aktualnie zalogowanego użytkownika, bazując na sesji Supabase Au
 - **500 Internal Server Error** — błąd DB/nieoczekiwany wyjątek.
 
 Nagłówki odpowiedzi:
+
 - `Cache-Control: private, max-age=30`
 - `ETag: "W/<hash(updated_at,id)>"` (opcjonalnie; pozwala na 304 z warunkiem `If-None-Match`)
 - `Vary: Authorization`
 - `Content-Type: application/json; charset=utf-8`
 
 ## 5. Przepływ danych
+
 1. **Middleware** (`src/middleware/index.ts`) tworzy klienta Supabase na podstawie cookies/nagłówka i umieszcza go w `locals.supabase` (zgodnie z `backend.mdc`).
 2. **Handler** `GET /profiles/me` odczytuje sesję: `const { data: { user } } = await locals.supabase.auth.getUser()`.
 3. Jeśli brak `user` → **401**.
 4. Zapytanie do `public.profiles` z RLS (klient użytkownika, nie service-role):
    ```ts
    const { data, error } = await locals.supabase
-     .from('profiles')
-     .select('id,email,role,created_at,updated_at')
-     .eq('id', user.id)
+     .from("profiles")
+     .select("id,email,role,created_at,updated_at")
+     .eq("id", user.id)
      .single();
    ```
 5. Na sukces: mapowanie do `ProfileDTO` i walidacja `ProfileDtoSchema.parse(data)`.
@@ -59,6 +65,7 @@ Nagłówki odpowiedzi:
 8. Na błąd DB → log + **500**.
 
 ## 6. Względy bezpieczeństwa
+
 - **Uwierzytelnienie:** tylko ważna sesja Supabase (Bearer lub cookies). Brak jawnych parametrów wejściowych.
 - **Autoryzacja i RLS:** zapytanie wykonywane klientem użytkownika → polityki RLS ograniczają widoczność do `auth.uid() = profiles.id`.
   - Polityka (przykład SQL):
@@ -73,6 +80,7 @@ Nagłówki odpowiedzi:
 - **Unikanie IDOR:** brak ID w ścieżce; zawsze `me` + RLS.
 
 ## 7. Obsługa błędów
+
 - Mapowanie na kody stanu:
   - Brak sesji/tokenu → **401** (`UNAUTHENTICATED`)
   - Rekord nie istnieje → **404** (`PROFILE_NOT_FOUND`)
@@ -85,6 +93,7 @@ Nagłówki odpowiedzi:
   - Brak dedykowanej tabeli logów w DB – nie zapisujemy do bazy w tym MVP.
 
 ## 8. Rozważania dotyczące wydajności
+
 - Ścieżka gorąca: pojedyncze zapytanie po kluczu głównym → O(1).
 - Indeksy: `profiles.id` = PK – wystarczające.
 - Odpowiedź mała (< 1 KB) – opóźnienia zdominowane przez sieć.
@@ -94,6 +103,7 @@ Nagłówki odpowiedzi:
   - Brak N+1 i joinów.
 
 ## 9. Etapy wdrożenia
+
 1. **Struktura plików**
    - `src/lib/services/profiles.service.ts`
    - `src/pages/api/profiles/me.ts` (Astro endpoint; `export const prerender = false`)
@@ -102,11 +112,11 @@ Nagłówki odpowiedzi:
    - `src/middleware/index.ts` (inicjalizacja `locals.supabase` zgodnie z `backend.mdc`)
 2. **Zod schema**
    ```ts
-   import { z } from 'zod';
+   import { z } from "zod";
    export const ProfileDtoSchema = z.object({
      id: z.string().uuid(),
      email: z.string().email().max(254),
-     role: z.enum(['admin','user']),
+     role: z.enum(["admin", "user"]),
      created_at: z.string().datetime(),
      updated_at: z.string().datetime(),
    });
@@ -115,15 +125,15 @@ Nagłówki odpowiedzi:
 3. **Service: `getMyProfile`**
    ```ts
    // src/lib/services/profiles.service.ts
-   import type { SupabaseClient } from '@supabase/supabase-js';
-   import { ProfileDtoSchema } from '../validation/profile.schema';
+   import type { SupabaseClient } from "@supabase/supabase-js";
+   import { ProfileDtoSchema } from "../validation/profile.schema";
    export async function getMyProfile(sb: SupabaseClient, userId: string) {
      const { data, error } = await sb
-       .from('profiles')
-       .select('id,email,role,created_at,updated_at')
-       .eq('id', userId)
+       .from("profiles")
+       .select("id,email,role,created_at,updated_at")
+       .eq("id", userId)
        .single();
-     if (error) throw new Error(`DB_ERROR:${error.code ?? 'UNKNOWN'}`);
+     if (error) throw new Error(`DB_ERROR:${error.code ?? "UNKNOWN"}`);
      if (!data) return null;
      return ProfileDtoSchema.parse(data);
    }
@@ -131,32 +141,41 @@ Nagłówki odpowiedzi:
 4. **Endpoint**
    ```ts
    // src/pages/api/profiles/me.ts
-   import type { APIContext } from 'astro';
-   import { getMyProfile } from '@/lib/services/profiles.service';
+   import type { APIContext } from "astro";
+   import { getMyProfile } from "@/lib/services/profiles.service";
    export const prerender = false;
    export async function GET(ctx: APIContext) {
      const sb = ctx.locals.supabase;
-     const { data: { user }, error: authError } = await sb.auth.getUser();
+     const {
+       data: { user },
+       error: authError,
+     } = await sb.auth.getUser();
      if (authError || !user) {
-       return new Response(JSON.stringify({ error: { code: 'UNAUTHENTICATED', message: 'Sign in required' } }), { status: 401 });
+       return new Response(JSON.stringify({ error: { code: "UNAUTHENTICATED", message: "Sign in required" } }), {
+         status: 401,
+       });
      }
      try {
        const profile = await getMyProfile(sb, user.id);
        if (!profile) {
-         return new Response(JSON.stringify({ error: { code: 'INTERNAL', message: 'Profile missing' } }), { status: 404 });
+         return new Response(JSON.stringify({ error: { code: "INTERNAL", message: "Profile missing" } }), {
+           status: 404,
+         });
        }
        const body = JSON.stringify(profile);
        return new Response(body, {
          status: 200,
          headers: {
-           'Content-Type': 'application/json; charset=utf-8',
-           'Cache-Control': 'private, max-age=30',
-           'Vary': 'Authorization',
-         }
+           "Content-Type": "application/json; charset=utf-8",
+           "Cache-Control": "private, max-age=30",
+           Vary: "Authorization",
+         },
        });
      } catch (e) {
-       console.error('[profiles/me]', e);
-       return new Response(JSON.stringify({ error: { code: 'INTERNAL', message: 'Unexpected error' } }), { status: 500 });
+       console.error("[profiles/me]", e);
+       return new Response(JSON.stringify({ error: { code: "INTERNAL", message: "Unexpected error" } }), {
+         status: 500,
+       });
      }
    }
    ```
@@ -180,6 +199,6 @@ Nagłówki odpowiedzi:
    - Stabilny kształt DTO, walidowany Zodem.
    - Brak koperty odpowiedzi (czysty DTO) — zgodnie ze specyfikacją.
 10. **Release**
-   - Deploy (GitHub Actions → DO) + migracje SQL RLS (jeśli wymagane).
-   - Smoke test: curl z ważnym tokenem + weryfikacja cache (`Vary`, `Cache-Control`).
 
+- Deploy (GitHub Actions → DO) + migracje SQL RLS (jeśli wymagane).
+- Smoke test: curl z ważnym tokenem + weryfikacja cache (`Vary`, `Cache-Control`).

@@ -1,11 +1,13 @@
 # API Endpoint Implementation Plan: PATCH `/profiles/me`
 
 ## 1. Przegląd punktu końcowego
+
 Aktualizacja własnego profilu zalogowanego użytkownika w zakresie **nieuprzywilejowanych pól** (bez zmiany `role`). W tym MVP dopuszczamy inicjację **zmiany adresu e‑mail** (przy zachowaniu mechanizmu weryfikacji e‑mail w Supabase). Odczyt zaktualizowanego profilu zwracamy w odpowiedzi, jeśli zmiana nie wymaga potwierdzenia; w przeciwnym razie zwracamy status „pending verification" (202 Accepted).
 
 **MVP Scope:** Only email changes; rate-limit via middleware per IP+userId.
 
 ## 2. Szczegóły żądania
+
 - **Metoda HTTP:** `PATCH`
 - **URL:** `/profiles/me`
 - **Nagłówki:**
@@ -13,12 +15,14 @@ Aktualizacja własnego profilu zalogowanego użytkownika w zakresie **nieuprzywi
   - `Content-Type: application/json`
 - **Parametry URL:** brak
 - **Request Body (JSON):**
+
   ```jsonc
   {
     // wszystkie pola opcjonalne; tylko nieuprzywilejowane
-    "email": "user@example.com" // opcjonalnie; zmiana wymaga potwierdzenia
+    "email": "user@example.com", // opcjonalnie; zmiana wymaga potwierdzenia
   }
   ```
+
   **Zabronione pola:** `role`, `org_id`, `created_at`, `updated_at`, `id`.
 
 - **Walidacja wejścia:**
@@ -27,7 +31,9 @@ Aktualizacja własnego profilu zalogowanego użytkownika w zakresie **nieuprzywi
   - jeżeli body puste → `400 Bad Request` (brak zmian).
 
 ## 3. Wykorzystywane typy
+
 - **DTO** (z `types.ts`)
+
   ```ts
   export type ProfileDTO = Pick<ProfileRow, "id" | "email" | "created_at" | "updated_at"> & {
     role: Role;
@@ -35,6 +41,7 @@ Aktualizacja własnego profilu zalogowanego użytkownika w zakresie **nieuprzywi
   ```
 
 - **Command model** (z `types.ts`)
+
   ```ts
   export type UpdateMyProfileCommand = Partial<Pick<ProfileRow, "email">>;
   ```
@@ -48,7 +55,9 @@ Aktualizacja własnego profilu zalogowanego użytkownika w zakresie **nieuprzywi
   ```
 
 ## 4. Szczegóły odpowiedzi
+
 - **200 OK** – zmiana wykonana (nie wymagająca potwierdzenia email):
+
   ```json
   {
     "id": "uuid",
@@ -60,6 +69,7 @@ Aktualizacja własnego profilu zalogowanego użytkownika w zakresie **nieuprzywi
   ```
 
 - **202 Accepted** – inicjacja zmiany e‑mail, wymagane potwierdzenie przez link w emailu:
+
   ```json
   {
     "status": "pending_verification",
@@ -77,6 +87,7 @@ Aktualizacja własnego profilu zalogowanego użytkownika w zakresie **nieuprzywi
     }
   }
   ```
+
   - `400` invalid payload / unknown field / puste body
   - `401` brak JWT / wygasła sesja
   - `403` próba modyfikacji pól uprzywilejowanych
@@ -85,6 +96,7 @@ Aktualizacja własnego profilu zalogowanego użytkownika w zakresie **nieuprzywi
   - `500` błąd serwera
 
 ## 5. Przepływ danych
+
 1. **Auth**: Middleware weryfikuje `Authorization: Bearer <JWT>` i pobiera `userId = auth.uid()`.
 2. **Rate-limit check**: Middleware sprawdza limit (5–10 prób/15min per IP+userId) → 429 jeśli exceeded.
 3. **Walidacja**: JSON → `UpdateMyProfileCommand`; odrzuć nieznane pola; waliduj `email`.
@@ -100,6 +112,7 @@ Aktualizacja własnego profilu zalogowanego użytkownika w zakresie **nieuprzywi
 7. **Zwróć odpowiedź:** 202 (pending) lub 200 (jeśli brak zmiany).
 
 ## 6. Względy bezpieczeństwa
+
 - **RLS (Row‑Level Security) na `profiles`:**
   - `SELECT`/`UPDATE` tylko gdy `id = auth.uid()`.
   - Trigger lub middleware blokują zmianę `role`, `org_id`, `created_at`, `updated_at`.
@@ -111,28 +124,32 @@ Aktualizacja własnego profilu zalogowanego użytkownika w zakresie **nieuprzywi
 - **Walidacja danych**: canonicalization e‑mail (lowercase), ogranicz długości; sanity‑check nagłówków.
 
 ## 7. Obsługa błędów (mapowanie)
-| Sytuacja | HTTP | `error.code` | Uwagi |
-|----------|-----:|---|---|
-| Brak/niepoprawny JWT | 401 | `UNAUTHENTICATED` | Nie ujawniaj szczegółów |
-| Puste body / same nieznane pola | 400 | `NO_CHANGES` | |
-| Próba zmiany pól zabronionych | 403 | `FORBIDDEN_FIELD` | |
-| Zły format e‑mail | 400 | `VALIDATION_ERROR` | details.email |
-| E‑mail zajęty (Auth) | 409 | `EMAIL_TAKEN` | |
-| Przekroczony rate-limit | 429 | `RATE_LIMITED` | Retry‑After header |
-| Błąd transakcji / triggera | 500 | `INTERNAL` | |
+
+| Sytuacja                        | HTTP | `error.code`       | Uwagi                   |
+| ------------------------------- | ---: | ------------------ | ----------------------- |
+| Brak/niepoprawny JWT            |  401 | `UNAUTHENTICATED`  | Nie ujawniaj szczegółów |
+| Puste body / same nieznane pola |  400 | `NO_CHANGES`       |                         |
+| Próba zmiany pól zabronionych   |  403 | `FORBIDDEN_FIELD`  |                         |
+| Zły format e‑mail               |  400 | `VALIDATION_ERROR` | details.email           |
+| E‑mail zajęty (Auth)            |  409 | `EMAIL_TAKEN`      |                         |
+| Przekroczony rate-limit         |  429 | `RATE_LIMITED`     | Retry‑After header      |
+| Błąd transakcji / triggera      |  500 | `INTERNAL`         |                         |
 
 **Logowanie:** ustrukturyzowane logi (JSON) z polami: `ts`, `requestId`, `userId`, `path`, `error.code`, `http_status`. (Brak dedykowanej tabeli — na razie stdout/stderr.)
 
 ## 8. Rozważania dotyczące wydajności
+
 - Operacja jednostkowa – brak gorących ścieżek.
 - **Indeksy/ograniczenia:** `profiles.email` już `UNIQUE (citext)` – kolizje obsługiwane na poziomie Auth + DB constraint.
 - **Zasoby zewnętrzne:** połączenie do Supabase Auth – timeout (np. 5s) i retry z backoff przy `5xx`.
 - **Synchronizacja email:** trigger DB jest O(1), webhook może mieć opóźnienie (ok dla MVP).
 
 ## 9. Etapy wdrożenia
+
 1. **DB (Migrations)**
    - ✅ RLS na `profiles` (`USING/WITH CHECK id = auth.uid()`) — już powinno być
    - ✅ Trigger `AFTER UPDATE OF email ON auth.users` → sync do `profiles.email`:
+
      ```sql
      CREATE OR REPLACE FUNCTION public.sync_auth_email_to_profile()
      RETURNS TRIGGER AS $$
@@ -141,7 +158,7 @@ Aktualizacja własnego profilu zalogowanego użytkownika w zakresie **nieuprzywi
        RETURN NEW;
      END;
      $$ LANGUAGE plpgsql;
-     
+
      DROP TRIGGER IF EXISTS sync_email_on_auth_user_update ON auth.users;
      CREATE TRIGGER sync_email_on_auth_user_update
      AFTER UPDATE OF email ON auth.users
@@ -193,9 +210,11 @@ Aktualizacja własnego profilu zalogowanego użytkownika w zakresie **nieuprzywi
 ## 10. MVP Decisions
 
 **Nie w MVP (przyszłość):**
+
 - Verifying email change link (Supabase Auth obsługuje — tylko dokumentuj)
 - Resend verification email endpoint (add later)
 - Email change reason/audit table (use `usage_events` z `kind='profile'`)
 
 **Audyt bez separate tabeli:**
+
 - Trigger DB + logi do stdout/stderr (strukturalne JSON)

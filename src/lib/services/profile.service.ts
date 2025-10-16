@@ -42,7 +42,10 @@ export async function getByUserId(userId: string): Promise<ProfileDTO> {
         }
 
         // Out of retries
-        const fetchError: any = new Error("profile_not_ready");
+        const fetchError = new Error("profile_not_ready") as Error & {
+          status: number;
+          code: string;
+        };
         fetchError.status = 500;
         fetchError.code = "INTERNAL";
         throw fetchError;
@@ -54,7 +57,10 @@ export async function getByUserId(userId: string): Promise<ProfileDTO> {
           continue;
         }
 
-        const noDataError: any = new Error("profile_not_ready");
+        const noDataError = new Error("profile_not_ready") as Error & {
+          status: number;
+          code: string;
+        };
         noDataError.status = 500;
         noDataError.code = "INTERNAL";
         throw noDataError;
@@ -68,9 +74,10 @@ export async function getByUserId(userId: string): Promise<ProfileDTO> {
         created_at: data.created_at,
         updated_at: data.updated_at,
       };
-    } catch (err: any) {
+    } catch (err: unknown) {
       // If already a wrapped error, rethrow on last attempt
-      if (err.code && err.status) {
+      const typedErr = err as Error & { code?: string; status?: number };
+      if (typedErr.code && typedErr.status) {
         if (attempt === PROFILE_RETRY_ATTEMPTS - 1) {
           throw err;
         }
@@ -81,7 +88,11 @@ export async function getByUserId(userId: string): Promise<ProfileDTO> {
 
       // Unexpected error
       if (attempt === PROFILE_RETRY_ATTEMPTS - 1) {
-        const unexpectedError: any = new Error("profile_fetch_error");
+        const unexpectedError = new Error("profile_fetch_error") as Error & {
+          status: number;
+          code: string;
+          originalError: unknown;
+        };
         unexpectedError.status = 500;
         unexpectedError.code = "INTERNAL";
         unexpectedError.originalError = err;
@@ -93,7 +104,10 @@ export async function getByUserId(userId: string): Promise<ProfileDTO> {
   }
 
   // Should not reach here, but fail gracefully
-  const finalError: any = new Error("profile_not_ready");
+  const finalError = new Error("profile_not_ready") as Error & {
+    status: number;
+    code: string;
+  };
   finalError.status = 500;
   finalError.code = "INTERNAL";
   throw finalError;

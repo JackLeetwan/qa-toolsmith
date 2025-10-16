@@ -42,10 +42,10 @@ curl -X GET https://your-qa-toolsmith-instance.com/api/health
 ### JavaScript (Fetch API)
 
 ```javascript
-fetch('https://your-qa-toolsmith-instance.com/api/health')
-  .then(response => response.json())
-  .then(data => console.log(data))
-  .catch(error => console.error('Health check failed:', error));
+fetch("https://your-qa-toolsmith-instance.com/api/health")
+  .then((response) => response.json())
+  .then((data) => console.log(data))
+  .catch((error) => console.error("Health check failed:", error));
 ```
 
 ## Notes
