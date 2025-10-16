@@ -51,7 +51,7 @@ export type CharterStatus = "active" | "closed" | "idle";
 export type CharterNoteTag = "bug" | "idea" | "question" | "risk";
 
 /** Generators */
-export type IbanCountry = "DE" | "AT";
+export type IbanCountry = "DE" | "AT" | "PL";
 export type LocalDataCountry = "PL" | "DE" | "AT";
 export type GeneratorKind = "address" | "phone" | "plates" | "email" | "company" | "card" | "guid" | "string";
 

@@ -635,6 +635,21 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
 
+-- sync email changes from auth.users to profiles
+create or replace function public.sync_auth_email_to_profile()
+returns trigger as $$
+begin
+  update public.profiles
+  set email = new.email, updated_at = now()
+  where id = new.id;
+  return new;
+end;
+$$ language plpgsql;
+
+create trigger sync_email_on_auth_user_update
+  after update of email on auth.users
+  for each row execute function public.sync_auth_email_to_profile();
+
 -- restrict access to admin views
 alter view public.admin_stats_users set (security_invoker = on);
 alter view public.admin_stats_templates set (security_invoker = on);
