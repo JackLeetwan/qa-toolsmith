@@ -17,13 +17,15 @@ const { title = "10x Astro Starter" } = Astro.props;
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
     <script is:inline>
+      /* eslint-disable */
       // Prevent FOUC (Flash of Unstyled Content) by applying theme before render
-      (function() {
-        const theme = localStorage.getItem('theme');
-        if (theme === 'dark') {
-          document.documentElement.classList.add('dark');
+      (function () {
+        const theme = localStorage.getItem("theme");
+        if (theme === "dark") {
+          document.documentElement.classList.add("dark");
         }
       })();
+      /* eslint-enable */
     </script>
   </head>
   <body>
