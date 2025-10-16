@@ -1,16 +1,29 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import type { GeneratorMeta } from "@/types/types";
-import * as LucideIcons from "lucide-react";
+import { CreditCard, Phone, MapPin, Car, Mail, Building2, Wallet, Hash, Type, HelpCircle } from "lucide-react";
 
 interface GeneratorCardProps {
   item: GeneratorMeta;
 }
 
+// Map of icon names to icon components
+const iconMap: Record<string, typeof HelpCircle> = {
+  CreditCard,
+  Phone,
+  MapPin,
+  Car,
+  Mail,
+  Building2,
+  Wallet,
+  Hash,
+  Type,
+  HelpCircle,
+};
+
 export default function GeneratorCard({ item }: GeneratorCardProps) {
   // Dynamically get the icon component
-  const IconComponent =
-    (LucideIcons as unknown as Record<string, typeof LucideIcons.HelpCircle>)[item.icon] || LucideIcons.HelpCircle;
+  const IconComponent = iconMap[item.icon] || HelpCircle;
 
   return (
     <Card className="group hover:shadow-lg transition-shadow duration-200 cursor-pointer" tabIndex={0}>
