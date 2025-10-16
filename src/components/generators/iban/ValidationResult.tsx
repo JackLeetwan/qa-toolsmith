@@ -1,5 +1,6 @@
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { CheckCircle2, XCircle } from "lucide-react";
+import { cn } from "@/lib/utils";
 import type { IbanValidationResponse } from "@/types/types";
 
 interface ValidationResultProps {
@@ -21,7 +22,7 @@ export default function ValidationResult({ data }: ValidationResultProps) {
           <XCircle className="h-5 w-5" aria-hidden="true" />
         )}
         <div className="flex-1">
-          <AlertTitle className={data.valid ? "text-green-900" : ""}>
+          <AlertTitle className={cn(data.valid ? "text-green-900" : "", "line-clamp-none")}>
             {data.valid ? "Valid IBAN" : "Invalid IBAN"}
           </AlertTitle>
           {data.reason && (
