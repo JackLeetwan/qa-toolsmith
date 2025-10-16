@@ -1,6 +1,13 @@
+---
+import { ThemeToggle } from "@/components/ThemeToggle";
+---
+
 <div
-  class="relative w-full mx-auto min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-blue-900 p-4 sm:p-8"
+  class="relative w-full mx-auto min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-blue-900 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 p-4 sm:p-8"
 >
+  <div class="absolute top-8 right-8">
+    <ThemeToggle client:load />
+  </div>
   <div
     class="relative max-w-4xl mx-auto backdrop-blur-xl bg-gradient-to-b from-white/10 to-white/5 rounded-2xl shadow-2xl p-8 text-white border border-white/10"
   >
