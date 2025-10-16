@@ -14,6 +14,7 @@ export type ISODateString = string;
 /** Standard error codes used across the application */
 export type ErrorCode =
   | "VALIDATION_ERROR"
+  | "INVALID_CREDENTIALS"
   | "UNAUTHENTICATED"
   | "NO_CHANGES"
   | "FORBIDDEN_FIELD"

@@ -1,4 +1,5 @@
 import type { ErrorCode, ErrorResponse } from "../../types/types";
+import type { Json } from "../../db/database.types";
 import { ZodError } from "zod";
 
 export interface AppError extends Error {
@@ -12,11 +13,8 @@ export interface AppError extends Error {
  * Check if an error is an AppError with proper structure.
  */
 export function isAppError(err: unknown): err is AppError {
-  return (
-    err instanceof Error &&
-    typeof (err as Record<string, unknown>).status === "number" &&
-    typeof (err as Record<string, unknown>).code === "string"
-  );
+  const obj = err as unknown as Record<string, unknown>;
+  return err instanceof Error && typeof obj.status === "number" && typeof obj.code === "string";
 }
 
 /**
@@ -60,11 +58,7 @@ export function mapErrorToMessage(err: unknown): string {
 /**
  * Create a standardized error response.
  */
-export function createErrorResponse(
-  code: ErrorCode,
-  message: string,
-  details?: Record<string, unknown>
-): ErrorResponse {
+export function createErrorResponse(code: ErrorCode, message: string, details?: Record<string, Json>): ErrorResponse {
   return {
     error: {
       code,
