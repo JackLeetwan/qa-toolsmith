@@ -77,17 +77,37 @@ jobs:
           name: build-output
           path: dist/
       - name: Start server
-        run: npm run preview &
+        run: |
+          npm run preview &
+          SERVER_PID=$!
+          echo "SERVER_PID=$SERVER_PID" >> $GITHUB_ENV
         env:
           PORT: 3000
       - name: Wait for server to start
-        run: sleep 10
+        run: |
+          for i in {1..30}; do
+            if curl -f http://localhost:3000/api/health >/dev/null 2>&1; then
+              echo "Server is ready"
+              break
+            fi
+            echo "Waiting for server... ($i/30)"
+            sleep 2
+          done
       - name: Check health endpoint
         run: |
           response=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/api/health)
+          echo "Health endpoint response: $response"
           if [ "$response" != "200" ]; then
             echo "Health check failed with status code $response"
+            curl -v http://localhost:3000/api/health || true
             exit 1
           else
             echo "Health check passed with status code $response"
           fi
+      - name: Stop server
+        if: always()
+        run: |
+          if [ ! -z "$SERVER_PID" ]; then
+            kill $SERVER_PID || true
+          fi
+          pkill -f "astro preview" || true
