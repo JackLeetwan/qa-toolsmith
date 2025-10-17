@@ -1,0 +1,17 @@
+---
+import AuthLayout from "@/layouts/AuthLayout.astro";
+import LoginForm from "@/components/auth/LoginForm";
+
+// Redirect if already logged in
+const { user } = Astro.locals;
+
+if (user) {
+  const url = new URL(Astro.request.url);
+  const nextUrl = url.searchParams.get("next") || "/";
+  return Astro.redirect(nextUrl);
+}
+---
+
+<AuthLayout title="Logowanie" description="Zaloguj się do swojego konta">
+  <LoginForm client:load />
+</AuthLayout>

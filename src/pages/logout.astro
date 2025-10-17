@@ -1,0 +1,12 @@
+---
+// Server-side logout
+const { user } = Astro.locals;
+if (user) {
+  // User is logged in, we'll handle logout via API on client side
+  // For now, redirect to home - the TopBar will handle the actual logout
+}
+return Astro.redirect("/");
+---
+
+<!-- This page should not be reached as we redirect immediately -->
+<div>Wylogowywanie...</div>

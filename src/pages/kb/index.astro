@@ -1,0 +1,22 @@
+---
+import PublicLayout from "../../layouts/PublicLayout.astro";
+
+// This page requires authentication - middleware will redirect if not logged in
+// const { user } = Astro.locals;
+---
+
+<PublicLayout title="Knowledge Base" description="Zarządzaj swoją bazą wiedzy">
+  <div class="max-w-4xl mx-auto">
+    <div class="text-center py-12">
+      <h1 class="text-3xl font-bold mb-4">Knowledge Base</h1>
+      <p class="text-muted-foreground mb-8">Zarządzaj swoją bazą wiedzy - dodawaj linki, notatki i tagi.</p>
+      <div class="bg-muted/50 rounded-lg p-8">
+        <p class="text-lg mb-4">🚧 W budowie</p>
+        <p class="text-muted-foreground">
+          Funkcja Knowledge Base będzie dostępna wkrótce. Będziesz mógł dodawać linki, notatki i tagi, a także
+          wyszukiwać po pełnym tekście.
+        </p>
+      </div>
+    </div>
+  </div>
+</PublicLayout>

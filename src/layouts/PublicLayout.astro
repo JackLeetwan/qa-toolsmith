@@ -1,0 +1,51 @@
+---
+import Layout from "./Layout.astro";
+import TopBar from "@/components/TopBar";
+
+interface Props {
+  title: string;
+  description?: string;
+  user?: {
+    id: string;
+    email: string;
+    role: "admin" | "user";
+  } | null;
+}
+
+const { title, description, user: propUser } = Astro.props;
+const { user: localsUser } = Astro.locals;
+
+// Use user from locals (SSR) or props (fallback)
+const user = localsUser || propUser;
+---
+
+<Layout title={`${title} | QA Toolsmith`}>
+  <div class="min-h-screen bg-background">
+    <TopBar client:load user={user} />
+
+    {
+      title !== "QA Toolsmith" && (
+        <div class="container mx-auto px-4 py-6">
+          <h1 class="text-3xl font-bold tracking-tight">{title}</h1>
+          {description && <p class="mt-2 text-muted-foreground max-w-3xl">{description}</p>}
+        </div>
+      )
+    }
+
+    <main id="main-content" tabindex="-1" class="container mx-auto px-4 py-8">
+      <slot />
+    </main>
+  </div>
+</Layout>
+
+<script>
+  /* eslint-disable */
+  // Focus management: move focus to main content after navigation
+  document.addEventListener("astro:page-load", () => {
+    const mainContent = document.getElementById("main-content");
+    if (mainContent) {
+      mainContent.focus();
+    }
+  });
+  /* eslint-enable */
+</script>

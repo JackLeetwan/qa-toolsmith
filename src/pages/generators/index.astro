@@ -1,13 +1,13 @@
 ---
-import GeneratorLayout from "../../layouts/GeneratorLayout.astro";
+import PublicLayout from "../../layouts/PublicLayout.astro";
 import GeneratorsList from "../../components/generators/GeneratorsList";
 
 export const prerender = false;
 ---
 
-<GeneratorLayout
+<PublicLayout
   title="Generators Hub"
   description="Quick access to test data generators and validators. Generate synthetic data for testing with country-specific formats."
 >
   <GeneratorsList client:load />
-</GeneratorLayout>
+</PublicLayout>

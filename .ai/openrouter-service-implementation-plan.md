@@ -468,6 +468,7 @@ private handleError(error: any): never {
 ### Krok 8: Implementacja RateLimiter
 
 1. **Rate limiting per IP**
+
    ```typescript
    class RateLimiter {
      async checkLimit(ip: string): Promise<boolean> {
@@ -504,6 +505,7 @@ private handleError(error: any): never {
    ```
 
 2. **Integration tests**
+
    ```typescript
    describe("AI API endpoint", () => {
      it("should return 429 when daily limit exceeded", async () => {

@@ -95,6 +95,7 @@ Kryteria akceptacji:
 - Jeśli email już istnieje w systemie nie informujemy o tym.
 - Po poprawnym wypełnieniu formularza i weryfikacji danych konto jest aktywowane
 - Użytkownik otrzymuje potwierdzenie pomyślnej rejestracji i zostaje zalogowany
+- Logowanie i rejestracja odbywają się na dedykowanych stronach
 
 US-002
 Tytuł: Logowanie i sesja
@@ -104,6 +105,12 @@ Kryteria akceptacji:
 - Logowanie działa z ważnymi danymi, po podaniu prawidłowych danych, użytkownik ma dostęp do systemu.
 - Błędne dane skutkują komunikatem bez ujawniania, czy e‑mail istnieje, tylko nieprawidłowe dane.
 - Dane dotyczące logowania przechowywane są w bezpieczny sposób
+- Użytkownik może korzystać z generatorów danych i szablonów bez logowania, jednak nie może zapisywać danych, wyciągać historii swojej pracy, ani edytować formatek.
+- Użytkownik nie może korzystać z funkcji wymagających zapisu/edycji danych bez logowania do systemu.
+- Użytkownik może logować się do systemu poprzez przycisk w prawym górnym rogu.
+- Użytkownik może wylogować się z systemu poprzez przycisk w prawym górnym rogu.
+- Logowanie i rejestracja odbywają się na dedykowanych stronach
+- Odzyskiwnie hasła powinno być możliwe
 
 US-003
 Tytuł: Zarządzanie rolami

@@ -1,8 +1,15 @@
 ---
 import Welcome from "../components/Welcome.astro";
-import Layout from "../layouts/Layout.astro";
+import PublicLayout from "../layouts/PublicLayout.astro";
+
+// Get user from Astro.locals (set by middleware)
+const { user } = Astro.locals;
 ---
 
-<Layout>
-  <Welcome />
-</Layout>
+<PublicLayout
+  title="QA Toolsmith"
+  description="Standardizuj codzienną pracę testerów z naszymi narzędziami"
+  user={user}
+>
+  <Welcome user={user} />
+</PublicLayout>

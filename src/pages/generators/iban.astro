@@ -1,13 +1,13 @@
 ---
-import GeneratorLayout from "../../layouts/GeneratorLayout.astro";
+import PublicLayout from "../../layouts/PublicLayout.astro";
 import IBANGeneratorView from "../../components/generators/iban/IBANGeneratorView";
 
 export const prerender = false;
 ---
 
-<GeneratorLayout
+<PublicLayout
   title="IBAN Generator"
   description="Generate and validate IBAN numbers for Germany, Austria, and Poland. Use optional seed for deterministic generation in your test scenarios."
 >
   <IBANGeneratorView client:load />
-</GeneratorLayout>
+</PublicLayout>

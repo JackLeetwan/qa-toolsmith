@@ -1,98 +1,184 @@
 ---
-import { ThemeToggle } from "@/components/ThemeToggle";
+const { user } = Astro.props;
 ---
 
-<div
-  class="relative w-full mx-auto min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-blue-900 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 p-4 sm:p-8"
->
-  <div class="absolute top-8 right-8">
-    <ThemeToggle client:load />
-  </div>
-  <div
-    class="relative max-w-4xl mx-auto backdrop-blur-xl bg-gradient-to-b from-white/10 to-white/5 rounded-2xl shadow-2xl p-8 text-white border border-white/10"
-  >
-    <div class="space-y-8">
+<div class="w-full mx-auto">
+  <div class="relative max-w-6xl mx-auto rounded-2xl shadow-lg p-8 border bg-card text-card-foreground">
+    <div class="space-y-12">
+      <!-- Hero Section -->
       <div class="text-center">
-        <h1
-          class="text-6xl font-bold mb-4 bg-gradient-to-r from-blue-200 via-purple-200 to-pink-200 text-transparent bg-clip-text drop-shadow-lg"
-        >
-          Witaj w 10xDevs Astro Starter!
-        </h1>
-        <p class="text-xl text-blue-100/90 drop-shadow-md">
-          Ten projekt został zbudowany w oparciu o nowoczesny stack technologiczny:
+        <h1 class="text-6xl font-bold mb-6 text-primary">QA Toolsmith</h1>
+        <p class="text-2xl text-muted-foreground mb-4">Nowoczesne narzędzie dla testerów</p>
+        <p class="text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+          Standaryzuj codzienną pracę, automatyzuj powtarzalne zadania i podnieś jakość testowania z naszym kompletnym
+          zestawem narzędzi dla profesjonalnych testerów.
         </p>
       </div>
 
-      <div class="flex flex-col gap-6 max-w-2xl mx-auto">
-        <div class="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-lg rounded-xl p-6 border border-white/10">
-          <h2
-            class="text-2xl font-semibold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-purple-200"
-          >
-            Core
-          </h2>
-          <ul class="space-y-3">
-            <li class="flex items-center space-x-3">
-              <span class="font-mono bg-blue-900/50 px-3 py-1.5 rounded-lg text-blue-200 shadow-sm">Astro v5.5.5</span>
-              <span class="text-blue-100/90">- Metaframework do aplikacji webowych</span>
-            </li>
-            <li class="flex items-center space-x-3">
-              <span class="font-mono bg-blue-900/50 px-3 py-1.5 rounded-lg text-blue-200 shadow-sm">React v19</span>
-              <span class="text-blue-100/90">- Biblioteka UI do komponentów interaktywnych</span>
-            </li>
-            <li class="flex items-center space-x-3">
-              <span class="font-mono bg-blue-900/50 px-3 py-1.5 rounded-lg text-blue-200 shadow-sm">TypeScript</span>
-              <span class="text-blue-100/90">- Typowanie statyczne</span>
-            </li>
-          </ul>
+      <!-- Main Features Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+        <!-- Templates -->
+        <div class="bg-card/50 rounded-xl p-6 border hover:bg-muted/50 transition-all duration-300">
+          <div class="flex items-center mb-4">
+            <div class="w-12 h-12 bg-primary/20 rounded-lg flex items-center justify-center mr-4">
+              <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                ></path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-semibold text-primary">Szablony Raportów</h3>
+          </div>
+          <p class="text-muted-foreground mb-4">
+            Gotowe szablony dla raportów defektów UI i API z eksportem do Markdown. Szybkie tworzenie profesjonalnych
+            raportów w ≤3 minuty.
+          </p>
+          <a href="/templates" class="inline-flex items-center text-primary hover:text-primary/80 font-medium">
+            Przejdź do szablonów →
+          </a>
         </div>
 
-        <div class="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-lg rounded-xl p-6 border border-white/10">
-          <h2
-            class="text-2xl font-semibold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-purple-200"
-          >
-            Stylowanie
-          </h2>
-          <ul class="space-y-3">
-            <li class="flex items-center space-x-3">
-              <span class="font-mono bg-blue-900/50 px-3 py-1.5 rounded-lg text-blue-200 shadow-sm"
-                >Tailwind CSS v4</span
-              >
-              <span class="text-blue-100/90">- Utility-first CSS framework</span>
-            </li>
-          </ul>
+        <!-- Exploration Charters -->
+        <div class="bg-card/50 rounded-xl p-6 border hover:bg-muted/50 transition-all duration-300">
+          <div class="flex items-center mb-4">
+            <div class="w-12 h-12 bg-primary/20 rounded-lg flex items-center justify-center mr-4">
+              <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-semibold text-primary">Exploration Charters</h3>
+          </div>
+          <p class="text-muted-foreground mb-4">
+            Strukturyzowane sesje eksploracyjne z timerem, tagami i autosave. Skróty klawiszowe i eksport notatek do
+            Markdown.
+          </p>
+          <a href="/charters" class="inline-flex items-center text-primary hover:text-primary/80 font-medium">
+            Rozpocznij eksplorację →
+          </a>
         </div>
 
-        <div class="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-lg rounded-xl p-6 border border-white/10">
-          <h2
-            class="text-2xl font-semibold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-purple-200"
-          >
-            Statyczna analiza kodu
-          </h2>
-          <ul class="space-y-3">
-            <li class="flex items-center space-x-3">
-              <span class="font-mono bg-blue-900/50 px-3 py-1.5 rounded-lg text-blue-200 shadow-sm">ESLint v9</span>
-              <span class="text-blue-100/90">- Lintowanie kodu</span>
-            </li>
-            <li class="flex items-center space-x-3">
-              <span class="font-mono bg-blue-900/50 px-3 py-1.5 rounded-lg text-blue-200 shadow-sm">Prettier</span>
-              <span class="text-blue-100/90">- Formatowanie kodu</span>
-            </li>
-            <li class="flex items-center space-x-3">
-              <span class="font-mono bg-blue-900/50 px-3 py-1.5 rounded-lg text-blue-200 shadow-sm"
-                >Husky i Lint-staged</span
-              >
-              <span class="text-blue-100/90">- Automatyczna analiza kodu przed commitowaniem</span>
-            </li>
-          </ul>
+        <!-- Knowledge Base -->
+        <div class="bg-card/50 rounded-xl p-6 border hover:bg-muted/50 transition-all duration-300">
+          <div class="flex items-center mb-4">
+            <div class="w-12 h-12 bg-primary/20 rounded-lg flex items-center justify-center mr-4">
+              <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                ></path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-semibold text-primary">Baza Wiedzy</h3>
+          </div>
+          <p class="text-muted-foreground mb-4">
+            Centralne miejsce na linki, notatki i zasoby. Wyszukiwanie pełnotekstowe, tagi i eksport JSON dla łatwego
+            zarządzania wiedzą.
+          </p>
+          <a href="/kb" class="inline-flex items-center text-primary hover:text-primary/80 font-medium">
+            Przeglądaj bazę wiedzy →
+          </a>
+        </div>
+
+        <!-- Data Generators -->
+        <div class="bg-card/50 rounded-xl p-6 border hover:bg-muted/50 transition-all duration-300">
+          <div class="flex items-center mb-4">
+            <div class="w-12 h-12 bg-primary/20 rounded-lg flex items-center justify-center mr-4">
+              <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-semibold text-primary">Generatory Danych</h3>
+          </div>
+          <p class="text-muted-foreground mb-4">
+            IBAN (DE/AT), numery telefonów, adresy, e-maile, dane firm i karty płatnicze. Walidatory i historia
+            generowanych danych.
+          </p>
+          <a href="/generators" class="inline-flex items-center text-primary hover:text-primary/80 font-medium">
+            Generuj dane testowe →
+          </a>
         </div>
       </div>
 
-      <p class="text-lg text-center text-blue-100/90 mt-8 leading-relaxed">
-        Starter zawiera wszystko, czego potrzebujesz do rozpoczęcia tworzenia <br class="hidden sm:block" />
-        <span class="font-semibold bg-gradient-to-r from-blue-200 to-purple-200 text-transparent bg-clip-text"
-          >nowoczesnych aplikacji webowych!</span
-        >
-      </p>
+      <!-- Key Benefits -->
+      <div class="bg-card/50 rounded-xl p-8 border">
+        <h2 class="text-2xl font-semibold mb-6 text-center text-primary">Dlaczego QA Toolsmith?</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="text-center">
+            <div class="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"
+                ></path>
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-primary mb-2">Szybkość</h3>
+            <p class="text-muted-foreground">Raporty defektów w ≤3 minuty, gotowe szablony, skróty klawiszowe</p>
+          </div>
+          <div class="text-center">
+            <div class="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                ></path>
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-primary mb-2">Bezpieczeństwo</h3>
+            <p class="text-muted-foreground">Autoryzacja, role użytkowników, brak przechowywania prawdziwych danych</p>
+          </div>
+          <div class="text-center">
+            <div class="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                ></path>
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-primary mb-2">Prostota</h3>
+            <p class="text-muted-foreground">Intuicyjny interfejs, łatwe wdrożenie, brak zewnętrznych zależności</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Call to Action - Only shown for non-authenticated users -->
+      {
+        !user && (
+          <div class="text-center">
+            <p class="text-lg text-muted-foreground mb-6">Gotowy na nowoczesne testowanie?</p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+              <a
+                href="/auth/login"
+                class="inline-flex items-center px-8 py-3 bg-primary text-primary-foreground font-semibold rounded-lg hover:bg-primary/90 transition-all duration-300 shadow-lg"
+              >
+                Zaloguj się
+              </a>
+              <a
+                href="/auth/register"
+                class="inline-flex items-center px-8 py-3 bg-transparent border-2 border-primary text-primary font-semibold rounded-lg hover:bg-primary hover:text-primary-foreground transition-all duration-300"
+              >
+                Zarejestruj się
+              </a>
+            </div>
+          </div>
+        )
+      }
     </div>
   </div>
 </div>

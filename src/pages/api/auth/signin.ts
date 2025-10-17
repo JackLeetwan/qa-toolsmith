@@ -1,0 +1,108 @@
+import type { APIRoute } from "astro";
+import { createSupabaseServerInstance } from "../../../db/supabase.client.ts";
+import { z } from "zod";
+import { logger } from "../../../lib/utils/logger";
+
+const signinSchema = z.object({
+  email: z
+    .string()
+    .min(1, "Email jest wymagany")
+    .max(254, "Email jest za długi")
+    .email("Nieprawidłowy format email")
+    .transform((val) => val.trim().toLowerCase()),
+  password: z.string().min(1, "Hasło jest wymagane").max(72, "Hasło jest za długie"),
+});
+
+export const POST: APIRoute = async ({ request, cookies }) => {
+  const startTime = Date.now();
+  logger.debug("🔐 Signin API called at:", new Date().toISOString());
+
+  try {
+    const body = await request.json();
+    logger.debug("📥 Request body received:", { email: body.email, hasPassword: !!body.password });
+
+    const { email, password } = signinSchema.parse(body);
+    logger.debug("✅ Input validation passed for email:", email);
+
+    const supabase = createSupabaseServerInstance({
+      cookies,
+      headers: request.headers,
+    });
+    logger.debug("🔧 Supabase instance created");
+
+    logger.debug("🔑 Attempting signInWithPassword...");
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      logger.error("❌ Supabase auth error:", {
+        message: error.message,
+        status: error.status,
+        timestamp: new Date().toISOString(),
+      });
+
+      // Always return generic error message to avoid revealing if email exists
+      return new Response(
+        JSON.stringify({
+          error: "INVALID_CREDENTIALS",
+          message: "Nieprawidłowe dane logowania.",
+        }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    logger.debug("✅ Signin successful:", {
+      userId: data.user?.id,
+      email: data.user?.email,
+      sessionExists: !!data.session,
+      duration: Date.now() - startTime + "ms",
+    });
+
+    return new Response(
+      JSON.stringify({
+        user: {
+          id: data.user?.id || "",
+          email: data.user?.email || "",
+        },
+      }),
+      {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      logger.error("❌ Input validation error:", error.errors);
+      return new Response(
+        JSON.stringify({
+          error: "INVALID_INPUT",
+          message: "Nieprawidłowe dane wejściowe.",
+        }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    logger.error("❌ Unexpected signin error:", error, {
+      timestamp: new Date().toISOString(),
+      duration: Date.now() - startTime + "ms",
+    });
+    return new Response(
+      JSON.stringify({
+        error: "UNKNOWN_ERROR",
+        message: "Wystąpił błąd podczas logowania.",
+      }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  }
+};

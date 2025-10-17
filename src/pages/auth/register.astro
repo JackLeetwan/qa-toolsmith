@@ -1,0 +1,11 @@
+---
+import AuthLayout from "@/layouts/AuthLayout.astro";
+import RegisterForm from "@/components/auth/RegisterForm";
+
+// TODO: Add server-side redirect logic if user is already logged in
+// TODO: Add session checking in onRequest
+---
+
+<AuthLayout title="Rejestracja" description="Utwórz nowe konto w QA Toolsmith">
+  <RegisterForm client:load />
+</AuthLayout>

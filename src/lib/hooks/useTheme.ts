@@ -7,16 +7,17 @@ type Theme = "light" | "dark";
  * Provides theme value and setter function
  */
 export function useTheme() {
-  const [theme, setThemeState] = useState<Theme>(() => {
-    // Check if we're in the browser
-    if (typeof window === "undefined") {
-      return "light";
-    }
+  const [theme, setThemeState] = useState<Theme>("light");
+  const [, setMounted] = useState(false);
 
-    // Get theme from localStorage or default to light
+  // Initialize theme after component mounts to avoid hydration mismatch
+  useEffect(() => {
+    setMounted(true);
     const stored = localStorage.getItem("theme") as Theme | null;
-    return stored || "light";
-  });
+    if (stored) {
+      setThemeState(stored);
+    }
+  }, []);
 
   useEffect(() => {
     const root = document.documentElement;

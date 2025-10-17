@@ -1,5 +1,5 @@
 ---
-import GeneratorLayout from "../../layouts/GeneratorLayout.astro";
+import PublicLayout from "../../layouts/PublicLayout.astro";
 import GenericGeneratorView from "../../components/generators/generic/GenericGeneratorView";
 import type { GeneratorKind } from "../../types/types";
 
@@ -55,6 +55,6 @@ const generatorMeta: Record<GeneratorKind, { title: string; description: string 
 const meta = generatorMeta[kind as GeneratorKind];
 ---
 
-<GeneratorLayout title={meta.title} description={meta.description}>
+<PublicLayout title={meta.title} description={meta.description}>
   <GenericGeneratorView kind={kind as GeneratorKind} client:load />
-</GeneratorLayout>
+</PublicLayout>

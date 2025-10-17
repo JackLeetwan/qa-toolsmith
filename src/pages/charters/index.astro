@@ -1,0 +1,24 @@
+---
+import PublicLayout from "../../layouts/PublicLayout.astro";
+
+// This page requires authentication - middleware will redirect if not logged in
+// const { user } = Astro.locals;
+---
+
+<PublicLayout title="Exploration Charters" description="Zarządzaj sesjami eksploracyjnymi">
+  <div class="max-w-4xl mx-auto">
+    <div class="text-center py-12">
+      <h1 class="text-3xl font-bold mb-4">Exploration Charters</h1>
+      <p class="text-muted-foreground mb-8">
+        Zarządzaj sesjami eksploracyjnymi - goal, hypotheses, notatki z tagami i timer.
+      </p>
+      <div class="bg-muted/50 rounded-lg p-8">
+        <p class="text-lg mb-4">🚧 W budowie</p>
+        <p class="text-muted-foreground">
+          Funkcja Exploration Charters będzie dostępna wkrótce. Będziesz mógł tworzyć chartery z goal, hypotheses,
+          notatkami tagowanymi oraz timerem.
+        </p>
+      </div>
+    </div>
+  </div>
+</PublicLayout>

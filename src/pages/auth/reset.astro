@@ -1,0 +1,11 @@
+---
+import AuthLayout from "@/layouts/AuthLayout.astro";
+import ResetRequestForm from "@/components/auth/ResetRequestForm";
+
+// TODO: Add server-side redirect logic if user is already logged in
+// TODO: Add session checking in onRequest
+---
+
+<AuthLayout title="Reset hasła" description="Odzyskaj dostęp do swojego konta">
+  <ResetRequestForm client:load />
+</AuthLayout>

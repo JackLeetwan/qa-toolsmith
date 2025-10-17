@@ -1,0 +1,20 @@
+---
+import AuthLayout from "@/layouts/AuthLayout.astro";
+import ResetConfirmForm from "@/components/auth/ResetConfirmForm";
+
+// TODO: Extract token from URL parameters (access_token, type=recovery)
+// TODO: Add server-side validation of token
+// TODO: Add session checking in onRequest
+
+// For now, we'll pass the token from URL to the component
+const url = Astro.url;
+const accessToken = url.searchParams.get("access_token");
+const tokenType = url.searchParams.get("type");
+
+// Only show form if we have a valid recovery token
+const isValidToken = accessToken && tokenType === "recovery";
+---
+
+<AuthLayout title="Potwierdzenie resetu hasła" description="Ustaw nowe hasło dla swojego konta">
+  <ResetConfirmForm client:load token={isValidToken ? accessToken : undefined} />
+</AuthLayout>

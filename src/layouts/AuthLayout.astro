@@ -1,0 +1,48 @@
+---
+import Layout from "./Layout.astro";
+import { ThemeToggle } from "@/components/ThemeToggle";
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<Layout title={`${title} | QA Toolsmith`}>
+  <div class="min-h-screen bg-background flex flex-col">
+    <!-- Minimal header for auth pages -->
+    <header class="border-b">
+      <div class="container mx-auto px-4 py-4">
+        <div class="flex items-center justify-between">
+          <a href="/" class="text-xl font-bold text-primary hover:text-primary/80 transition-colors"> QA Toolsmith </a>
+          <ThemeToggle client:load />
+        </div>
+      </div>
+    </header>
+
+    <!-- Centered auth content -->
+    <main class="flex-1 flex items-center justify-center px-4 py-8">
+      <div class="w-full max-w-md">
+        <div class="text-center mb-8">
+          <h1 class="text-2xl font-bold tracking-tight">{title}</h1>
+          {description && <p class="mt-2 text-sm text-muted-foreground">{description}</p>}
+        </div>
+        <slot />
+      </div>
+    </main>
+  </div>
+</Layout>
+
+<script>
+  /* eslint-disable */
+  // Focus management: move focus to main content after navigation
+  document.addEventListener("astro:page-load", () => {
+    const mainContent = document.querySelector("main");
+    if (mainContent) {
+      mainContent.focus();
+    }
+  });
+  /* eslint-enable */
+</script>
