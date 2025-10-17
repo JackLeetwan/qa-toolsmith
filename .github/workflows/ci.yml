@@ -83,6 +83,10 @@ jobs:
           echo "SERVER_PID=$SERVER_PID" >> $GITHUB_ENV
         env:
           PORT: 3000
+          SUPABASE_URL: "https://dummy.supabase.co"
+          SUPABASE_KEY: "dummy-key"
+          SUPABASE_SERVICE_KEY: "dummy-service-key"
+          OPENROUTER_API_KEY: "dummy-key"
       - name: Wait for server to start
         run: |
           for i in {1..30}; do
