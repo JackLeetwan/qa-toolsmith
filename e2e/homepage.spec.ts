@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test } from "@playwright/test";
 import { HomePage } from "./pages/HomePage";
 
 test.describe("Homepage", () => {
@@ -34,7 +34,7 @@ test.describe("Homepage", () => {
 
     // Check meta description
     await homePage.verifyMetaDescription(
-      "Standardizuj codzienną pracę testerów z naszymi narzędziami"
+      "Standardizuj codzienną pracę testerów z naszymi narzędziami",
     );
   });
 

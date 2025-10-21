@@ -47,7 +47,7 @@ test.describe("Visual Regression - Desktop (1280x720)", () => {
         {
           fullPage: true,
           threshold: 0.02, // 2% tolerance for anti-aliasing
-        }
+        },
       );
     });
 
@@ -72,7 +72,7 @@ test.describe("Visual Regression - Desktop (1280x720)", () => {
         "homepage-light-desktop-hero.png",
         {
           threshold: 0.02,
-        }
+        },
       );
     });
 
@@ -89,7 +89,9 @@ test.describe("Visual Regression - Desktop (1280x720)", () => {
       });
 
       // Scroll down to feature cards section
-      await page.locator("h3", { hasText: "Szablony Raportów" }).scrollIntoViewIfNeeded();
+      await page
+        .locator("h3", { hasText: "Szablony Raportów" })
+        .scrollIntoViewIfNeeded();
       await page.waitForTimeout(500); // Allow scroll animation
 
       // Get the cards container
@@ -103,7 +105,7 @@ test.describe("Visual Regression - Desktop (1280x720)", () => {
         "homepage-light-desktop-cards.png",
         {
           threshold: 0.02,
-        }
+        },
       );
     });
 
@@ -128,7 +130,7 @@ test.describe("Visual Regression - Desktop (1280x720)", () => {
         "homepage-light-desktop-topbar.png",
         {
           threshold: 0.02,
-        }
+        },
       );
     });
   });
@@ -156,7 +158,7 @@ test.describe("Visual Regression - Desktop (1280x720)", () => {
         {
           fullPage: true,
           threshold: 0.02,
-        }
+        },
       );
     });
 
@@ -184,7 +186,7 @@ test.describe("Visual Regression - Desktop (1280x720)", () => {
         "homepage-dark-desktop-hero.png",
         {
           threshold: 0.02,
-        }
+        },
       );
     });
 
@@ -204,7 +206,9 @@ test.describe("Visual Regression - Desktop (1280x720)", () => {
       await page.waitForLoadState("networkidle");
 
       // Scroll down to feature cards
-      await page.locator("h3", { hasText: "Szablony Raportów" }).scrollIntoViewIfNeeded();
+      await page
+        .locator("h3", { hasText: "Szablony Raportów" })
+        .scrollIntoViewIfNeeded();
       await page.waitForTimeout(500);
 
       // Get the cards container
@@ -218,7 +222,7 @@ test.describe("Visual Regression - Desktop (1280x720)", () => {
         "homepage-dark-desktop-cards.png",
         {
           threshold: 0.02,
-        }
+        },
       );
     });
 
@@ -246,7 +250,7 @@ test.describe("Visual Regression - Desktop (1280x720)", () => {
         "homepage-dark-desktop-topbar.png",
         {
           threshold: 0.02,
-        }
+        },
       );
     });
   });
@@ -274,7 +278,7 @@ test.describe("Visual Regression - Desktop (1280x720)", () => {
         {
           fullPage: true,
           threshold: 0.02,
-        }
+        },
       );
     });
 
@@ -303,7 +307,7 @@ test.describe("Visual Regression - Desktop (1280x720)", () => {
         "iban-generator-light-desktop-form.png",
         {
           threshold: 0.02,
-        }
+        },
       );
     });
 
@@ -335,7 +339,7 @@ test.describe("Visual Regression - Desktop (1280x720)", () => {
         "iban-generator-light-desktop-with-result.png",
         {
           threshold: 0.02,
-        }
+        },
       );
     });
 
@@ -367,7 +371,7 @@ test.describe("Visual Regression - Desktop (1280x720)", () => {
         "iban-generator-light-desktop-result-card.png",
         {
           threshold: 0.02,
-        }
+        },
       );
     });
   });
@@ -395,7 +399,7 @@ test.describe("Visual Regression - Desktop (1280x720)", () => {
         {
           fullPage: true,
           threshold: 0.02,
-        }
+        },
       );
     });
 
@@ -424,7 +428,7 @@ test.describe("Visual Regression - Desktop (1280x720)", () => {
         "iban-generator-dark-desktop-form.png",
         {
           threshold: 0.02,
-        }
+        },
       );
     });
 
@@ -456,7 +460,7 @@ test.describe("Visual Regression - Desktop (1280x720)", () => {
         "iban-generator-dark-desktop-with-result.png",
         {
           threshold: 0.02,
-        }
+        },
       );
     });
 
@@ -488,7 +492,7 @@ test.describe("Visual Regression - Desktop (1280x720)", () => {
         "iban-generator-dark-desktop-result-card.png",
         {
           threshold: 0.02,
-        }
+        },
       );
     });
   });
@@ -521,7 +525,7 @@ test.describe("Visual Regression - Tablet (768x1024)", () => {
         {
           fullPage: true,
           threshold: 0.02,
-        }
+        },
       );
     });
 
@@ -546,7 +550,7 @@ test.describe("Visual Regression - Tablet (768x1024)", () => {
         "homepage-light-tablet-hero.png",
         {
           threshold: 0.02,
-        }
+        },
       );
     });
   });
@@ -573,7 +577,7 @@ test.describe("Visual Regression - Tablet (768x1024)", () => {
         {
           fullPage: true,
           threshold: 0.02,
-        }
+        },
       );
     });
 
@@ -601,7 +605,7 @@ test.describe("Visual Regression - Tablet (768x1024)", () => {
         "homepage-dark-tablet-hero.png",
         {
           threshold: 0.02,
-        }
+        },
       );
     });
   });
@@ -629,7 +633,7 @@ test.describe("Visual Regression - Tablet (768x1024)", () => {
         {
           fullPage: true,
           threshold: 0.02,
-        }
+        },
       );
     });
 
@@ -659,7 +663,7 @@ test.describe("Visual Regression - Tablet (768x1024)", () => {
         {
           fullPage: true,
           threshold: 0.02,
-        }
+        },
       );
     });
   });
@@ -687,7 +691,7 @@ test.describe("Visual Regression - Tablet (768x1024)", () => {
         {
           fullPage: true,
           threshold: 0.02,
-        }
+        },
       );
     });
 
@@ -717,7 +721,7 @@ test.describe("Visual Regression - Tablet (768x1024)", () => {
         {
           fullPage: true,
           threshold: 0.02,
-        }
+        },
       );
     });
   });

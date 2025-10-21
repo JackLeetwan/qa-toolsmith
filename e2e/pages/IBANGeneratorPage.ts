@@ -1,4 +1,4 @@
-import { Page, Locator, expect } from "@playwright/test";
+import { Locator, expect } from "@playwright/test";
 import { BasePage } from "./BasePage";
 
 /**
@@ -6,14 +6,6 @@ import { BasePage } from "./BasePage";
  * Encapsulates all selectors and actions related to IBAN generation and validation
  */
 export class IBANGeneratorPage extends BasePage {
-  /**
-   * Initializes the IBANGeneratorPage
-   * @param page - The Playwright Page instance
-   */
-  constructor(page: Page) {
-    super(page);
-  }
-
   // ============================================================================
   // LOCATORS (get*() methods)
   // ============================================================================

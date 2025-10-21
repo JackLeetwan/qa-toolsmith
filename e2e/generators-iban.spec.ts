@@ -86,26 +86,11 @@ test.describe("IBAN Generator - Copy Button Stability", () => {
  * Reference: @playwright-e2e-testing.mdc guideline 5 (Leverage API testing for backend validation)
  */
 test.describe("IBAN Generator - API Endpoint", () => {
-  /**
-   * Helper function to make API requests
-   * Returns response with type safety for common scenarios
-   */
-  async function callIbanApi(params: Record<string, string>) {
-    const queryString = new URLSearchParams(params).toString();
-    const url = `/api/generators/iban${queryString ? `?${queryString}` : ""}`;
-    const response = await test.step(`GET ${url}`, async () => {
-      return await (await test._currentContext?.page())?.request.get(url) || new Response();
-    });
-    return response;
-  }
-
   test("should generate random IBAN for country DE without seed", async ({
     page,
   }) => {
     // Call API
-    const response = await page.request.get(
-      "/api/generators/iban?country=DE",
-    );
+    const response = await page.request.get("/api/generators/iban?country=DE");
 
     // Assert response status
     expect(response.status()).toBe(200);
@@ -135,9 +120,7 @@ test.describe("IBAN Generator - API Endpoint", () => {
     page,
   }) => {
     // Call API
-    const response = await page.request.get(
-      "/api/generators/iban?country=AT",
-    );
+    const response = await page.request.get("/api/generators/iban?country=AT");
 
     // Assert response status
     expect(response.status()).toBe(200);
@@ -166,9 +149,7 @@ test.describe("IBAN Generator - API Endpoint", () => {
     page,
   }) => {
     // Call API
-    const response = await page.request.get(
-      "/api/generators/iban?country=PL",
-    );
+    const response = await page.request.get("/api/generators/iban?country=PL");
 
     // Assert response status
     expect(response.status()).toBe(200);
@@ -419,9 +400,7 @@ test.describe("IBAN Generator - API Endpoint", () => {
     page,
   }) => {
     // Test lowercase country code (should work if API normalizes)
-    const response = await page.request.get(
-      "/api/generators/iban?country=de",
-    );
+    const response = await page.request.get("/api/generators/iban?country=de");
 
     // This tests current API behavior - adjust expectation if case-insensitive handling is added
     if (response.status() === 400) {
@@ -465,9 +444,7 @@ test.describe("IBAN Generator - API Endpoint", () => {
     page,
   }) => {
     // Call API
-    const response = await page.request.get(
-      "/api/generators/iban?country=DE",
-    );
+    const response = await page.request.get("/api/generators/iban?country=DE");
 
     // Verify content-type header
     const contentType = response.headers()["content-type"];

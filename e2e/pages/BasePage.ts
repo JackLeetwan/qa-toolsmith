@@ -39,7 +39,7 @@ export class BasePage {
    * Wait for page to be in a ready state
    * @param timeout - Maximum time to wait in milliseconds (default: 5000)
    */
-  async waitForPageReady(timeout: number = 5000): Promise<void> {
+  async waitForPageReady(timeout = 5000): Promise<void> {
     await this.page.waitForLoadState("networkidle", { timeout });
   }
 }

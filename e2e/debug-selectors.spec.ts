@@ -1,11 +1,8 @@
 import { test, expect } from "@playwright/test";
-import { HomePage } from "./pages/HomePage";
 
 test.describe("Debug Selectors", () => {
-  let homePage: HomePage;
-
-  test.beforeEach(async ({ page }) => {
-    homePage = new HomePage(page);
+  test.beforeEach(async () => {
+    // Setup for tests
   });
 
   test("should test selectors on static HTML page", async ({ page }) => {
@@ -13,7 +10,7 @@ test.describe("Debug Selectors", () => {
     await page.goto(`file://${process.cwd()}/e2e/test-page.html`);
 
     // Re-initialize HomePage with the current page for testing against static HTML
-    homePage = new HomePage(page);
+    // homePage = new HomePage(page); // This line is removed
 
     // Check main title
     await expect(page.locator("h1.text-6xl")).toBeVisible();
@@ -55,7 +52,7 @@ test.describe("Debug Selectors", () => {
     await page.goto(`file://${process.cwd()}/e2e/test-page.html`);
 
     // Re-initialize HomePage with the current page for testing against static HTML
-    homePage = new HomePage(page);
+    // homePage = new HomePage(page); // This line is removed
 
     // Check call to action section for non-authenticated users
     await expect(page.getByRole("link", { name: "Zaloguj się" })).toBeVisible();
@@ -68,7 +65,7 @@ test.describe("Debug Selectors", () => {
     await page.goto(`file://${process.cwd()}/e2e/test-page.html`);
 
     // Re-initialize HomePage with the current page for testing against static HTML
-    homePage = new HomePage(page);
+    // homePage = new HomePage(page); // This line is removed
 
     // Check title
     await expect(page).toHaveTitle("QA Toolsmith");

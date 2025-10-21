@@ -6,14 +6,6 @@ import { BasePage } from "./BasePage";
  * Encapsulates all selectors and actions related to the homepage
  */
 export class HomePage extends BasePage {
-  /**
-   * Initializes the HomePage
-   * @param page - The Playwright Page instance
-   */
-  constructor(page: Page) {
-    super(page);
-  }
-
   // ============================================================================
   // PROPERTIES
   // ============================================================================
@@ -248,7 +240,7 @@ export class HomePage extends BasePage {
   async verifyMetaDescription(expectedDescription: string): Promise<void> {
     await expect(this.getMetaDescription()).toHaveAttribute(
       "content",
-      expectedDescription
+      expectedDescription,
     );
   }
 
