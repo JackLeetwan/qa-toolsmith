@@ -1,6 +1,6 @@
 # QA Toolsmith (MVP)
 
-[![CI](https://github.com/<USERNAME>/<REPO>/actions/workflows/ci.yml/badge.svg)](https://github.com/<USERNAME>/<REPO>/actions)  
+[![CI](https://github.com/jakub-litkowski/qa-toolsmith/actions/workflows/ci.yml/badge.svg)](https://github.com/jakub-litkowski/qa-toolsmith/actions)  
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ## Table of Contents
@@ -16,15 +16,16 @@
 
 ## Project Description
 
-QA Toolsmith is an open-source, lightweight web application that standardizes and automates common tasks for software testers. The MVP offers:
+QA Toolsmith is an open-source, lightweight web application that standardizes and automates common tasks for software testers. The MVP currently offers:
 
-- Email/password authentication with Admin and User roles
-- Defect report templates (UI/API bugs) with Markdown export
-- Exploration Chart (timer, tagged notes, keyboard shortcuts, Markdown export)
-- Minimal Knowledge Base (CRUD, tags, full-text search, JSON export)
-- Synthetic test data generators & validators (IBAN DE/AT, phone, address, license plates, email, companies, credit cards, GUIDs, strings)
-- Optional AI assistant to polish content (per-user daily limit, dry-run/manual fallback)
-- Unit tests, E2E tests, and GitHub Actions CI/CD pipeline
+- ✅ Email/password authentication with Admin and User roles
+- ✅ IBAN Generator & Validator (Germany, Austria with deterministic seed support)
+- ✅ Comprehensive test suite (1167 unit tests, E2E tests, CI/CD pipeline)
+- 🚧 Defect report templates (UI/API bugs) with Markdown export — *in development*
+- 🚧 Exploration Charter (timer, tagged notes, keyboard shortcuts, Markdown export) — *in development*
+- 🚧 Minimal Knowledge Base (CRUD, tags, full-text search, JSON export) — *in development*
+- 📋 Additional synthetic test data generators & validators (phone, address, license plates, email, companies, credit cards, GUIDs, strings) — *planned*
+- 📋 Optional AI assistant to polish content (per-user daily limit, dry-run/manual fallback) — *planned*
 
 ## Tech Stack
 
@@ -56,8 +57,8 @@ QA Toolsmith is an open-source, lightweight web application that standardizes an
 ### Installation
 
 ```bash
-git clone https://github.com/<USERNAME>/<REPO>.git
-cd <REPO>
+git clone https://github.com/jakub-litkowski/qa-toolsmith.git
+cd qa-toolsmith
 npm install
 ```
 
@@ -129,50 +130,69 @@ For flaky IBAN generator tests, check:
 
 ## Project Scope
 
-### 1. Authentication & Roles
+### MVP (v0.0.1) - Complete ✅
+
+#### 1. Authentication & Roles ✅
 
 - Email/password sign-in/out
 - Admin & User roles (first Admin seeded)
 - Login rate limiting and temporary lockout
 
-### 2. Defect Report Templates
+#### 2. Data Generators & Validators ✅
+
+- **IBAN Generator & Validator**: Full implementation for Germany (DE) and Austria (AT)
+  - Deterministic generation with optional seed
+  - Luhn algorithm validation
+  - Comprehensive test suite (1000+ test cases)
+
+### In Development 🚧
+
+#### 3. Defect Report Templates
 
 - UI & API bug presets with required fields
 - Global templates managed by Admin; Users can fork & customize
 - Markdown export & "Copy to clipboard" button
 
-### 3. Exploration Chart
+#### 4. Exploration Charter
 
 - Charters with Goal, Hypotheses, Notes (tags: bug / idea / question / risk)
 - Start/Stop timer, keyboard shortcuts (Alt+N, Alt+T, Alt+S)
 - Autosave (localStorage every 5 s, DB on close)
 - Markdown export & session history
 
-### 4. Knowledge Base
+#### 5. Knowledge Base
 
 - CRUD for links with canonicalization & deduplication
 - Multiple notes per link, tag support
 - Full-text search (Postgres FTS) & tag filtering
 - JSON export of entries
 
-### 5. Data Generators & Validators
+### Planned 📋
 
-- IBAN generator & validator (DE/AT)
-- Phone numbers, addresses, license plates, emails, company names, credit cards, GUIDs, random strings
-- Optional seed for deterministic results
+#### 6. Additional Data Generators
 
-### 6. AI Assistant
+- Phone numbers (DE/AT/PL)
+- Addresses (DE/AT/PL)
+- License plates (DE/AT/PL)
+- Email addresses
+- Company names
+- Payment cards (Visa, Mastercard with Luhn checksum)
+- GUIDs/UUIDs
+- Random strings with custom patterns
+
+#### 7. AI Assistant
 
 - "Improve / Expand" actions for descriptions, steps, notes
 - Diff preview with accept/reject
 - Per-user daily limit (`AI_MAX_REQUESTS_PER_USER_PER_DAY`), dry-run & manual fallback
+- Integration with Openrouter.ai
 
-### 7. Testing & CI/CD
+### 7. Testing & CI/CD ✅
 
-- **Unit tests**: IBAN validator, generator & edge cases (property-based, 1 000 cases)
-- **E2E tests**: Playwright (login → KB CRUD)
-- **Smoke tests**: GET /health, homepage render, login, sample CRUD
-- **CI/CD**: GitHub Actions pipeline for lint, unit, E2E
+- **Unit tests**: IBAN validator, generator & edge cases (property-based, 1000+ cases)
+- **E2E tests**: Playwright (generators, navigation, authentication)
+- **Smoke tests**: GET /health, homepage render, login
+- **CI/CD**: GitHub Actions pipeline (lint → build → test → e2e → health-check)
 
 ## API Documentation
 
