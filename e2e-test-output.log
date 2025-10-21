@@ -5,191 +5,21 @@
 
 Running 11 tests using 4 workers
 
-[1A[2K[1/11] [chromium] › e2e/debug-selectors.spec.ts:54:3 › Debug Selectors › should test meta tags
-[1A[2K[2/11] [chromium] › e2e/debug-selectors.spec.ts:4:3 › Debug Selectors › should test selectors on static HTML page
-[1A[2K[3/11] [chromium] › e2e/debug-selectors.spec.ts:44:3 › Debug Selectors › should test login/register buttons
-[1A[2K[4/11] [chromium] › e2e/generators-iban.spec.ts:39:3 › IBAN Generator - Copy Button Stability › copy button should have stable testid selector
-[1A[2K[5/11] [chromium] › e2e/generators-iban.spec.ts:52:3 › IBAN Generator - Copy Button Stability › should show and hide copy toast deterministically
-[1A[2K[6/11] [chromium] › e2e/generators-iban.spec.ts:82:3 › IBAN Generator - Copy Button Stability › should handle multiple sequential copy actions
-[1A[2K[7/11] [chromium] › e2e/generators-iban.spec.ts:109:3 › IBAN Generator - Copy Button Stability › result content should have stable testid selector
-[1A[2K  1) [chromium] › e2e/generators-iban.spec.ts:39:3 › IBAN Generator - Copy Button Stability › copy button should have stable testid selector 
+[1A[2K[1/11] [chromium] › e2e/debug-selectors.spec.ts:11:3 › Debug Selectors › should test selectors on static HTML page
+[1A[2K[2/11] [chromium] › e2e/debug-selectors.spec.ts:54:3 › Debug Selectors › should test login/register buttons
+[1A[2K[3/11] [chromium] › e2e/debug-selectors.spec.ts:67:3 › Debug Selectors › should test meta tags
+[1A[2K[4/11] [chromium] › e2e/generators-iban.spec.ts:28:3 › IBAN Generator - Copy Button Stability › copy button should have stable testid selector
+[1A[2K[5/11] [chromium] › e2e/generators-iban.spec.ts:36:3 › IBAN Generator - Copy Button Stability › should show and hide copy toast deterministically
+[1A[2K[6/11] [chromium] › e2e/generators-iban.spec.ts:53:3 › IBAN Generator - Copy Button Stability › should handle multiple sequential copy actions
+[1A[2K[7/11] [chromium] › e2e/generators-iban.spec.ts:69:3 › IBAN Generator - Copy Button Stability › result content should have stable testid selector
+[1A[2K[8/11] [chromium] › e2e/homepage.spec.ts:12:3 › Homepage › should display main title and navigation
+[1A[2K[9/11] [chromium] › e2e/homepage.spec.ts:26:3 › Homepage › should display login and register buttons for unauthenticated users
+[1A[2K[10/11] [chromium] › e2e/homepage.spec.ts:31:3 › Homepage › should have proper meta tags
+[1A[2K[11/11] [chromium] › e2e/homepage.spec.ts:41:8 › Homepage › should navigate to feature pages
+[1A[2K  1 skipped
+  10 passed (23.6s)
 
-    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
-
-    Locator: getByTestId('iban-root')
-    Expected: visible
-    Timeout: 5000ms
-    Error: element(s) not found
-
-    Call log:
-    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
-    [2m  - waiting for getByTestId('iban-root')[22m
-
-
-      19 |
-      20 |     // Wait for the root component to be hydrated
-    > 21 |     await expect(page.getByTestId("iban-root")).toBeVisible({ timeout: 5000 });
-         |                                                 ^
-      22 |
-      23 |     // Wait for the form to load
-      24 |     await expect(
-        at /home/jakub-litkowski/projects/10xdevs/qa-toolsmith/e2e/generators-iban.spec.ts:21:49
-
-    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
-    test-results/generators-iban-IBAN-Gener-9afd7-have-stable-testid-selector-chromium/test-failed-1.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
-    test-results/generators-iban-IBAN-Gener-9afd7-have-stable-testid-selector-chromium/video.webm
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    Error Context: test-results/generators-iban-IBAN-Gener-9afd7-have-stable-testid-selector-chromium/error-context.md
-
-    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
-    test-results/generators-iban-IBAN-Gener-9afd7-have-stable-testid-selector-chromium/trace.zip
-    Usage:
-
-        npx playwright show-trace test-results/generators-iban-IBAN-Gener-9afd7-have-stable-testid-selector-chromium/trace.zip
-
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-
-[1A[2K  2) [chromium] › e2e/generators-iban.spec.ts:82:3 › IBAN Generator - Copy Button Stability › should handle multiple sequential copy actions 
-
-    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
-
-    Locator: getByTestId('iban-root')
-    Expected: visible
-    Timeout: 5000ms
-    Error: element(s) not found
-
-    Call log:
-    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
-    [2m  - waiting for getByTestId('iban-root')[22m
-
-
-      19 |
-      20 |     // Wait for the root component to be hydrated
-    > 21 |     await expect(page.getByTestId("iban-root")).toBeVisible({ timeout: 5000 });
-         |                                                 ^
-      22 |
-      23 |     // Wait for the form to load
-      24 |     await expect(
-        at /home/jakub-litkowski/projects/10xdevs/qa-toolsmith/e2e/generators-iban.spec.ts:21:49
-
-    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
-    test-results/generators-iban-IBAN-Gener-f32bd-ple-sequential-copy-actions-chromium/test-failed-1.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
-    test-results/generators-iban-IBAN-Gener-f32bd-ple-sequential-copy-actions-chromium/video.webm
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    Error Context: test-results/generators-iban-IBAN-Gener-f32bd-ple-sequential-copy-actions-chromium/error-context.md
-
-    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
-    test-results/generators-iban-IBAN-Gener-f32bd-ple-sequential-copy-actions-chromium/trace.zip
-    Usage:
-
-        npx playwright show-trace test-results/generators-iban-IBAN-Gener-f32bd-ple-sequential-copy-actions-chromium/trace.zip
-
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-
-[1A[2K  3) [chromium] › e2e/generators-iban.spec.ts:109:3 › IBAN Generator - Copy Button Stability › result content should have stable testid selector 
-
-    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
-
-    Locator: getByTestId('iban-root')
-    Expected: visible
-    Timeout: 5000ms
-    Error: element(s) not found
-
-    Call log:
-    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
-    [2m  - waiting for getByTestId('iban-root')[22m
-
-
-      19 |
-      20 |     // Wait for the root component to be hydrated
-    > 21 |     await expect(page.getByTestId("iban-root")).toBeVisible({ timeout: 5000 });
-         |                                                 ^
-      22 |
-      23 |     // Wait for the form to load
-      24 |     await expect(
-        at /home/jakub-litkowski/projects/10xdevs/qa-toolsmith/e2e/generators-iban.spec.ts:21:49
-
-    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
-    test-results/generators-iban-IBAN-Gener-eedfa-have-stable-testid-selector-chromium/test-failed-1.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
-    test-results/generators-iban-IBAN-Gener-eedfa-have-stable-testid-selector-chromium/video.webm
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    Error Context: test-results/generators-iban-IBAN-Gener-eedfa-have-stable-testid-selector-chromium/error-context.md
-
-    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
-    test-results/generators-iban-IBAN-Gener-eedfa-have-stable-testid-selector-chromium/trace.zip
-    Usage:
-
-        npx playwright show-trace test-results/generators-iban-IBAN-Gener-eedfa-have-stable-testid-selector-chromium/trace.zip
-
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-
-[1A[2K  4) [chromium] › e2e/generators-iban.spec.ts:52:3 › IBAN Generator - Copy Button Stability › should show and hide copy toast deterministically 
-
-    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
-
-    Locator: getByTestId('iban-root')
-    Expected: visible
-    Timeout: 5000ms
-    Error: element(s) not found
-
-    Call log:
-    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
-    [2m  - waiting for getByTestId('iban-root')[22m
-
-
-      19 |
-      20 |     // Wait for the root component to be hydrated
-    > 21 |     await expect(page.getByTestId("iban-root")).toBeVisible({ timeout: 5000 });
-         |                                                 ^
-      22 |
-      23 |     // Wait for the form to load
-      24 |     await expect(
-        at /home/jakub-litkowski/projects/10xdevs/qa-toolsmith/e2e/generators-iban.spec.ts:21:49
-
-    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
-    test-results/generators-iban-IBAN-Gener-7d359-opy-toast-deterministically-chromium/test-failed-1.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
-    test-results/generators-iban-IBAN-Gener-7d359-opy-toast-deterministically-chromium/video.webm
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    Error Context: test-results/generators-iban-IBAN-Gener-7d359-opy-toast-deterministically-chromium/error-context.md
-
-    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
-    test-results/generators-iban-IBAN-Gener-7d359-opy-toast-deterministically-chromium/trace.zip
-    Usage:
-
-        npx playwright show-trace test-results/generators-iban-IBAN-Gener-7d359-opy-toast-deterministically-chromium/trace.zip
-
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-
-[1A[2K[8/11] [chromium] › e2e/homepage.spec.ts:67:8 › Homepage › should navigate to feature pages
-[1A[2K[9/11] [chromium] › e2e/homepage.spec.ts:4:3 › Homepage › should display main title and navigation
-[1A[2K[10/11] [chromium] › e2e/homepage.spec.ts:41:3 › Homepage › should display login and register buttons for unauthenticated users
-[1A[2K[11/11] [chromium] › e2e/homepage.spec.ts:53:3 › Homepage › should have proper meta tags
-[1A[2K  4 failed
-    [chromium] › e2e/generators-iban.spec.ts:39:3 › IBAN Generator - Copy Button Stability › copy button should have stable testid selector 
-    [chromium] › e2e/generators-iban.spec.ts:52:3 › IBAN Generator - Copy Button Stability › should show and hide copy toast deterministically 
-    [chromium] › e2e/generators-iban.spec.ts:82:3 › IBAN Generator - Copy Button Stability › should handle multiple sequential copy actions 
-    [chromium] › e2e/generators-iban.spec.ts:109:3 › IBAN Generator - Copy Button Stability › result content should have stable testid selector 
-  1 skipped
-  6 passed (11.0s)
-
-[36m  Serving HTML report at http://localhost:9323. Press Ctrl+C to quit.[39m
+To open last HTML report run:
+[36m[39m
+[36m  npx playwright show-report[39m
+[36m[39m

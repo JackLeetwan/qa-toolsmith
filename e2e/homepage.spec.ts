@@ -1,89 +1,61 @@
 import { test, expect } from "@playwright/test";
+import { HomePage } from "./pages/HomePage";
 
 test.describe("Homepage", () => {
-  test("should display main title and navigation", async ({ page }) => {
-    await page.goto("/");
+  let homePage: HomePage;
 
-    // Check main title (h1 with specific class)
-    await expect(page.locator("h1.text-6xl")).toBeVisible();
-    await expect(page.locator("h1.text-6xl")).toHaveText("QA Toolsmith");
-
-    // Check main description
-    await expect(page.getByText("Standaryzuj codzienną pracę")).toBeVisible();
-
-    // Check feature cards are present (h3 elements)
-    await expect(
-      page.locator("h3", { hasText: "Szablony Raportów" }),
-    ).toBeVisible();
-    await expect(
-      page.locator("h3", { hasText: "Exploration Charters" }),
-    ).toBeVisible();
-    await expect(page.locator("h3", { hasText: "Baza Wiedzy" })).toBeVisible();
-    await expect(
-      page.locator("h3", { hasText: "Generatory Danych" }),
-    ).toBeVisible();
-
-    // Check navigation links
-    await expect(
-      page.getByRole("link", { name: "Przejdź do szablonów" }),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("link", { name: "Rozpocznij eksplorację" }),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("link", { name: "Przeglądaj bazę wiedzy" }),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("link", { name: "Generuj dane testowe" }),
-    ).toBeVisible();
+  test.beforeEach(async ({ page }) => {
+    homePage = new HomePage(page);
+    await homePage.setup();
   });
 
-  test("should display login and register buttons for unauthenticated users", async ({
-    page,
-  }) => {
-    await page.goto("/");
+  test("should display main title and navigation", async () => {
+    // Verify main title
+    await homePage.verifyMainTitleDisplayed();
 
+    // Verify main description
+    await homePage.verifyMainDescriptionDisplayed();
+
+    // Verify all feature cards are present
+    await homePage.verifyAllFeatureCardsDisplayed();
+
+    // Verify navigation links are present
+    await homePage.verifyAllNavigationLinksDisplayed();
+  });
+
+  test("should display login and register buttons for unauthenticated users", async () => {
     // Check call to action section for non-authenticated users
-    await expect(page.locator("a", { hasText: "Zaloguj się" })).toBeVisible();
-    await expect(
-      page.locator("a", { hasText: "Zarejestruj się" }),
-    ).toBeVisible();
+    await homePage.verifyAuthButtonsDisplayed();
   });
 
-  test("should have proper meta tags", async ({ page }) => {
-    await page.goto("/");
-
+  test("should have proper meta tags", async () => {
     // Check title
-    await expect(page).toHaveTitle("QA Toolsmith");
+    await homePage.verifyPageTitle("QA Toolsmith");
 
     // Check meta description
-    const metaDescription = page.locator('meta[name="description"]');
-    await expect(metaDescription).toHaveAttribute(
-      "content",
-      "Standardizuj codzienną pracę testerów z naszymi narzędziami",
+    await homePage.verifyMetaDescription(
+      "Standardizuj codzienną pracę testerów z naszymi narzędziami"
     );
   });
 
-  test.skip("should navigate to feature pages", async ({ page }) => {
-    await page.goto("/");
-
+  test.skip("should navigate to feature pages", async () => {
     // Test navigation to templates
-    await page.getByRole("link", { name: "Przejdź do szablonów" }).click();
-    await expect(page).toHaveURL(/\/templates/);
-    await page.goBack();
+    await homePage.clickTemplatesLink();
+    await homePage.verifyPageUrl(/\/templates/);
+    await homePage.pageInstance.goBack();
 
     // Test navigation to charters
-    await page.getByRole("link", { name: "Rozpocznij eksplorację" }).click();
-    await expect(page).toHaveURL(/\/charters/);
-    await page.goBack();
+    await homePage.clickExplorationLink();
+    await homePage.verifyPageUrl(/\/charters/);
+    await homePage.pageInstance.goBack();
 
     // Test navigation to knowledge base
-    await page.getByRole("link", { name: "Przeglądaj bazę wiedzy" }).click();
-    await expect(page).toHaveURL(/\/kb/);
-    await page.goBack();
+    await homePage.clickKnowledgeBaseLink();
+    await homePage.verifyPageUrl(/\/kb/);
+    await homePage.pageInstance.goBack();
 
     // Test navigation to generators
-    await page.getByRole("link", { name: "Generuj dane testowe" }).click();
-    await expect(page).toHaveURL(/\/generators/);
+    await homePage.clickGenerateDataLink();
+    await homePage.verifyPageUrl(/\/generators/);
   });
 });

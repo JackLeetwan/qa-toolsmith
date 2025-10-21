@@ -105,6 +105,8 @@ git commit --no-verify
 - `npm run test:e2e:ui` — Open Playwright UI for test development
 - `npm run test:e2e:debug` — Run E2E tests in debug mode (step-through)
 - `npm run test:e2e:headed` — Run E2E tests in headed mode (visible browser)
+- `npm run test:e2e:visual` — Run visual regression tests
+- `npm run test:e2e:visual:update` — Update visual regression baselines (snapshots)
 
 ### E2E Diagnostics
 
@@ -127,6 +129,27 @@ For flaky IBAN generator tests, check:
 1. Timeline in HTML report to see exact failure step
 2. Video to watch selector interactions
 3. Trace to inspect network timing and DOM mutations
+
+### Visual Regression Testing
+
+The project includes comprehensive visual regression tests to verify UI consistency across viewport sizes and themes. See [docs/VISUAL_REGRESSION_TESTING.md](docs/VISUAL_REGRESSION_TESTING.md) for detailed documentation.
+
+```bash
+# Run all visual regression tests
+npm run test:e2e:visual
+
+# View detailed report
+npx playwright show-report
+
+# Update snapshots after approved design changes
+npm run test:e2e:visual:update
+```
+
+**Coverage:**
+- Pages: Homepage, IBAN Generator
+- Viewports: Desktop (1280x720), Tablet (768x1024)
+- Themes: Light, Dark
+- 30+ screenshot assertions verifying layouts, components, and theme consistency
 
 ## Project Scope
 

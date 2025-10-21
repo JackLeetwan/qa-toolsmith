@@ -1,0 +1,107 @@
+
+> qa-toolsmith@0.0.1 test:e2e
+> playwright test
+
+
+Running 27 tests using 4 workers
+
+[1A[2K[1/27] [chromium] › e2e/debug-selectors.spec.ts:67:3 › Debug Selectors › should test meta tags
+[1A[2K[2/27] [chromium] › e2e/generators-iban.spec.ts:28:3 › IBAN Generator - Copy Button Stability › copy button should have stable testid selector
+[1A[2K[3/27] [chromium] › e2e/debug-selectors.spec.ts:11:3 › Debug Selectors › should test selectors on static HTML page
+[1A[2K[4/27] [chromium] › e2e/debug-selectors.spec.ts:54:3 › Debug Selectors › should test login/register buttons
+[1A[2K[5/27] [chromium] › e2e/generators-iban.spec.ts:36:3 › IBAN Generator - Copy Button Stability › should show and hide copy toast deterministically
+[1A[2K[6/27] [chromium] › e2e/generators-iban.spec.ts:53:3 › IBAN Generator - Copy Button Stability › should handle multiple sequential copy actions
+[1A[2K[7/27] [chromium] › e2e/generators-iban.spec.ts:69:3 › IBAN Generator - Copy Button Stability › result content should have stable testid selector
+[1A[2K[8/27] [chromium] › e2e/generators-iban.spec.ts:102:3 › IBAN Generator - API Endpoint › should generate random IBAN for country DE without seed
+[1A[2K[9/27] [chromium] › e2e/generators-iban.spec.ts:134:3 › IBAN Generator - API Endpoint › should generate random IBAN for country AT without seed
+[1A[2K[10/27] [chromium] › e2e/generators-iban.spec.ts:165:3 › IBAN Generator - API Endpoint › should generate random IBAN for country PL without seed
+[1A[2K[11/27] [chromium] › e2e/generators-iban.spec.ts:192:3 › IBAN Generator - API Endpoint › should generate deterministic IBAN for DE with seed
+[1A[2K[12/27] [chromium] › e2e/generators-iban.spec.ts:225:3 › IBAN Generator - API Endpoint › should generate deterministic IBAN for AT with seed
+[1A[2K  1) [chromium] › e2e/generators-iban.spec.ts:192:3 › IBAN Generator - API Endpoint › should generate deterministic IBAN for DE with seed 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m"DE[7m86011870660241783056[27m"[39m
+    Received: [31m"DE[7m50185482443452538353[27m"[39m
+
+      210 |
+      211 |     // Verify golden test value (from implementation plan)
+    > 212 |     expect(body.iban).toBe("DE86011870660241783056");
+          |                       ^
+      213 |     expect(body.country).toBe("DE");
+      214 |     expect(body.seed).toBe("1234");
+      215 |
+        at /home/jakub-litkowski/projects/10xdevs/qa-toolsmith/e2e/generators-iban.spec.ts:212:23
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/generators-iban-IBAN-Gener-cce50-istic-IBAN-for-DE-with-seed-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/generators-iban-IBAN-Gener-cce50-istic-IBAN-for-DE-with-seed-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/generators-iban-IBAN-Gener-cce50-istic-IBAN-for-DE-with-seed-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/generators-iban-IBAN-Gener-cce50-istic-IBAN-for-DE-with-seed-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[1A[2K  2) [chromium] › e2e/generators-iban.spec.ts:225:3 › IBAN Generator - API Endpoint › should generate deterministic IBAN for AT with seed 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m"AT[7m370118702417830564[27m"[39m
+    Received: [31m"AT[7m471854824434525383[27m"[39m
+
+      243 |
+      244 |     // Verify golden test value (from implementation plan)
+    > 245 |     expect(body.iban).toBe("AT370118702417830564");
+          |                       ^
+      246 |     expect(body.country).toBe("AT");
+      247 |     expect(body.seed).toBe("1234");
+      248 |
+        at /home/jakub-litkowski/projects/10xdevs/qa-toolsmith/e2e/generators-iban.spec.ts:245:23
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/generators-iban-IBAN-Gener-7f021-istic-IBAN-for-AT-with-seed-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/generators-iban-IBAN-Gener-7f021-istic-IBAN-for-AT-with-seed-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/generators-iban-IBAN-Gener-7f021-istic-IBAN-for-AT-with-seed-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/generators-iban-IBAN-Gener-7f021-istic-IBAN-for-AT-with-seed-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[1A[2K[13/27] [chromium] › e2e/generators-iban.spec.ts:258:3 › IBAN Generator - API Endpoint › should support special characters in seed (alphanumeric, dots, underscores, hyphens)
+[1A[2K[14/27] [chromium] › e2e/generators-iban.spec.ts:286:3 › IBAN Generator - API Endpoint › should return 400 when country parameter is missing
+[1A[2K[15/27] [chromium] › e2e/generators-iban.spec.ts:314:3 › IBAN Generator - API Endpoint › should return 400 when country parameter is invalid
+[1A[2K[16/27] [chromium] › e2e/generators-iban.spec.ts:336:3 › IBAN Generator - API Endpoint › should return 400 when seed exceeds 64 character limit
+[1A[2K[17/27] [chromium] › e2e/generators-iban.spec.ts:358:3 › IBAN Generator - API Endpoint › should return 400 when seed contains invalid characters (XSS attempt)
+[1A[2K[18/27] [chromium] › e2e/generators-iban.spec.ts:380:3 › IBAN Generator - API Endpoint › should return 400 when seed contains invalid characters (SQL injection attempt)
+[1A[2K[19/27] [chromium] › e2e/generators-iban.spec.ts:401:3 › IBAN Generator - API Endpoint › should return 400 when seed contains spaces
+[1A[2K[20/27] [chromium] › e2e/generators-iban.spec.ts:418:3 › IBAN Generator - API Endpoint › should accept uppercase and lowercase country codes
+[1A[2K[21/27] [chromium] › e2e/generators-iban.spec.ts:438:3 › IBAN Generator - API Endpoint › should return valid IBAN format for all supported countries
+[1A[2K[22/27] [chromium] › e2e/generators-iban.spec.ts:464:3 › IBAN Generator - API Endpoint › should return Content-Type application/json header
+[1A[2K[23/27] [chromium] › e2e/generators-iban.spec.ts:477:3 › IBAN Generator - API Endpoint › should handle multiple consecutive requests without state leakage
+[1A[2K[24/27] [chromium] › e2e/homepage.spec.ts:12:3 › Homepage › should display main title and navigation
+[1A[2K[25/27] [chromium] › e2e/homepage.spec.ts:26:3 › Homepage › should display login and register buttons for unauthenticated users
+[1A[2K[26/27] [chromium] › e2e/homepage.spec.ts:31:3 › Homepage › should have proper meta tags
+[1A[2K[27/27] [chromium] › e2e/homepage.spec.ts:41:8 › Homepage › should navigate to feature pages
+[1A[2K  2 failed
+    [chromium] › e2e/generators-iban.spec.ts:192:3 › IBAN Generator - API Endpoint › should generate deterministic IBAN for DE with seed 
+    [chromium] › e2e/generators-iban.spec.ts:225:3 › IBAN Generator - API Endpoint › should generate deterministic IBAN for AT with seed 
+  1 skipped
+  24 passed (23.6s)
+
+[36m  Serving HTML report at http://localhost:9323. Press Ctrl+C to quit.[39m

@@ -40,6 +40,205 @@ Tests should be:
 - Avoid fragile selectors (CSS classes, XPath)
 - Prefer built-in Playwright locators over custom selectors
 
+## Page Object Model (POM)
+
+The E2E tests follow the **Page Object Model** design pattern to improve maintainability and reduce code duplication.
+
+### Purpose
+
+POM encapsulates all selectors and actions related to a specific page into a dedicated class. This provides:
+
+- **Centralized Selectors**: All locators are in one place, making updates easy
+- **Reusable Actions**: Common page interactions are methods that multiple tests can call
+- **Improved Readability**: Tests read like user stories, not selector chains
+- **Reduced Maintenance**: Selector changes only need to be updated in one location
+
+### Structure
+
+All POM classes are located in `e2e/pages/`:
+
+```
+e2e/pages/
+├── BasePage.ts              # Base class with common functionality
+├── HomePage.ts              # Homepage POM
+└── IBANGeneratorPage.ts     # IBAN Generator page POM
+```
+
+#### BasePage
+
+The `BasePage` class provides common functionality shared by all page objects:
+
+```typescript
+// Navigation
+await page.goto(path)
+
+// Permissions
+await page.grantClipboardPermissions()
+
+// Utilities
+await page.waitForPageReady()
+```
+
+All page objects extend `BasePage` to inherit these methods.
+
+#### Naming Conventions
+
+Page Object Model classes follow strict naming conventions for clarity:
+
+##### Locators: `get*()` methods
+
+Return `Locator` objects representing UI elements:
+
+```typescript
+// ✅ Good: Clear, semantic naming
+getGenerateButton(): Locator
+getCopyButton(): Locator
+getResultContent(): Locator
+
+// ❌ Avoid: Vague or implementation-specific naming
+getBtn(): Locator
+getElement(): Locator
+```
+
+##### Actions: `do*()` methods (or `click*()`, `fill*()`, etc.)
+
+Perform user interactions:
+
+```typescript
+// ✅ Good: Action-focused naming
+async clickGenerateButton(): Promise<void>
+async fillCountryField(country: string): Promise<void>
+async submitForm(): Promise<void>
+
+// ❌ Avoid: Ambiguous naming
+async click(): Promise<void>
+async input(value: string): Promise<void>
+```
+
+##### Verification: `verify*()` methods
+
+Assert expected state:
+
+```typescript
+// ✅ Good: Explicit verification
+async verifyResultIsValidIBAN(): Promise<void>
+async verifyErrorMessageDisplayed(): Promise<void>
+async verifyCopyButtonVisible(): Promise<void>
+
+// ❌ Avoid: Incomplete naming
+async check(): Promise<void>
+async validate(): Promise<void>
+```
+
+### Example: IBANGeneratorPage
+
+```typescript
+export class IBANGeneratorPage extends BasePage {
+  // Locators (return Locator, no execution)
+  getGenerateButton(): Locator {
+    return this.page.getByRole("button", { name: /Generate IBAN/i });
+  }
+
+  // Actions (perform user interactions)
+  async clickGenerateButton(): Promise<void> {
+    const btn = this.getGenerateButton();
+    await expect(btn).toBeEnabled({ timeout: 5000 });
+    await btn.click();
+  }
+
+  // Verification (assert expectations)
+  async verifyResultIsValidIBAN(): Promise<void> {
+    const text = await this.getResultText();
+    expect(text).toMatch(/[A-Z]{2}\d{2}/);
+  }
+}
+```
+
+### Using POM in Tests
+
+Tests become cleaner and more readable:
+
+#### ❌ Before (inline selectors)
+
+```typescript
+test("should copy IBAN", async ({ page }) => {
+  const generateBtn = page.getByRole("button", { name: /Generate IBAN/i });
+  await generateBtn.click();
+
+  const copyBtn = page.locator("[data-testid='iban-copy-button']");
+  await expect(copyBtn).toBeVisible({ timeout: 20000 });
+  await copyBtn.click();
+
+  const toast = page.getByText("IBAN copied to clipboard", { exact: true });
+  await expect(toast).toBeVisible({ timeout: 5000 });
+  await expect(toast).toBeHidden({ timeout: 10000 });
+});
+```
+
+#### ✅ After (using POM)
+
+```typescript
+test("should copy IBAN", async ({ page }) => {
+  const ibanPage = new IBANGeneratorPage(page);
+  await ibanPage.setup();
+
+  await ibanPage.clickGenerateButton();
+  await ibanPage.performCopyAction();
+});
+```
+
+### Adding New Page Objects
+
+When adding a new tested page:
+
+1. **Create the POM class**:
+   ```typescript
+   export class MyPage extends BasePage {
+     // Locators, actions, verification methods
+   }
+   ```
+
+2. **Extract all selectors as `get*()` methods**:
+   ```typescript
+   getSubmitButton(): Locator {
+     return this.page.getByRole("button", { name: "Submit" });
+   }
+   ```
+
+3. **Encapsulate actions as async methods**:
+   ```typescript
+   async submitForm(): Promise<void> {
+     await this.getSubmitButton().click();
+   }
+   ```
+
+4. **Add verification methods**:
+   ```typescript
+   async verifyFormSubmitted(): Promise<void> {
+     await expect(this.getSuccessMessage()).toBeVisible();
+   }
+   ```
+
+5. **Use in tests**:
+   ```typescript
+   test("should submit form", async ({ page }) => {
+     const myPage = new MyPage(page);
+     await myPage.setup();
+     await myPage.submitForm();
+     await myPage.verifyFormSubmitted();
+   });
+   ```
+
+### Benefits of POM
+
+| Issue | POM Solution |
+|-------|--------------|
+| Selector changes require updating multiple tests | Centralize in one `get*()` method |
+| Duplicate click/wait logic across tests | Encapsulate in reusable action method |
+| Tests are hard to read and maintain | Read like user stories with method names |
+| No clear separation between test logic and selectors | Clean separation: POM = selectors/actions, tests = scenarios |
+| Difficult to find which tests use a specific selector | Search for `get*()` method usage |
+
 ## E2E Diagnostic Configuration
 
 ### Trace, Video & Screenshot Retention

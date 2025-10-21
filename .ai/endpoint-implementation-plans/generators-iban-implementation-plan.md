@@ -74,10 +74,10 @@ export interface IbanGenerateResponse {
 - Cyfry kontrolne: standard IBAN (przeniesienie `country` + `00` na koniec, transliteracja A=10..Z=35, `check=98 - (N mod 97)`).
 - Wynik: `CC{check}{BBAN}` z długością 22 (DE) / 20 (AT).
 
-### Przykłady testowe („golden values”)
+### Przykłady testowe („golden values")
 
-- `GET /generators/iban?country=DE&seed=1234` → `DE86011870660241783056`
-- `GET /generators/iban?country=AT&seed=1234` → `AT370118702417830564`
+- `GET /generators/iban?country=DE&seed=1234` → `DE50185482443452538353`
+- `GET /generators/iban?country=AT&seed=1234` → `AT471854824434525383`
 
 ## 6. Względy bezpieczeństwa
 

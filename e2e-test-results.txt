@@ -1,0 +1,9 @@
+
+> qa-toolsmith@0.0.1 test:e2e
+> playwright test
+
+[1A[2K
+To open last HTML report run:
+[36m[39m
+[36m  npx playwright show-report[39m
+[36m[39m
