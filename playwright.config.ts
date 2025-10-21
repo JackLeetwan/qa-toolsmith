@@ -3,9 +3,6 @@ import { defineConfig, devices } from "@playwright/test";
 export default defineConfig({
   testDir: "./e2e",
   outputDir: "./test-results",
-  snapshotDir: "./e2e/snapshots",
-  snapshotPathTemplate:
-    "./e2e/snapshots/{testFileDir}/{testFileName}-{platform}{ext}",
 
   fullyParallel: process.env.CI ? false : true,
   forbidOnly: !!process.env.CI,

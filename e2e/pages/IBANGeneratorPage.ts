@@ -89,6 +89,14 @@ export class IBANGeneratorPage extends BasePage {
   }
 
   /**
+   * Set the seed input value for deterministic IBAN generation
+   */
+  async setSeed(seed: string): Promise<void> {
+    const seedInput = this.page.locator("#seed");
+    await seedInput.fill(seed);
+  }
+
+  /**
    * Click the generate button to create a new IBAN
    */
   async clickGenerateButton(): Promise<void> {

@@ -327,7 +327,8 @@ test.describe("Visual Regression - Desktop (1280x720)", () => {
       await page.waitForLoadState("networkidle");
       await ibanPage.waitForPageLoad();
 
-      // Generate IBAN
+      // Generate IBAN with fixed seed for deterministic output
+      await ibanPage.setSeed("visual-test-seed");
       await ibanPage.clickGenerateButton();
       await ibanPage.waitForResultVisible();
 
@@ -359,7 +360,8 @@ test.describe("Visual Regression - Desktop (1280x720)", () => {
       await page.waitForLoadState("networkidle");
       await ibanPage.waitForPageLoad();
 
-      // Generate IBAN
+      // Generate IBAN with fixed seed for deterministic output
+      await ibanPage.setSeed("visual-test-seed");
       await ibanPage.clickGenerateButton();
       await ibanPage.waitForResultVisible();
 
@@ -448,7 +450,8 @@ test.describe("Visual Regression - Desktop (1280x720)", () => {
       await page.waitForLoadState("networkidle");
       await ibanPage.waitForPageLoad();
 
-      // Generate IBAN
+      // Generate IBAN with fixed seed for deterministic output
+      await ibanPage.setSeed("visual-test-seed");
       await ibanPage.clickGenerateButton();
       await ibanPage.waitForResultVisible();
 
@@ -480,7 +483,8 @@ test.describe("Visual Regression - Desktop (1280x720)", () => {
       await page.waitForLoadState("networkidle");
       await ibanPage.waitForPageLoad();
 
-      // Generate IBAN
+      // Generate IBAN with fixed seed for deterministic output
+      await ibanPage.setSeed("visual-test-seed");
       await ibanPage.clickGenerateButton();
       await ibanPage.waitForResultVisible();
 
@@ -596,6 +600,11 @@ test.describe("Visual Regression - Tablet (768x1024)", () => {
       await page.reload();
       await page.waitForLoadState("networkidle");
 
+      // Wait for dark theme to be fully applied
+      await page.waitForFunction(() => {
+        return document.documentElement.classList.contains("dark");
+      });
+
       // Get the main hero section
       const heroSection = await page.locator("main").first();
       await expect(heroSection).toBeVisible();
@@ -653,7 +662,8 @@ test.describe("Visual Regression - Tablet (768x1024)", () => {
       await page.waitForLoadState("networkidle");
       await ibanPage.waitForPageLoad();
 
-      // Generate IBAN
+      // Generate IBAN with fixed seed for deterministic output
+      await ibanPage.setSeed("visual-test-seed");
       await ibanPage.clickGenerateButton();
       await ibanPage.waitForResultVisible();
 
@@ -711,7 +721,8 @@ test.describe("Visual Regression - Tablet (768x1024)", () => {
       await page.waitForLoadState("networkidle");
       await ibanPage.waitForPageLoad();
 
-      // Generate IBAN
+      // Generate IBAN with fixed seed for deterministic output
+      await ibanPage.setSeed("visual-test-seed");
       await ibanPage.clickGenerateButton();
       await ibanPage.waitForResultVisible();
 
