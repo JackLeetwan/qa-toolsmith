@@ -26,5 +26,8 @@ CI/CD i Hosting:
 Testing - Narzędzia do testowania aplikacji:
 
 - Vitest - framework do testów jednostkowych, szybki i kompatybilny z Vite
+  - 1167 testów jednostkowych (34 pliki testowe)
+  - Testuje: IBAN validator/generator, serwisy, helpery, utility functions
 - Playwright - framework do testów end-to-end (E2E) z obsługą wielu przeglądarek
-- React Testing Library - biblioteka do testowania komponentów React w sposób zbliżony do użytkownika końcowego
+  - 10 testów E2E obejmujących: generatory, nawigację, autentykację
+  - Pełne diagnostyki: traces, screenshots, videos (on failure)

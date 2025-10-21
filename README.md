@@ -189,9 +189,11 @@ For flaky IBAN generator tests, check:
 
 ### 7. Testing & CI/CD ✅
 
-- **Unit tests**: IBAN validator, generator & edge cases (property-based, 1000+ cases)
-- **E2E tests**: Playwright (generators, navigation, authentication)
-- **Smoke tests**: GET /health, homepage render, login
+- **Unit tests**: 1167 tests across 34 test files
+  - IBAN validator & generator: 158 test cases covering edge cases
+  - Authentication, services, helpers, and utilities: 1009 test cases
+- **E2E tests**: 10 Playwright tests covering generators, navigation, and authentication
+- **Smoke tests**: GET /health, homepage render, login flow
 - **CI/CD**: GitHub Actions pipeline (lint → build → test → e2e → health-check)
 
 ## API Documentation
