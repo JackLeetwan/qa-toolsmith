@@ -1,5 +1,5 @@
 import type { APIRoute } from "astro";
-import { createSupabaseServerInstance } from "../../../db/supabase.client.ts";
+import { createSupabaseServerInstance } from "../../../db/supabase.client";
 import { z } from "zod";
 import { logger } from "../../../lib/utils/logger";
 
@@ -8,9 +8,15 @@ const signinSchema = z.object({
     .string()
     .min(1, "Email jest wymagany")
     .max(254, "Email jest za długi")
-    .email("Nieprawidłowy format email")
-    .transform((val) => val.trim().toLowerCase()),
-  password: z.string().min(1, "Hasło jest wymagane").max(72, "Hasło jest za długie"),
+    .transform((val) => val.trim().toLowerCase())
+    .refine((val) => {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(val);
+    }, "Nieprawidłowy format email"),
+  password: z
+    .string()
+    .min(1, "Hasło jest wymagane")
+    .max(72, "Hasło jest za długie"),
 });
 
 export const POST: APIRoute = async ({ request, cookies }) => {
@@ -19,7 +25,10 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
   try {
     const body = await request.json();
-    logger.debug("📥 Request body received:", { email: body.email, hasPassword: !!body.password });
+    logger.debug("📥 Request body received:", {
+      email: body.email,
+      hasPassword: !!body.password,
+    });
 
     const { email, password } = signinSchema.parse(body);
     logger.debug("✅ Input validation passed for email:", email);
@@ -52,7 +61,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
         {
           status: 400,
           headers: { "Content-Type": "application/json" },
-        }
+        },
       );
     }
 
@@ -73,7 +82,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       {
         status: 200,
         headers: { "Content-Type": "application/json" },
-      }
+      },
     );
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -86,7 +95,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
         {
           status: 400,
           headers: { "Content-Type": "application/json" },
-        }
+        },
       );
     }
 
@@ -102,7 +111,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       {
         status: 500,
         headers: { "Content-Type": "application/json" },
-      }
+      },
     );
   }
 };

@@ -19,7 +19,7 @@ const resetRequestSchema = z.object({
     .transform((val) => val.trim().toLowerCase()),
 });
 
-type ResetRequestFormData = z.infer<typeof resetRequestSchema>;
+export type ResetRequestFormData = z.infer<typeof resetRequestSchema>;
 
 interface ResetRequestFormProps {
   onSubmit?: (data: ResetRequestFormData) => Promise<void>;
@@ -68,7 +68,9 @@ export default function ResetRequestForm({
         <CardContent className="space-y-4">
           <Alert>
             <CheckCircle className="h-4 w-4" />
-            <AlertDescription>Jeśli konto istnieje, wyślemy instrukcję na e‑mail.</AlertDescription>
+            <AlertDescription>
+              Jeśli konto istnieje, wyślemy instrukcję na e‑mail.
+            </AlertDescription>
           </Alert>
 
           <div className="text-center space-y-2">
@@ -98,13 +100,20 @@ export default function ResetRequestForm({
   return (
     <Card className="w-full">
       <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl text-center">Reset hasła</CardTitle>
+        <CardTitle id="reset-form-title" className="text-2xl text-center">
+          Reset hasła
+        </CardTitle>
         <p className="text-sm text-muted-foreground text-center">
           Wprowadź swój email, a wyślemy Ci instrukcję resetowania hasła
         </p>
       </CardHeader>
       <CardContent className="space-y-4">
-        <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
+        <form
+          onSubmit={handleSubmit(handleFormSubmit)}
+          className="space-y-4"
+          noValidate
+          aria-labelledby="reset-form-title"
+        >
           {/* Email field */}
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
@@ -117,6 +126,7 @@ export default function ResetRequestForm({
                 className="pl-10"
                 disabled={isFormLoading}
                 aria-invalid={!!errors.email}
+                autoComplete="email"
                 {...register("email")}
               />
             </div>

@@ -26,7 +26,7 @@ export const GET: APIRoute = async ({ request, cookies }) => {
         {
           status: 401,
           headers: { "Content-Type": "application/json" },
-        }
+        },
       );
     }
 
@@ -46,7 +46,7 @@ export const GET: APIRoute = async ({ request, cookies }) => {
         {
           status: 200,
           headers: { "Content-Type": "application/json" },
-        }
+        },
       );
     } else {
       logger.debug("❌ Auth check: No authenticated user");
@@ -57,7 +57,7 @@ export const GET: APIRoute = async ({ request, cookies }) => {
         {
           status: 401,
           headers: { "Content-Type": "application/json" },
-        }
+        },
       );
     }
   } catch (error) {
@@ -70,7 +70,7 @@ export const GET: APIRoute = async ({ request, cookies }) => {
       {
         status: 500,
         headers: { "Content-Type": "application/json" },
-      }
+      },
     );
   }
 };

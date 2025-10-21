@@ -24,7 +24,10 @@ export function validateIban(iban: string): IbanValidationResult {
 
   // Check minimum length
   if (normalized.length < 15) {
-    return { valid: false, reason: "IBAN is too short (minimum 15 characters)" };
+    return {
+      valid: false,
+      reason: "IBAN is too short (minimum 15 characters)",
+    };
   }
 
   // Check maximum length
@@ -62,13 +65,19 @@ export function validateIban(iban: string): IbanValidationResult {
   // Validate BBAN contains only alphanumeric characters
   const bban = normalized.slice(4);
   if (!/^[A-Z0-9]+$/.test(bban)) {
-    return { valid: false, reason: "BBAN contains invalid characters (must be alphanumeric)" };
+    return {
+      valid: false,
+      reason: "BBAN contains invalid characters (must be alphanumeric)",
+    };
   }
 
   // Perform mod-97 checksum validation
   const isChecksumValid = validateIbanChecksum(normalized);
   if (!isChecksumValid) {
-    return { valid: false, reason: "Invalid checksum (mod-97 validation failed)" };
+    return {
+      valid: false,
+      reason: "Invalid checksum (mod-97 validation failed)",
+    };
   }
 
   return { valid: true };

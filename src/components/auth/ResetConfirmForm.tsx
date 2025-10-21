@@ -16,7 +16,10 @@ const resetConfirmSchema = z
       .string()
       .min(8, "Hasło musi mieć co najmniej 8 znaków")
       .max(72, "Hasło jest za długie")
-      .regex(/^(?=.*[A-Za-z])(?=.*\d)/, "Hasło musi zawierać co najmniej jedną literę i jedną cyfrę"),
+      .regex(
+        /^(?=.*[A-Za-z])(?=.*\d)/,
+        "Hasło musi zawierać co najmniej jedną literę i jedną cyfrę",
+      ),
     confirmPassword: z.string().min(1, "Potwierdzenie hasła jest wymagane"),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -24,10 +27,12 @@ const resetConfirmSchema = z
     path: ["confirmPassword"],
   });
 
-type ResetConfirmFormData = z.infer<typeof resetConfirmSchema>;
+export type ResetConfirmFormData = z.infer<typeof resetConfirmSchema>;
 
 interface ResetConfirmFormProps {
-  onSubmit?: (data: Omit<ResetConfirmFormData, "confirmPassword">) => Promise<void>;
+  onSubmit?: (
+    data: Omit<ResetConfirmFormData, "confirmPassword">,
+  ) => Promise<void>;
   isLoading?: boolean;
   error?: string;
   success?: boolean;
@@ -72,13 +77,16 @@ export default function ResetConfirmForm({
     return (
       <Card className="w-full">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl text-center">Hasło zaktualizowane</CardTitle>
+          <CardTitle className="text-2xl text-center">
+            Hasło zaktualizowane
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <Alert>
             <CheckCircle className="h-4 w-4" />
             <AlertDescription>
-              Twoje hasło zostało pomyślnie zaktualizowane. Zostałeś automatycznie zalogowany.
+              Twoje hasło zostało pomyślnie zaktualizowane. Zostałeś
+              automatycznie zalogowany.
             </AlertDescription>
           </Alert>
 
@@ -96,19 +104,26 @@ export default function ResetConfirmForm({
     return (
       <Card className="w-full">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl text-center">Nieprawidłowy link</CardTitle>
+          <CardTitle className="text-2xl text-center">
+            Nieprawidłowy link
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              Link do resetowania hasła jest nieprawidłowy lub wygasł. Poproś o nowy link.
+              Link do resetowania hasła jest nieprawidłowy lub wygasł. Poproś o
+              nowy link.
             </AlertDescription>
           </Alert>
 
           <div className="text-center">
-            <Button asChild variant="outline" className="w-full">
-              <a href="/auth/reset">Poproś o nowy link</a>
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => (window.location.href = "/auth/reset")}
+            >
+              Poproś o nowy link
             </Button>
           </div>
         </CardContent>
@@ -120,10 +135,17 @@ export default function ResetConfirmForm({
     <Card className="w-full">
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl text-center">Ustaw nowe hasło</CardTitle>
-        <p className="text-sm text-muted-foreground text-center">Wprowadź nowe hasło dla swojego konta</p>
+        <p className="text-sm text-muted-foreground text-center">
+          Wprowadź nowe hasło dla swojego konta
+        </p>
       </CardHeader>
       <CardContent className="space-y-4">
-        <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
+        <form
+          onSubmit={handleSubmit(handleFormSubmit)}
+          className="space-y-4"
+          noValidate
+          aria-label="Formularz ustawiania nowego hasła"
+        >
           {/* Password field */}
           <div className="space-y-2">
             <Label htmlFor="password">Nowe hasło</Label>
@@ -144,7 +166,9 @@ export default function ResetConfirmForm({
                 {errors.password.message}
               </p>
             )}
-            <p className="text-xs text-muted-foreground">Minimum 8 znaków, co najmniej jedna litera i jedna cyfra</p>
+            <p className="text-xs text-muted-foreground">
+              Minimum 8 znaków, co najmniej jedna litera i jedna cyfra
+            </p>
           </div>
 
           {/* Confirm Password field */}

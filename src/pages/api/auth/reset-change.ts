@@ -9,7 +9,10 @@ const resetChangeSchema = z.object({
     .string()
     .min(8, "Hasło musi mieć co najmniej 8 znaków")
     .max(72, "Hasło jest za długie")
-    .regex(/^(?=.*[a-zA-Z])(?=.*\d)/, "Hasło musi zawierać co najmniej jedną literę i jedną cyfrę"),
+    .regex(
+      /^(?=.*[a-zA-Z])(?=.*\d)/,
+      "Hasło musi zawierać co najmniej jedną literę i jedną cyfrę",
+    ),
 });
 
 export const POST: APIRoute = async ({ request, cookies }) => {
@@ -27,6 +30,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     });
 
     if (error) {
+      logger.error("Password update failed:", error);
       return new Response(
         JSON.stringify({
           error: "INVALID_CREDENTIALS",
@@ -35,7 +39,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
         {
           status: 400,
           headers: { "Content-Type": "application/json" },
-        }
+        },
       );
     }
 
@@ -47,7 +51,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       {
         status: 200,
         headers: { "Content-Type": "application/json" },
-      }
+      },
     );
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -59,7 +63,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
         {
           status: 400,
           headers: { "Content-Type": "application/json" },
-        }
+        },
       );
     }
 
@@ -72,7 +76,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       {
         status: 500,
         headers: { "Content-Type": "application/json" },
-      }
+      },
     );
   }
 };

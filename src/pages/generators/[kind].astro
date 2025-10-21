@@ -9,7 +9,16 @@ export const prerender = false;
 const { kind } = Astro.params;
 
 // Valid generator kinds (excluding 'iban' which has its own route)
-const validKinds: GeneratorKind[] = ["phone", "address", "plates", "email", "company", "card", "guid", "string"];
+const validKinds: GeneratorKind[] = [
+  "phone",
+  "address",
+  "plates",
+  "email",
+  "company",
+  "card",
+  "guid",
+  "string",
+];
 
 // Validate kind
 if (!kind || !validKinds.includes(kind as GeneratorKind)) {
@@ -17,18 +26,24 @@ if (!kind || !validKinds.includes(kind as GeneratorKind)) {
 }
 
 // Map kind to user-friendly titles and descriptions
-const generatorMeta: Record<GeneratorKind, { title: string; description: string }> = {
+const generatorMeta: Record<
+  GeneratorKind,
+  { title: string; description: string }
+> = {
   phone: {
     title: "Phone Number Generator",
-    description: "Generate realistic phone numbers (mobile or landline) for Poland, Germany, and Austria.",
+    description:
+      "Generate realistic phone numbers (mobile or landline) for Poland, Germany, and Austria.",
   },
   address: {
     title: "Address Generator",
-    description: "Generate realistic addresses (home or business) with street, city, and postal code.",
+    description:
+      "Generate realistic addresses (home or business) with street, city, and postal code.",
   },
   plates: {
     title: "License Plate Generator",
-    description: "Generate valid license plate numbers in country-specific formats.",
+    description:
+      "Generate valid license plate numbers in country-specific formats.",
   },
   email: {
     title: "Email Generator",
@@ -40,7 +55,8 @@ const generatorMeta: Record<GeneratorKind, { title: string; description: string 
   },
   card: {
     title: "Payment Card Generator",
-    description: "Generate valid test payment card numbers (Visa, Mastercard) with Luhn checksum.",
+    description:
+      "Generate valid test payment card numbers (Visa, Mastercard) with Luhn checksum.",
   },
   guid: {
     title: "GUID Generator",
@@ -48,7 +64,8 @@ const generatorMeta: Record<GeneratorKind, { title: string; description: string 
   },
   string: {
     title: "Random String Generator",
-    description: "Generate random strings with configurable length and character sets.",
+    description:
+      "Generate random strings with configurable length and character sets.",
   },
 };
 

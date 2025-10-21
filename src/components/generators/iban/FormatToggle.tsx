@@ -8,7 +8,11 @@ interface FormatToggleProps {
 
 export default function FormatToggle({ value, onChange }: FormatToggleProps) {
   return (
-    <div className="flex items-center gap-2" role="group" aria-label="Output format">
+    <div
+      className="flex items-center gap-2"
+      role="group"
+      aria-label="Output format"
+    >
       <Button
         variant={value === "text" ? "default" : "outline"}
         size="sm"

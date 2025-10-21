@@ -54,7 +54,15 @@ export type CharterNoteTag = "bug" | "idea" | "question" | "risk";
 /** Generators */
 export type IbanCountry = "DE" | "AT" | "PL";
 export type LocalDataCountry = "PL" | "DE" | "AT";
-export type GeneratorKind = "address" | "phone" | "plates" | "email" | "company" | "card" | "guid" | "string";
+export type GeneratorKind =
+  | "address"
+  | "phone"
+  | "plates"
+  | "email"
+  | "company"
+  | "card"
+  | "guid"
+  | "string";
 
 /** UI-specific types for Generators view */
 export type OutputFormat = "text" | "json";
@@ -104,7 +112,10 @@ export type AIField = "description" | "steps" | "hypotheses" | "notes";
 type ProfileRow = Tables<"profiles">;
 
 /** Response for GET /profiles/me and list items in /admin/profiles */
-export type ProfileDTO = Pick<ProfileRow, "id" | "email" | "created_at" | "updated_at"> & {
+export type ProfileDTO = Pick<
+  ProfileRow,
+  "id" | "email" | "created_at" | "updated_at"
+> & {
   role: Role; // constrain to API enum
 };
 
@@ -122,7 +133,13 @@ export type AdminProfilesListResponse = KeysetPage<ProfileDTO>;
  * ----------------------------------------------------- */
 
 /** Structured field schema stored in templates.fields (DB has Json) */
-export type TemplateFieldType = "text" | "markdown" | "number" | "date" | "select" | "multiselect";
+export type TemplateFieldType =
+  | "text"
+  | "markdown"
+  | "number"
+  | "date"
+  | "select"
+  | "multiselect";
 
 /** Minimal, practical schema matching the API plan */
 export interface TemplateField {
@@ -148,7 +165,12 @@ export type TemplateDTO = Omit<TemplateRow, "fields" | "scope" | "preset"> & {
 /** List shape: GET /templates (alias of templates_effective view) */
 export type TemplateListItemDTO = Omit<
   TemplateEffectiveRow,
-  "fields" | "scope" | "preset" | "required_fields" | "is_readonly" | "origin_template_id"
+  | "fields"
+  | "scope"
+  | "preset"
+  | "required_fields"
+  | "is_readonly"
+  | "origin_template_id"
 > & {
   fields: TemplateField[] | null;
   scope: TemplateScope | null;
@@ -172,7 +194,10 @@ export interface CreateTemplateCommand {
 
 /** PATCH /templates/{id} — mutable fields, readonly semantics enforced by server */
 export type UpdateTemplateCommand = Partial<
-  Pick<TemplateDTO, "name" | "fields" | "required_fields" | "attachments" | "preset" | "scope">
+  Pick<
+    TemplateDTO,
+    "name" | "fields" | "required_fields" | "attachments" | "preset" | "scope"
+  >
 >;
 
 /** POST /templates/{id}/fork — create a user-owned fork */
@@ -205,7 +230,9 @@ export type CreateDraftCommand = Pick<DraftRow, "title" | "content"> & {
   template_id?: UUID | null;
 };
 
-export type UpdateDraftCommand = Partial<Pick<DraftRow, "title" | "content" | "template_id">>;
+export type UpdateDraftCommand = Partial<
+  Pick<DraftRow, "title" | "content" | "template_id">
+>;
 
 /* -------------------------------------------------------
  * Charters & Notes
@@ -228,7 +255,9 @@ export interface CreateCharterCommand {
 }
 
 /** PATCH /charters/{id} — update mutable fields */
-export type UpdateCharterCommand = Partial<Pick<CharterRow, "goal" | "hypotheses" | "summary_notes">>;
+export type UpdateCharterCommand = Partial<
+  Pick<CharterRow, "goal" | "hypotheses" | "summary_notes">
+>;
 
 /** POST /charters/{id}/start and /stop — no payload, status transitions are server-side */
 export type StartCharterCommand = Record<never, never>;
@@ -269,7 +298,9 @@ export interface CreateKBEntryCommand {
   tags?: string[];
 }
 
-export type UpdateKBEntryCommand = Partial<Pick<KBEntryDTO, "title" | "tags" | "url_original">>;
+export type UpdateKBEntryCommand = Partial<
+  Pick<KBEntryDTO, "title" | "tags" | "url_original">
+>;
 
 /** KB notes */
 export type KBNoteDTO = KbNoteRow;
@@ -419,6 +450,34 @@ export interface ValidationResult {
 export interface Message {
   role: "system" | "user" | "assistant";
   content: string;
+}
+
+/* -------------------------------------------------------
+ * OpenRouter API Types
+ * ----------------------------------------------------- */
+
+export interface OpenRouterChoice {
+  message: {
+    content: string;
+    role?: string;
+  };
+  finish_reason?: string;
+  index?: number;
+}
+
+export interface OpenRouterUsage {
+  prompt_tokens: number;
+  completion_tokens: number;
+  total_tokens: number;
+}
+
+export interface OpenRouterResponse {
+  choices: OpenRouterChoice[];
+  model: string;
+  usage: OpenRouterUsage;
+  created?: number;
+  id?: string;
+  object?: string;
 }
 
 /* -------------------------------------------------------

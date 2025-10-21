@@ -20,7 +20,7 @@ npm install
 # Start development server
 npm run dev
 
-# Application should be available at http://localhost:4321
+# Application should be available at http://localhost:3000
 ```
 
 ## Manual Testing Checklist

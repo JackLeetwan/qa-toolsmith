@@ -41,6 +41,10 @@ QA Toolsmith is an open-source, lightweight web application that standardizes an
 - **CI/CD & Hosting**
   - GitHub Actions
   - Docker (DigitalOcean)
+- **Testing**
+  - Vitest (unit testing)
+  - Playwright (E2E testing)
+  - React Testing Library (component testing)
 
 ## Getting Started Locally
 
@@ -70,6 +74,20 @@ npm run build
 npm run preview
 ```
 
+### Pre-commit Hooks
+
+This project uses **Husky** and **lint-staged** to automatically lint, format, and type-check files before each commit:
+
+- Staged TypeScript/JavaScript files are automatically fixed with ESLint
+- All staged files are formatted with Prettier
+- TypeScript type checking blocks commits if errors are found
+
+The hooks run automatically when you commit. To bypass them (not recommended):
+
+```bash
+git commit --no-verify
+```
+
 ## Available Scripts
 
 - `npm run dev` — Start development server
@@ -79,6 +97,35 @@ npm run preview
 - `npm run lint` — Run ESLint checks
 - `npm run lint:fix` — Automatically fix lint issues
 - `npm run format` — Format files with Prettier
+- `npm run typecheck` — Run TypeScript type checking
+- `npm run test` — Run all tests (unit + E2E)
+- `npm run test:unit` — Run unit tests with Vitest
+- `npm run test:e2e` — Run E2E tests with Playwright
+- `npm run test:e2e:ui` — Open Playwright UI for test development
+- `npm run test:e2e:debug` — Run E2E tests in debug mode (step-through)
+- `npm run test:e2e:headed` — Run E2E tests in headed mode (visible browser)
+
+### E2E Diagnostics
+
+When tests fail, Playwright automatically captures diagnostic artifacts:
+
+```bash
+# View HTML report with traces, videos, and screenshots
+npx playwright show-report
+
+# Or manually open the HTML report
+open playwright-report/index.html
+```
+
+The report includes:
+- **Traces**: Full HAR + event timeline for debugging selectors and hydration issues
+- **Videos**: Screen recording of failed test sessions
+- **Screenshots**: Snapshot at exact failure point
+
+For flaky IBAN generator tests, check:
+1. Timeline in HTML report to see exact failure step
+2. Video to watch selector interactions
+3. Trace to inspect network timing and DOM mutations
 
 ## Project Scope
 
@@ -96,7 +143,7 @@ npm run preview
 
 ### 3. Exploration Chart
 
-- Charters with Goal, Hypotheses, Notes (tags: bug / idea / question / risk)
+- Charters with Goal, Hypotheses, Notes (tags: bug / idea / question / risk)
 - Start/Stop timer, keyboard shortcuts (Alt+N, Alt+T, Alt+S)
 - Autosave (localStorage every 5 s, DB on close)
 - Markdown export & session history
@@ -116,7 +163,7 @@ npm run preview
 
 ### 6. AI Assistant
 
-- “Improve / Expand” actions for descriptions, steps, notes
+- "Improve / Expand" actions for descriptions, steps, notes
 - Diff preview with accept/reject
 - Per-user daily limit (`AI_MAX_REQUESTS_PER_USER_PER_DAY`), dry-run & manual fallback
 
@@ -136,7 +183,7 @@ The QA Toolsmith API provides several endpoints for interacting with the applica
 ## Project Status
 
 - **MVP Complete** (v0.0.1)
-- Actively maintained feature set for testers’ core workflows
+- Actively maintained feature set for testers' core workflows
 
 ## License
 

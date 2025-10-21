@@ -401,17 +401,17 @@ pm.test("Status is 200 on valid credentials", function () {
 
 // Response structure
 pm.test("Response has access_token", function () {
-  var jsonData = pm.response.json();
+  let jsonData = pm.response.json();
   pm.expect(jsonData).to.have.property("access_token");
 });
 
 pm.test("Response has profile", function () {
-  var jsonData = pm.response.json();
+  let jsonData = pm.response.json();
   pm.expect(jsonData).to.have.property("profile");
 });
 
 pm.test("Profile has required fields", function () {
-  var jsonData = pm.response.json();
+  let jsonData = pm.response.json();
   pm.expect(jsonData.profile).to.have.property("id");
   pm.expect(jsonData.profile).to.have.property("email");
   pm.expect(jsonData.profile).to.have.property("role");
@@ -423,12 +423,14 @@ pm.test("X-Request-ID header present", function () {
 });
 
 pm.test("Content-Type is application/json", function () {
-  pm.expect(pm.response.headers.get("Content-Type")).to.include("application/json");
+  pm.expect(pm.response.headers.get("Content-Type")).to.include(
+    "application/json",
+  );
 });
 
 // Save token for later use
 pm.test("Save access_token for authenticated requests", function () {
-  var jsonData = pm.response.json();
+  let jsonData = pm.response.json();
   pm.environment.set("ACCESS_TOKEN", jsonData.access_token);
 });
 ```

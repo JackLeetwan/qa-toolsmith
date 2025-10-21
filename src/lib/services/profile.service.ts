@@ -2,17 +2,29 @@ import { createClient } from "@supabase/supabase-js";
 import type { Database } from "../../db/database.types";
 import type { ProfileDTO } from "../../types/types";
 
-const supabaseUrl = import.meta.env.SUPABASE_URL;
-const supabaseServiceKey = import.meta.env.SUPABASE_SERVICE_KEY;
+function getSupabaseDb(): ReturnType<typeof createClient<Database>> {
+  // Allow bypassing credential check in test environment
+  if (import.meta.env.VITEST) {
+    return createClient<Database>(
+      "https://test.supabase.co",
+      "test-service-key",
+    );
+  }
 
-if (!supabaseUrl || !supabaseServiceKey) {
-  throw new Error("Missing Supabase credentials (SUPABASE_URL, SUPABASE_SERVICE_KEY)");
+  const supabaseUrl = import.meta.env.SUPABASE_URL;
+  const supabaseServiceKey = import.meta.env.SUPABASE_SERVICE_KEY;
+
+  if (!supabaseUrl || !supabaseServiceKey) {
+    throw new Error(
+      "Missing Supabase credentials (SUPABASE_URL, SUPABASE_SERVICE_KEY)",
+    );
+  }
+
+  return createClient<Database>(supabaseUrl, supabaseServiceKey);
 }
 
-const supabaseDb = createClient<Database>(supabaseUrl, supabaseServiceKey);
-
 const PROFILE_RETRY_ATTEMPTS = 3;
-const PROFILE_RETRY_DELAY = 50; // ms
+const PROFILE_RETRY_DELAY = import.meta.env.VITEST ? 1 : 50; // ms - shorter delay for tests
 
 /**
  * Fetch user profile by user ID with retry logic.
@@ -28,7 +40,7 @@ const PROFILE_RETRY_DELAY = 50; // ms
 export async function getByUserId(userId: string): Promise<ProfileDTO> {
   for (let attempt = 0; attempt < PROFILE_RETRY_ATTEMPTS; attempt++) {
     try {
-      const { data, error } = await supabaseDb
+      const { data, error } = await getSupabaseDb()
         .from("profiles")
         .select("id, email, role, created_at, updated_at")
         .eq("id", userId)

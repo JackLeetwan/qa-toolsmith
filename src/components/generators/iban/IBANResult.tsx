@@ -1,4 +1,10 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Copy, Check } from "lucide-react";
 import { useState } from "react";
@@ -23,14 +29,18 @@ export default function IBANResult({ data, format }: IBANResultProps) {
       textToCopy = data.iban;
     }
 
-    const success = await copyToClipboard(textToCopy, "IBAN copied to clipboard");
+    const success = await copyToClipboard(
+      textToCopy,
+      "IBAN copied to clipboard",
+    );
     if (success) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }
   };
 
-  const displayContent = format === "json" ? JSON.stringify(data, null, 2) : data.iban;
+  const displayContent =
+    format === "json" ? JSON.stringify(data, null, 2) : data.iban;
 
   return (
     <Card>
@@ -41,7 +51,8 @@ export default function IBANResult({ data, format }: IBANResultProps) {
             <CardDescription>
               {data.seed ? (
                 <>
-                  Deterministic result for seed: <code className="text-xs">{data.seed}</code>
+                  Deterministic result for seed:{" "}
+                  <code className="text-xs">{data.seed}</code>
                 </>
               ) : (
                 "Random IBAN generated"
@@ -54,14 +65,24 @@ export default function IBANResult({ data, format }: IBANResultProps) {
             onClick={handleCopy}
             disabled={isCopying}
             aria-label="Copy IBAN to clipboard"
+            data-testid="iban-copy-button"
           >
-            {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+            {copied ? (
+              <Check className="h-4 w-4" />
+            ) : (
+              <Copy className="h-4 w-4" />
+            )}
             <span className="sr-only">{copied ? "Copied" : "Copy"}</span>
           </Button>
         </div>
       </CardHeader>
       <CardContent>
-        <pre className="p-4 bg-muted rounded-lg overflow-x-auto" role="region" aria-label="Generated IBAN result">
+        <pre
+          className="p-4 bg-muted rounded-lg overflow-x-auto"
+          role="region"
+          aria-label="Generated IBAN result"
+          data-testid="iban-result-content"
+        >
           <code className="text-sm font-mono">{displayContent}</code>
         </pre>
       </CardContent>

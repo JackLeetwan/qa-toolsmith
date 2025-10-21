@@ -1,6 +1,7 @@
 import { includeIgnoreFile } from "@eslint/compat";
 import eslint from "@eslint/js";
-import eslintPluginPrettier from "eslint-plugin-prettier/recommended";
+import eslintConfigPrettier from "eslint-config-prettier";
+import eslintPluginPrettier from "eslint-plugin-prettier";
 import eslintPluginAstro from "eslint-plugin-astro";
 import jsxA11y from "eslint-plugin-jsx-a11y";
 import pluginReact from "eslint-plugin-react";
@@ -16,10 +17,21 @@ const __dirname = path.dirname(__filename);
 const gitignorePath = path.resolve(__dirname, ".gitignore");
 
 const baseConfig = tseslint.config({
-  extends: [eslint.configs.recommended, tseslint.configs.strict, tseslint.configs.stylistic],
+  extends: [
+    eslint.configs.recommended,
+    tseslint.configs.strict,
+    tseslint.configs.stylistic,
+  ],
   rules: {
     "no-console": "warn",
     "no-unused-vars": "off",
+  },
+});
+
+const testConfig = tseslint.config({
+  files: ["**/*.test.{js,ts,tsx}", "**/test/**/*.{js,ts,tsx}"],
+  rules: {
+    "no-console": "off",
   },
 });
 
@@ -31,6 +43,7 @@ const jsxA11yConfig = tseslint.config({
   },
   rules: {
     ...jsxA11y.flatConfigs.recommended.rules,
+    "jsx-a11y/heading-has-content": "off", // Allow headings in component libraries that expect children
   },
 });
 
@@ -56,11 +69,22 @@ const reactConfig = tseslint.config({
   },
 });
 
+const prettierConfig = tseslint.config({
+  plugins: {
+    prettier: eslintPluginPrettier,
+  },
+  rules: {
+    "prettier/prettier": "error",
+  },
+});
+
 export default tseslint.config(
   includeIgnoreFile(gitignorePath),
   baseConfig,
+  testConfig,
   jsxA11yConfig,
   reactConfig,
   eslintPluginAstro.configs["flat/recommended"],
-  eslintPluginPrettier
+  prettierConfig,
+  eslintConfigPrettier,
 );

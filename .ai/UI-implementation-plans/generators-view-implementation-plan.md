@@ -184,13 +184,25 @@ export interface IbanValidateResponse {
 }
 
 // Generic
-export type GeneratorKind = "phone" | "address" | "plates" | "email" | "company" | "card" | "guid" | "string";
+export type GeneratorKind =
+  | "phone"
+  | "address"
+  | "plates"
+  | "email"
+  | "company"
+  | "card"
+  | "guid"
+  | "string";
 export type Country = "PL" | "DE" | "AT";
 
 export type GenericParams =
   | { kind: "address"; type: "home" | "business" }
   | { kind: "phone"; type: "mobile" | "landline" }
-  | { kind: "string"; length: number; charset: "alnum" | "hex" | "base64" | "printable" }
+  | {
+      kind: "string";
+      length: number;
+      charset: "alnum" | "hex" | "base64" | "printable";
+    }
   | { kind: "card"; type: "visa" | "mastercard" }
   | { kind: "email" | "company" | "guid" | "plates" }; // bez dodatkowych pól w MVP
 

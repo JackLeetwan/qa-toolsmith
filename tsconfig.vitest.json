@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [".astro/types.d.ts", "**/*", "src/test/global.d.ts"],
+  "exclude": ["dist"],
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "types": ["vitest/globals", "vitest", "vite/client", "@testing-library/jest-dom"]
+  }
+}

@@ -1,7 +1,17 @@
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { History, ChevronDown, ChevronUp, Trash2 } from "lucide-react";
 import {
   AlertDialog,
@@ -22,7 +32,11 @@ interface GeneratorHistoryProps {
   onClear: () => void;
 }
 
-export default function GeneratorHistory({ items, onSelect, onClear }: GeneratorHistoryProps) {
+export default function GeneratorHistory({
+  items,
+  onSelect,
+  onClear,
+}: GeneratorHistoryProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   const formatTimestamp = (ts: number): string => {
@@ -57,10 +71,14 @@ export default function GeneratorHistory({ items, onSelect, onClear }: Generator
             <History className="h-5 w-5" />
             History
           </CardTitle>
-          <CardDescription>Your recent generations will appear here</CardDescription>
+          <CardDescription>
+            Your recent generations will appear here
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground text-center py-4">No history yet</p>
+          <p className="text-sm text-muted-foreground text-center py-4">
+            No history yet
+          </p>
         </CardContent>
       </Card>
     );
@@ -77,13 +95,21 @@ export default function GeneratorHistory({ items, onSelect, onClear }: Generator
         >
           <div className="flex items-start justify-between gap-2">
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-mono text-muted-foreground truncate">{formatIban(item.data.iban)}</p>
+              <p className="text-xs font-mono text-muted-foreground truncate">
+                {formatIban(item.data.iban)}
+              </p>
               <div className="flex items-center gap-2 mt-1">
                 <span className="text-xs font-medium">{item.data.country}</span>
-                {item.data.seed && <span className="text-xs text-muted-foreground">• {item.data.seed}</span>}
+                {item.data.seed && (
+                  <span className="text-xs text-muted-foreground">
+                    • {item.data.seed}
+                  </span>
+                )}
               </div>
             </div>
-            <span className="text-xs text-muted-foreground whitespace-nowrap">{formatTimestamp(item.ts)}</span>
+            <span className="text-xs text-muted-foreground whitespace-nowrap">
+              {formatTimestamp(item.ts)}
+            </span>
           </div>
         </button>
       ))}
@@ -104,8 +130,14 @@ export default function GeneratorHistory({ items, onSelect, onClear }: Generator
                 </CardTitle>
                 <CollapsibleTrigger asChild>
                   <Button variant="ghost" size="sm">
-                    {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                    <span className="sr-only">{isOpen ? "Collapse" : "Expand"} history</span>
+                    {isOpen ? (
+                      <ChevronUp className="h-4 w-4" />
+                    ) : (
+                      <ChevronDown className="h-4 w-4" />
+                    )}
+                    <span className="sr-only">
+                      {isOpen ? "Collapse" : "Expand"} history
+                    </span>
                   </Button>
                 </CollapsibleTrigger>
               </div>
@@ -125,13 +157,15 @@ export default function GeneratorHistory({ items, onSelect, onClear }: Generator
                       <AlertDialogHeader>
                         <AlertDialogTitle>Clear history?</AlertDialogTitle>
                         <AlertDialogDescription>
-                          This will permanently delete all {items.length} items from your history. This action cannot be
-                          undone.
+                          This will permanently delete all {items.length} items
+                          from your history. This action cannot be undone.
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={onClear}>Clear</AlertDialogAction>
+                        <AlertDialogAction onClick={onClear}>
+                          Clear
+                        </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
                   </AlertDialog>
@@ -167,8 +201,8 @@ export default function GeneratorHistory({ items, onSelect, onClear }: Generator
                 <AlertDialogHeader>
                   <AlertDialogTitle>Clear history?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    This will permanently delete all {items.length} items from your history. This action cannot be
-                    undone.
+                    This will permanently delete all {items.length} items from
+                    your history. This action cannot be undone.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>

@@ -37,7 +37,11 @@ export const GET: APIRoute = async ({ request }) => {
     const parsed = QuerySchema.parse(queryParams);
 
     if (!parsed.iban) {
-      return createErrorResponse("VALIDATION_ERROR", "Query parameter 'iban' is required", 400);
+      return createErrorResponse(
+        "VALIDATION_ERROR",
+        "Query parameter 'iban' is required",
+        400,
+      );
     }
 
     // Validate IBAN
@@ -54,7 +58,9 @@ export const GET: APIRoute = async ({ request }) => {
   } catch (error) {
     // Handle validation errors
     if (error instanceof z.ZodError) {
-      const message = error.errors.map((e) => `${e.path.join(".")}: ${e.message}`).join("; ");
+      const message = error.errors
+        .map((e) => `${e.path.join(".")}: ${e.message}`)
+        .join("; ");
 
       return createErrorResponse("VALIDATION_ERROR", message, 400);
     }
@@ -64,7 +70,7 @@ export const GET: APIRoute = async ({ request }) => {
       "INTERNAL",
       "An unexpected server error occurred",
       500,
-      error instanceof Error ? error.message : String(error)
+      error instanceof Error ? error.message : String(error),
     );
   }
 };
@@ -73,7 +79,12 @@ export const GET: APIRoute = async ({ request }) => {
  * Create a standardized error response
  * Follows the ErrorResponse interface from src/types/types.ts
  */
-function createErrorResponse(code: ErrorCode, message: string, status: number, details?: string): Response {
+function createErrorResponse(
+  code: ErrorCode,
+  message: string,
+  status: number,
+  details?: string,
+): Response {
   const payload: Record<string, unknown> = {
     error: {
       code,

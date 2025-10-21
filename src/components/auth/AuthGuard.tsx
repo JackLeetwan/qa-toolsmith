@@ -63,7 +63,9 @@ export default function AuthGuard({ children, fallback }: AuthGuardProps) {
       <div className="flex items-center justify-center min-h-screen">
         <div className="flex items-center space-x-2">
           <Loader2 className="h-4 w-4 animate-spin" />
-          <span className="text-sm text-muted-foreground">Sprawdzanie autoryzacji...</span>
+          <span className="text-sm text-muted-foreground">
+            Sprawdzanie autoryzacji...
+          </span>
         </div>
       </div>
     );

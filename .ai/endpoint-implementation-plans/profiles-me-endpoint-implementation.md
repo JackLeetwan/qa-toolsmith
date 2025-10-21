@@ -151,16 +151,26 @@ Nagłówki odpowiedzi:
        error: authError,
      } = await sb.auth.getUser();
      if (authError || !user) {
-       return new Response(JSON.stringify({ error: { code: "UNAUTHENTICATED", message: "Sign in required" } }), {
-         status: 401,
-       });
+       return new Response(
+         JSON.stringify({
+           error: { code: "UNAUTHENTICATED", message: "Sign in required" },
+         }),
+         {
+           status: 401,
+         },
+       );
      }
      try {
        const profile = await getMyProfile(sb, user.id);
        if (!profile) {
-         return new Response(JSON.stringify({ error: { code: "INTERNAL", message: "Profile missing" } }), {
-           status: 404,
-         });
+         return new Response(
+           JSON.stringify({
+             error: { code: "INTERNAL", message: "Profile missing" },
+           }),
+           {
+             status: 404,
+           },
+         );
        }
        const body = JSON.stringify(profile);
        return new Response(body, {
@@ -173,9 +183,14 @@ Nagłówki odpowiedzi:
        });
      } catch (e) {
        console.error("[profiles/me]", e);
-       return new Response(JSON.stringify({ error: { code: "INTERNAL", message: "Unexpected error" } }), {
-         status: 500,
-       });
+       return new Response(
+         JSON.stringify({
+           error: { code: "INTERNAL", message: "Unexpected error" },
+         }),
+         {
+           status: 500,
+         },
+       );
      }
    }
    ```

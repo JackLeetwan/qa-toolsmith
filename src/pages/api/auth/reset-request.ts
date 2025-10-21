@@ -8,8 +8,11 @@ const resetRequestSchema = z.object({
     .string()
     .min(1, "Email jest wymagany")
     .max(254, "Email jest za długi")
-    .email("Nieprawidłowy format email")
-    .transform((val) => val.trim().toLowerCase()),
+    .transform((val) => val.trim().toLowerCase())
+    .refine((val) => {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(val);
+    }, "Nieprawidłowy format email"),
 });
 
 export const POST: APIRoute = async ({ request, cookies }) => {
@@ -22,11 +25,20 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       headers: request.headers,
     });
 
-    const redirectUrl = import.meta.env.AUTH_RESET_REDIRECT_URL || `${new URL(request.url).origin}/auth/reset/confirm`;
+    const envRedirectUrl = import.meta.env?.AUTH_RESET_REDIRECT_URL;
+    const redirectUrl =
+      envRedirectUrl && envRedirectUrl !== "undefined"
+        ? envRedirectUrl
+        : undefined;
 
-    await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: redirectUrl,
-    });
+    try {
+      await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: redirectUrl,
+      });
+    } catch (supabaseError) {
+      // Log the error but don't fail - we want to hide if email exists
+      logger.error("Reset password email failed:", supabaseError);
+    }
 
     // Always return success to avoid revealing if email exists
     return new Response(
@@ -37,7 +49,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       {
         status: 200,
         headers: { "Content-Type": "application/json" },
-      }
+      },
     );
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -49,7 +61,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
         {
           status: 400,
           headers: { "Content-Type": "application/json" },
-        }
+        },
       );
     }
 
@@ -62,7 +74,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       {
         status: 500,
         headers: { "Content-Type": "application/json" },
-      }
+      },
     );
   }
 };

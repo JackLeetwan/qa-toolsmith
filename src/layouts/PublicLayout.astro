@@ -19,7 +19,7 @@ const { user: localsUser } = Astro.locals;
 const user = localsUser || propUser;
 ---
 
-<Layout title={`${title} | QA Toolsmith`}>
+<Layout title={`${title}`} description={description}>
   <div class="min-h-screen bg-background">
     <TopBar client:load user={user} />
 
@@ -27,7 +27,9 @@ const user = localsUser || propUser;
       title !== "QA Toolsmith" && (
         <div class="container mx-auto px-4 py-6">
           <h1 class="text-3xl font-bold tracking-tight">{title}</h1>
-          {description && <p class="mt-2 text-muted-foreground max-w-3xl">{description}</p>}
+          {description && (
+            <p class="mt-2 text-muted-foreground max-w-3xl">{description}</p>
+          )}
         </div>
       )
     }

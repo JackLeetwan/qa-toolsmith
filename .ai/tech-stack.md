@@ -20,5 +20,11 @@ AI - Komunikacja z modelami przez usługę Openrouter.ai:
 
 CI/CD i Hosting:
 
-- Github Actions do tworzenia pipeline’ów CI/CD
+- Github Actions do tworzenia pipeline'ów CI/CD
 - DigitalOcean do hostowania aplikacji za pośrednictwem obrazu docker
+
+Testing - Narzędzia do testowania aplikacji:
+
+- Vitest - framework do testów jednostkowych, szybki i kompatybilny z Vite
+- Playwright - framework do testów end-to-end (E2E) z obsługą wielu przeglądarek
+- React Testing Library - biblioteka do testowania komponentów React w sposób zbliżony do użytkownika końcowego

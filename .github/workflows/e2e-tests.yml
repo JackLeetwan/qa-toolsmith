@@ -1,0 +1,73 @@
+name: E2E Tests with Diagnostic Artifacts
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  e2e:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22.14.x"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npm run playwright:install
+
+      - name: Build application
+        run: npm run build
+
+      - name: Start preview server
+        run: npm run preview &
+        env:
+          NODE_ENV: production
+
+      - name: Wait for server to start
+        run: npx wait-on http://localhost:3000 --timeout 30000
+
+      - name: Run E2E tests
+        id: e2e
+        run: npm run test:e2e
+        continue-on-error: true
+        env:
+          CI: true
+
+      - name: Upload HTML Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-html-report
+          path: playwright-report/
+          retention-days: 30
+
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: test-results/
+          retention-days: 30
+
+      - name: Publish test results
+        if: always()
+        uses: daun/playwright-report-action@v3
+        with:
+          report_path: playwright-report
+
+      - name: Exit with test status
+        if: steps.e2e.outcome == 'failure'
+        run: exit 1

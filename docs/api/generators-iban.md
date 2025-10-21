@@ -272,7 +272,9 @@ curl "http://localhost:3000/api/generators/iban?country=DE&seed=fixture-001"
 ```javascript
 const countries = ["DE", "AT", "PL"];
 const ibans = await Promise.all(
-  countries.map((country) => fetch(`/api/generators/iban?country=${country}`).then((r) => r.json()))
+  countries.map((country) =>
+    fetch(`/api/generators/iban?country=${country}`).then((r) => r.json()),
+  ),
 );
 console.log(ibans);
 ```

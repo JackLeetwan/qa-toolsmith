@@ -32,7 +32,7 @@ export async function consume(ip: string): Promise<void> {
   let entry = rateLimitStore.get(key);
 
   // Expire old entries
-  if (entry && entry.expireAt < now) {
+  if (entry && entry.expireAt <= now) {
     rateLimitStore.delete(key);
     entry = undefined;
   }

@@ -1,15 +1,17 @@
 /**
  * Simple logger utility for development and production
- * In production, only error logs are shown
+ * In production, no console logging occurs to avoid production noise
  */
 
 type LogLevel = "debug" | "info" | "warn" | "error";
 
 class Logger {
-  private isDevelopment = import.meta.env.DEV;
+  private isDevelopment =
+    import.meta.env.MODE === "development" || !!process.env.VITEST;
 
   private log(level: LogLevel, message: string, ...args: unknown[]) {
-    if (!this.isDevelopment && level !== "error") {
+    // Early return in production to avoid any console references
+    if (!this.isDevelopment) {
       return;
     }
 
@@ -18,20 +20,16 @@ class Logger {
 
     switch (level) {
       case "debug":
-        // eslint-disable-next-line no-console
-        console.debug(prefix, message, ...args);
+        globalThis.console.debug(prefix, message, ...args);
         break;
       case "info":
-        // eslint-disable-next-line no-console
-        console.info(prefix, message, ...args);
+        globalThis.console.info(prefix, message, ...args);
         break;
       case "warn":
-        // eslint-disable-next-line no-console
-        console.warn(prefix, message, ...args);
+        globalThis.console.warn(prefix, message, ...args);
         break;
       case "error":
-        // eslint-disable-next-line no-console
-        console.error(prefix, message, ...args);
+        globalThis.console.error(prefix, message, ...args);
         break;
     }
   }

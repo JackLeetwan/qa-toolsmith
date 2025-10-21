@@ -1,11 +1,18 @@
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "../../db/database.types";
 
-const supabaseUrl = import.meta.env.SUPABASE_URL;
-const supabaseServiceKey = import.meta.env.SUPABASE_SERVICE_KEY;
+// Allow bypassing credential check in test environment
+const supabaseUrl = import.meta.env.VITEST
+  ? "https://test.supabase.co"
+  : import.meta.env.SUPABASE_URL;
+const supabaseServiceKey = import.meta.env.VITEST
+  ? "test-service-key"
+  : import.meta.env.SUPABASE_SERVICE_KEY;
 
 if (!supabaseUrl || !supabaseServiceKey) {
-  throw new Error("Missing Supabase credentials (SUPABASE_URL, SUPABASE_SERVICE_KEY)");
+  throw new Error(
+    "Missing Supabase credentials (SUPABASE_URL, SUPABASE_SERVICE_KEY)",
+  );
 }
 
 /**
@@ -41,7 +48,9 @@ export interface LoginSession {
  * @returns Session with JWT access token and user ID
  * @throws Error with status 401 for invalid credentials, 500 for provider errors
  */
-export async function loginWithPassword(cmd: LoginCommand): Promise<LoginSession> {
+export async function loginWithPassword(
+  cmd: LoginCommand,
+): Promise<LoginSession> {
   const { email, password } = cmd;
 
   try {
@@ -87,7 +96,7 @@ export async function loginWithPassword(cmd: LoginCommand): Promise<LoginSession
 
     return {
       access_token: data.session.access_token,
-      expires_in: data.session.expires_in || 3600,
+      expires_in: data.session.expires_in ?? 3600,
       user_id: data.session.user.id,
     };
   } catch (err: unknown) {

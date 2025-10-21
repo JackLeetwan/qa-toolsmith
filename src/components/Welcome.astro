@@ -3,25 +3,41 @@ const { user } = Astro.props;
 ---
 
 <div class="w-full mx-auto">
-  <div class="relative max-w-6xl mx-auto rounded-2xl shadow-lg p-8 border bg-card text-card-foreground">
+  <div
+    class="relative max-w-6xl mx-auto rounded-2xl shadow-lg p-8 border bg-card text-card-foreground"
+  >
     <div class="space-y-12">
       <!-- Hero Section -->
       <div class="text-center">
         <h1 class="text-6xl font-bold mb-6 text-primary">QA Toolsmith</h1>
-        <p class="text-2xl text-muted-foreground mb-4">Nowoczesne narzędzie dla testerów</p>
-        <p class="text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-          Standaryzuj codzienną pracę, automatyzuj powtarzalne zadania i podnieś jakość testowania z naszym kompletnym
-          zestawem narzędzi dla profesjonalnych testerów.
+        <p class="text-2xl text-muted-foreground mb-4">
+          Nowoczesne narzędzie dla testerów
+        </p>
+        <p
+          class="text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed"
+        >
+          Standaryzuj codzienną pracę, automatyzuj powtarzalne zadania i podnieś
+          jakość testowania z naszym kompletnym zestawem narzędzi dla
+          profesjonalnych testerów.
         </p>
       </div>
 
       <!-- Main Features Grid -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
         <!-- Templates -->
-        <div class="bg-card/50 rounded-xl p-6 border hover:bg-muted/50 transition-all duration-300">
+        <div
+          class="bg-card/50 rounded-xl p-6 border hover:bg-muted/50 transition-all duration-300"
+        >
           <div class="flex items-center mb-4">
-            <div class="w-12 h-12 bg-primary/20 rounded-lg flex items-center justify-center mr-4">
-              <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div
+              class="w-12 h-12 bg-primary/20 rounded-lg flex items-center justify-center mr-4"
+            >
+              <svg
+                class="w-6 h-6 text-primary"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -30,22 +46,36 @@ const { user } = Astro.props;
                 ></path>
               </svg>
             </div>
-            <h3 class="text-xl font-semibold text-primary">Szablony Raportów</h3>
+            <h3 class="text-xl font-semibold text-primary">
+              Szablony Raportów
+            </h3>
           </div>
           <p class="text-muted-foreground mb-4">
-            Gotowe szablony dla raportów defektów UI i API z eksportem do Markdown. Szybkie tworzenie profesjonalnych
-            raportów w ≤3 minuty.
+            Gotowe szablony dla raportów defektów UI i API z eksportem do
+            Markdown. Szybkie tworzenie profesjonalnych raportów w ≤3 minuty.
           </p>
-          <a href="/templates" class="inline-flex items-center text-primary hover:text-primary/80 font-medium">
+          <a
+            href="/templates"
+            class="inline-flex items-center text-primary hover:text-primary/80 font-medium"
+          >
             Przejdź do szablonów →
           </a>
         </div>
 
         <!-- Exploration Charters -->
-        <div class="bg-card/50 rounded-xl p-6 border hover:bg-muted/50 transition-all duration-300">
+        <div
+          class="bg-card/50 rounded-xl p-6 border hover:bg-muted/50 transition-all duration-300"
+        >
           <div class="flex items-center mb-4">
-            <div class="w-12 h-12 bg-primary/20 rounded-lg flex items-center justify-center mr-4">
-              <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div
+              class="w-12 h-12 bg-primary/20 rounded-lg flex items-center justify-center mr-4"
+            >
+              <svg
+                class="w-6 h-6 text-primary"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -53,22 +83,36 @@ const { user } = Astro.props;
                   d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
             </div>
-            <h3 class="text-xl font-semibold text-primary">Exploration Charters</h3>
+            <h3 class="text-xl font-semibold text-primary">
+              Exploration Charters
+            </h3>
           </div>
           <p class="text-muted-foreground mb-4">
-            Strukturyzowane sesje eksploracyjne z timerem, tagami i autosave. Skróty klawiszowe i eksport notatek do
-            Markdown.
+            Strukturyzowane sesje eksploracyjne z timerem, tagami i autosave.
+            Skróty klawiszowe i eksport notatek do Markdown.
           </p>
-          <a href="/charters" class="inline-flex items-center text-primary hover:text-primary/80 font-medium">
+          <a
+            href="/charters"
+            class="inline-flex items-center text-primary hover:text-primary/80 font-medium"
+          >
             Rozpocznij eksplorację →
           </a>
         </div>
 
         <!-- Knowledge Base -->
-        <div class="bg-card/50 rounded-xl p-6 border hover:bg-muted/50 transition-all duration-300">
+        <div
+          class="bg-card/50 rounded-xl p-6 border hover:bg-muted/50 transition-all duration-300"
+        >
           <div class="flex items-center mb-4">
-            <div class="w-12 h-12 bg-primary/20 rounded-lg flex items-center justify-center mr-4">
-              <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div
+              class="w-12 h-12 bg-primary/20 rounded-lg flex items-center justify-center mr-4"
+            >
+              <svg
+                class="w-6 h-6 text-primary"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -80,33 +124,51 @@ const { user } = Astro.props;
             <h3 class="text-xl font-semibold text-primary">Baza Wiedzy</h3>
           </div>
           <p class="text-muted-foreground mb-4">
-            Centralne miejsce na linki, notatki i zasoby. Wyszukiwanie pełnotekstowe, tagi i eksport JSON dla łatwego
-            zarządzania wiedzą.
+            Centralne miejsce na linki, notatki i zasoby. Wyszukiwanie
+            pełnotekstowe, tagi i eksport JSON dla łatwego zarządzania wiedzą.
           </p>
-          <a href="/kb" class="inline-flex items-center text-primary hover:text-primary/80 font-medium">
+          <a
+            href="/kb"
+            class="inline-flex items-center text-primary hover:text-primary/80 font-medium"
+          >
             Przeglądaj bazę wiedzy →
           </a>
         </div>
 
         <!-- Data Generators -->
-        <div class="bg-card/50 rounded-xl p-6 border hover:bg-muted/50 transition-all duration-300">
+        <div
+          class="bg-card/50 rounded-xl p-6 border hover:bg-muted/50 transition-all duration-300"
+        >
           <div class="flex items-center mb-4">
-            <div class="w-12 h-12 bg-primary/20 rounded-lg flex items-center justify-center mr-4">
-              <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div
+              class="w-12 h-12 bg-primary/20 rounded-lg flex items-center justify-center mr-4"
+            >
+              <svg
+                class="w-6 h-6 text-primary"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
                   stroke-width="2"
-                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"
+                ></path>
               </svg>
             </div>
-            <h3 class="text-xl font-semibold text-primary">Generatory Danych</h3>
+            <h3 class="text-xl font-semibold text-primary">
+              Generatory Danych
+            </h3>
           </div>
           <p class="text-muted-foreground mb-4">
-            IBAN (DE/AT), numery telefonów, adresy, e-maile, dane firm i karty płatnicze. Walidatory i historia
-            generowanych danych.
+            IBAN (DE/AT), numery telefonów, adresy, e-maile, dane firm i karty
+            płatnicze. Walidatory i historia generowanych danych.
           </p>
-          <a href="/generators" class="inline-flex items-center text-primary hover:text-primary/80 font-medium">
+          <a
+            href="/generators"
+            class="inline-flex items-center text-primary hover:text-primary/80 font-medium"
+          >
             Generuj dane testowe →
           </a>
         </div>
@@ -114,21 +176,42 @@ const { user } = Astro.props;
 
       <!-- Key Benefits -->
       <div class="bg-card/50 rounded-xl p-8 border">
-        <h2 class="text-2xl font-semibold mb-6 text-center text-primary">Dlaczego QA Toolsmith?</h2>
+        <h2 class="text-2xl font-semibold mb-6 text-center text-primary">
+          Dlaczego QA Toolsmith?
+        </h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div class="text-center">
-            <div class="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"
-                ></path>
+            <div
+              class="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4"
+            >
+              <svg
+                class="w-8 h-8 text-primary"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13 10V3L4 14h7v7l9-11h-7z"></path>
               </svg>
             </div>
             <h3 class="text-lg font-semibold text-primary mb-2">Szybkość</h3>
-            <p class="text-muted-foreground">Raporty defektów w ≤3 minuty, gotowe szablony, skróty klawiszowe</p>
+            <p class="text-muted-foreground">
+              Raporty defektów w ≤3 minuty, gotowe szablony, skróty klawiszowe
+            </p>
           </div>
           <div class="text-center">
-            <div class="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div
+              class="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4"
+            >
+              <svg
+                class="w-8 h-8 text-primary"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -137,12 +220,24 @@ const { user } = Astro.props;
                 ></path>
               </svg>
             </div>
-            <h3 class="text-lg font-semibold text-primary mb-2">Bezpieczeństwo</h3>
-            <p class="text-muted-foreground">Autoryzacja, role użytkowników, brak przechowywania prawdziwych danych</p>
+            <h3 class="text-lg font-semibold text-primary mb-2">
+              Bezpieczeństwo
+            </h3>
+            <p class="text-muted-foreground">
+              Autoryzacja, role użytkowników, brak przechowywania prawdziwych
+              danych
+            </p>
           </div>
           <div class="text-center">
-            <div class="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div
+              class="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4"
+            >
+              <svg
+                class="w-8 h-8 text-primary"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -152,7 +247,10 @@ const { user } = Astro.props;
               </svg>
             </div>
             <h3 class="text-lg font-semibold text-primary mb-2">Prostota</h3>
-            <p class="text-muted-foreground">Intuicyjny interfejs, łatwe wdrożenie, brak zewnętrznych zależności</p>
+            <p class="text-muted-foreground">
+              Intuicyjny interfejs, łatwe wdrożenie, brak zewnętrznych
+              zależności
+            </p>
           </div>
         </div>
       </div>
@@ -161,7 +259,9 @@ const { user } = Astro.props;
       {
         !user && (
           <div class="text-center">
-            <p class="text-lg text-muted-foreground mb-6">Gotowy na nowoczesne testowanie?</p>
+            <p class="text-lg text-muted-foreground mb-6">
+              Gotowy na nowoczesne testowanie?
+            </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
               <a
                 href="/auth/login"

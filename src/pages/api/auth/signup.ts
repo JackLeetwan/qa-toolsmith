@@ -1,5 +1,5 @@
 import type { APIRoute } from "astro";
-import { createSupabaseServerInstance } from "../../../db/supabase.client.ts";
+import { createSupabaseServerInstance } from "../../../db/supabase.client";
 import { z } from "zod";
 import { logger } from "../../../lib/utils/logger";
 
@@ -8,13 +8,19 @@ const signupSchema = z.object({
     .string()
     .min(1, "Email jest wymagany")
     .max(254, "Email jest za długi")
-    .email("Nieprawidłowy format email")
-    .transform((val) => val.trim().toLowerCase()),
+    .transform((val) => val.trim().toLowerCase())
+    .refine((val) => {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(val);
+    }, "Nieprawidłowy format email"),
   password: z
     .string()
     .min(8, "Hasło musi mieć co najmniej 8 znaków")
     .max(72, "Hasło jest za długie")
-    .regex(/^(?=.*[a-zA-Z])(?=.*\d)/, "Hasło musi zawierać co najmniej jedną literę i jedną cyfrę"),
+    .regex(
+      /^(?=.*[a-zA-Z])(?=.*\d)/,
+      "Hasło musi zawierać co najmniej jedną literę i jedną cyfrę",
+    ),
 });
 
 export const POST: APIRoute = async ({ request, cookies }) => {
@@ -42,15 +48,16 @@ export const POST: APIRoute = async ({ request, cookies }) => {
         {
           status: 400,
           headers: { "Content-Type": "application/json" },
-        }
+        },
       );
     }
 
     // Auto-login after successful signup (US-001)
-    const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    const { data: signInData, error: signInError } =
+      await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
     if (signInError) {
       return new Response(
@@ -61,7 +68,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
         {
           status: 500,
           headers: { "Content-Type": "application/json" },
-        }
+        },
       );
     }
 
@@ -75,7 +82,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       {
         status: 200,
         headers: { "Content-Type": "application/json" },
-      }
+      },
     );
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -87,7 +94,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
         {
           status: 400,
           headers: { "Content-Type": "application/json" },
-        }
+        },
       );
     }
 
@@ -100,7 +107,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       {
         status: 500,
         headers: { "Content-Type": "application/json" },
-      }
+      },
     );
   }
 };

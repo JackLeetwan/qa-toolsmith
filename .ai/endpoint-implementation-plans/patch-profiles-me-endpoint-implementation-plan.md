@@ -35,7 +35,10 @@ Aktualizacja własnego profilu zalogowanego użytkownika w zakresie **nieuprzywi
 - **DTO** (z `types.ts`)
 
   ```ts
-  export type ProfileDTO = Pick<ProfileRow, "id" | "email" | "created_at" | "updated_at"> & {
+  export type ProfileDTO = Pick<
+    ProfileRow,
+    "id" | "email" | "created_at" | "updated_at"
+  > & {
     role: Role;
   };
   ```

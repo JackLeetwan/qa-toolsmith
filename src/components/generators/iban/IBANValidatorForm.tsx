@@ -1,5 +1,11 @@
-import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState, useEffect, useCallback } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -38,7 +44,7 @@ export default function IBANValidatorForm({
     return value.replace(/\s/g, "").toUpperCase();
   };
 
-  const validateInput = (value: string): boolean => {
+  const validateInput = useCallback((value: string): boolean => {
     const normalized = normalizeIban(value);
 
     if (!normalized) {
@@ -78,7 +84,15 @@ export default function IBANValidatorForm({
 
     setInputError(null);
     return true;
-  };
+  }, []);
+
+  // Sync internal state with inputIban prop changes
+  useEffect(() => {
+    if (inputIban !== undefined) {
+      setIbanInput(inputIban);
+      validateInput(inputIban);
+    }
+  }, [inputIban, validateInput]);
 
   const handleInputChange = (value: string) => {
     setIbanInput(value);
@@ -104,7 +118,7 @@ export default function IBANValidatorForm({
 
     const normalized = normalizeIban(ibanInput);
 
-    if (!normalized) {
+    if (!normalized.trim()) {
       setInputError("Please enter an IBAN to validate");
       return;
     }
@@ -124,14 +138,18 @@ export default function IBANValidatorForm({
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Validate IBAN</CardTitle>
+          <CardTitle id="iban-validator-title">Validate IBAN</CardTitle>
           <CardDescription>
-            Check if an IBAN is valid using checksum verification. Paste your IBAN and we&apos;ll verify its format and
-            checksum.
+            Check if an IBAN is valid using checksum verification. Paste your
+            IBAN and we&apos;ll verify its format and checksum.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-4"
+            aria-labelledby="iban-validator-title"
+          >
             <div className="space-y-2">
               <Label htmlFor="iban-input">IBAN</Label>
               <Input
@@ -152,7 +170,8 @@ export default function IBANValidatorForm({
                 </p>
               ) : (
                 <p id="iban-help" className="text-sm text-muted-foreground">
-                  Enter or paste an IBAN to validate (spaces will be removed automatically)
+                  Enter or paste an IBAN to validate (spaces will be removed
+                  automatically)
                 </p>
               )}
             </div>
@@ -164,14 +183,18 @@ export default function IBANValidatorForm({
               </Alert>
             )}
 
-            <Button type="submit" className="w-full" disabled={isLoading || !!inputError || !ibanInput}>
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={isLoading || !!inputError || !ibanInput.trim()}
+            >
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Validating...
                 </>
               ) : (
-                "Validate IBAN"
+                <>Validate IBAN</>
               )}
             </Button>
           </form>

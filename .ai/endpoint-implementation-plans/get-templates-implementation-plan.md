@@ -27,7 +27,12 @@ Zgodny ze stackiem: **Astro (API route)** ↔ **Supabase (PostgREST / RPC)** z *
   ```ts
   export type TemplateListItemDTO = Omit<
     TemplateEffectiveRow,
-    "fields" | "scope" | "preset" | "required_fields" | "is_readonly" | "origin_template_id"
+    | "fields"
+    | "scope"
+    | "preset"
+    | "required_fields"
+    | "is_readonly"
+    | "origin_template_id"
   > & {
     fields: TemplateField[] | null;
     scope: TemplateScope | null;
@@ -139,7 +144,13 @@ FOR SELECT USING (scope = 'global' OR owner_id = auth.uid());
 
 - **Format błędów API (spójny w projekcie):**
   ```json
-  { "error": { "code": "VALIDATION_ERROR", "message": "invalid limit", "details": { "limit": "…" } } }
+  {
+    "error": {
+      "code": "VALIDATION_ERROR",
+      "message": "invalid limit",
+      "details": { "limit": "…" }
+    }
+  }
   ```
 - **Mapowanie:**
   - Walidacja parametrów → `400`.

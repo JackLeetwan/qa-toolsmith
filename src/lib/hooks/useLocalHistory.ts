@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import type { HistoryItem } from "@/types/types";
+import { logger } from "@/lib/utils/logger";
 
 /**
  * Hook for managing local history in localStorage with FIFO limit
@@ -21,8 +22,7 @@ export function useLocalHistory<T>(key: string, limit = 10) {
         }
       }
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error("Failed to load history:", error);
+      logger.error("Failed to load history:", error);
     }
   }, [key, limit]);
 
@@ -32,11 +32,10 @@ export function useLocalHistory<T>(key: string, limit = 10) {
       try {
         localStorage.setItem(key, JSON.stringify(newItems));
       } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error("Failed to save history:", error);
+        logger.error("Failed to save history:", error);
       }
     },
-    [key]
+    [key],
   );
 
   // Add item to history (FIFO)
@@ -55,7 +54,7 @@ export function useLocalHistory<T>(key: string, limit = 10) {
         return updated;
       });
     },
-    [limit, saveToStorage]
+    [limit, saveToStorage],
   );
 
   // Clear all history
@@ -64,8 +63,7 @@ export function useLocalHistory<T>(key: string, limit = 10) {
     try {
       localStorage.removeItem(key);
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error("Failed to clear history:", error);
+      logger.error("Failed to clear history:", error);
     }
   }, [key]);
 
@@ -78,7 +76,7 @@ export function useLocalHistory<T>(key: string, limit = 10) {
         return updated;
       });
     },
-    [saveToStorage]
+    [saveToStorage],
   );
 
   return {

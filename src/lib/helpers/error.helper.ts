@@ -14,7 +14,11 @@ export interface AppError extends Error {
  */
 export function isAppError(err: unknown): err is AppError {
   const obj = err as unknown as Record<string, unknown>;
-  return err instanceof Error && typeof obj.status === "number" && typeof obj.code === "string";
+  return (
+    err instanceof Error &&
+    typeof obj.status === "number" &&
+    typeof obj.code === "string"
+  );
 }
 
 /**
@@ -58,7 +62,11 @@ export function mapErrorToMessage(err: unknown): string {
 /**
  * Create a standardized error response.
  */
-export function createErrorResponse(code: ErrorCode, message: string, details?: Record<string, Json>): ErrorResponse {
+export function createErrorResponse(
+  code: ErrorCode,
+  message: string,
+  details?: Record<string, Json>,
+): ErrorResponse {
   return {
     error: {
       code,
@@ -94,20 +102,29 @@ export function errorToHttpResponse(err: unknown): {
     return {
       status: err.status,
       body: createErrorResponse(err.code, mapErrorToMessage(err)),
-      headers: err.retryAfter ? { "Retry-After": String(err.retryAfter) } : undefined,
+      headers: err.retryAfter
+        ? { "Retry-After": String(err.retryAfter) }
+        : undefined,
     };
   }
 
   if (err instanceof ZodError) {
     return {
       status: 400,
-      body: createErrorResponse("VALIDATION_ERROR", mapErrorToMessage(err), extractZodErrorDetails(err)),
+      body: createErrorResponse(
+        "VALIDATION_ERROR",
+        mapErrorToMessage(err),
+        extractZodErrorDetails(err),
+      ),
     };
   }
 
   // Unknown error
   return {
     status: 500,
-    body: createErrorResponse("INTERNAL", "An unexpected error occurred. Please try again."),
+    body: createErrorResponse(
+      "INTERNAL",
+      "An unexpected error occurred. Please try again.",
+    ),
   };
 }

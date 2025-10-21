@@ -442,9 +442,12 @@ private handleError(error: any): never {
        if (hasLimit.remaining <= 0) {
          return new Response(
            JSON.stringify({
-             error: { code: "DAILY_LIMIT_EXCEEDED", message: "Daily AI usage limit exceeded" },
+             error: {
+               code: "DAILY_LIMIT_EXCEEDED",
+               message: "Daily AI usage limit exceeded",
+             },
            }),
-           { status: 429 }
+           { status: 429 },
          );
        }
 
@@ -512,7 +515,11 @@ private handleError(error: any): never {
        // Mock usage tracker to return limit exceeded
        const response = await fetch("/api/ai/process", {
          method: "POST",
-         body: JSON.stringify({ context: "template", field: "description", text: "test" }),
+         body: JSON.stringify({
+           context: "template",
+           field: "description",
+           text: "test",
+         }),
        });
 
        expect(response.status).toBe(429);

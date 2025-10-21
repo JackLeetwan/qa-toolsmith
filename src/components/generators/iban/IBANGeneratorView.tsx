@@ -5,6 +5,7 @@ import IBANGeneratorForm from "./IBANGeneratorForm";
 import IBANValidatorForm from "./IBANValidatorForm";
 import GeneratorHistory from "./GeneratorHistory";
 import { useLocalHistory } from "@/lib/hooks/useLocalHistory";
+import { logger } from "@/lib/utils/logger";
 import type { IbanViewState, IbanGeneratorResponse } from "@/types/types";
 
 type IbanAction =
@@ -20,7 +21,10 @@ type IbanAction =
   | { type: "CLEAR_ERROR" }
   | { type: "REHYDRATE_RESULT"; payload: IbanGeneratorResponse };
 
-function ibanViewReducer(state: IbanViewState, action: IbanAction): IbanViewState {
+function ibanViewReducer(
+  state: IbanViewState,
+  action: IbanAction,
+): IbanViewState {
   switch (action.type) {
     case "SET_MODE":
       return { ...state, mode: action.payload, error: undefined };
@@ -77,13 +81,14 @@ export default function IBANGeneratorView() {
       const prefs = localStorage.getItem("gen_pref_iban");
       if (prefs) {
         const parsed = JSON.parse(prefs);
-        if (parsed.country) dispatch({ type: "SET_COUNTRY", payload: parsed.country });
-        if (parsed.format) dispatch({ type: "SET_FORMAT", payload: parsed.format });
+        if (parsed.country)
+          dispatch({ type: "SET_COUNTRY", payload: parsed.country });
+        if (parsed.format)
+          dispatch({ type: "SET_FORMAT", payload: parsed.format });
         if (parsed.mode) dispatch({ type: "SET_MODE", payload: parsed.mode });
       }
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error("Failed to load preferences:", error);
+      logger.error("Failed to load preferences:", error);
     }
   }, []);
 
@@ -97,8 +102,7 @@ export default function IBANGeneratorView() {
       };
       localStorage.setItem("gen_pref_iban", JSON.stringify(prefs));
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error("Failed to save preferences:", error);
+      logger.error("Failed to save preferences:", error);
     }
   }, [state.country, state.format, state.mode]);
 
@@ -140,11 +144,16 @@ export default function IBANGeneratorView() {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row gap-6">
+    <div className="flex flex-col lg:flex-row gap-6" data-testid="iban-root">
       <div className="flex-1">
         <Tabs
           value={state.mode}
-          onValueChange={(value) => dispatch({ type: "SET_MODE", payload: value as "generate" | "validate" })}
+          onValueChange={(value) =>
+            dispatch({
+              type: "SET_MODE",
+              payload: value as "generate" | "validate",
+            })
+          }
         >
           <TabsList className="grid w-full grid-cols-2 mb-6">
             <TabsTrigger value="generate">Generate</TabsTrigger>
@@ -184,7 +193,11 @@ export default function IBANGeneratorView() {
       </div>
 
       <aside className="lg:w-80">
-        <GeneratorHistory items={history} onSelect={handleHistorySelect} onClear={clearHistory} />
+        <GeneratorHistory
+          items={history}
+          onSelect={handleHistorySelect}
+          onClear={clearHistory}
+        />
       </aside>
 
       <Toaster />

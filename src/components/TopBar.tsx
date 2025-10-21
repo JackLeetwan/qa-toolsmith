@@ -16,7 +16,11 @@ interface TopBarProps {
   onLogout?: () => void;
 }
 
-export default function TopBar({ user, isLoading = false, onLogout }: TopBarProps) {
+export default function TopBar({
+  user,
+  isLoading = false,
+  onLogout,
+}: TopBarProps) {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
   // Close user menu when clicking outside
@@ -68,7 +72,10 @@ export default function TopBar({ user, isLoading = false, onLogout }: TopBarProp
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <a href="/" className="text-xl font-bold text-primary hover:text-primary/80 transition-colors">
+            <a
+              href="/"
+              className="text-xl font-bold text-primary hover:text-primary/80 transition-colors"
+            >
               QA Toolsmith
             </a>
             <nav aria-label="Main navigation">
@@ -127,7 +134,9 @@ export default function TopBar({ user, isLoading = false, onLogout }: TopBarProp
             {isLoading ? (
               <div className="flex items-center space-x-2">
                 <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-                <span className="text-sm text-muted-foreground">Ładowanie...</span>
+                <span className="text-sm text-muted-foreground">
+                  Ładowanie...
+                </span>
               </div>
             ) : user ? (
               // User menu
@@ -143,8 +152,12 @@ export default function TopBar({ user, isLoading = false, onLogout }: TopBarProp
                       <User className="h-4 w-4 text-primary" />
                     </div>
                     <div className="text-left">
-                      <div className="text-sm font-medium text-foreground">{user.email}</div>
-                      <div className="text-xs text-muted-foreground capitalize">{user.role}</div>
+                      <div className="text-sm font-medium text-foreground">
+                        {user.email}
+                      </div>
+                      <div className="text-xs text-muted-foreground capitalize">
+                        {user.role}
+                      </div>
                     </div>
                   </div>
                   <ChevronDown className="h-4 w-4 text-muted-foreground" />
@@ -175,7 +188,10 @@ export default function TopBar({ user, isLoading = false, onLogout }: TopBarProp
             ) : (
               // Auth buttons
               <div className="flex items-center space-x-2">
-                <a href="/auth/login" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <a
+                  href="/auth/login"
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
                   Zaloguj
                 </a>
                 <a

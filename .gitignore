@@ -23,3 +23,7 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# E2E test artifacts (local runs; CI publishes via artifacts)
+playwright-report/
+test-results/

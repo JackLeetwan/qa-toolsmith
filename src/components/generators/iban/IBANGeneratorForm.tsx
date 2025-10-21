@@ -1,15 +1,32 @@
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, AlertCircle } from "lucide-react";
 import { useIbanApi } from "@/lib/hooks/useIbanApi";
 import IBANResult from "./IBANResult";
 import FormatToggle from "./FormatToggle";
-import type { IbanCountry, IbanGeneratorResponse, OutputFormat, UIError } from "@/types/types";
+import type {
+  IbanCountry,
+  IbanGeneratorResponse,
+  OutputFormat,
+  UIError,
+} from "@/types/types";
 
 interface IBANGeneratorFormProps {
   country: IbanCountry;
@@ -58,7 +75,9 @@ export default function IBANGeneratorForm({
     }
 
     if (!SEED_REGEX.test(value)) {
-      setSeedError("Seed must contain only alphanumeric characters, dots, underscores, or hyphens");
+      setSeedError(
+        "Seed must contain only alphanumeric characters, dots, underscores, or hyphens",
+      );
       return false;
     }
 
@@ -98,16 +117,24 @@ export default function IBANGeneratorForm({
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Generate IBAN</CardTitle>
+          <CardTitle id="iban-generator-title">Generate IBAN</CardTitle>
           <CardDescription>
-            Generate a valid IBAN for Germany, Austria, or Poland with optional seed for deterministic results
+            Generate a valid IBAN for Germany, Austria, or Poland with optional
+            seed for deterministic results
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-4"
+            aria-labelledby="iban-generator-title"
+          >
             <div className="space-y-2">
               <Label htmlFor="country">Country</Label>
-              <Select value={country} onValueChange={(value) => onCountryChange(value as IbanCountry)}>
+              <Select
+                value={country}
+                onValueChange={(value) => onCountryChange(value as IbanCountry)}
+              >
                 <SelectTrigger id="country">
                   <SelectValue placeholder="Select country" />
                 </SelectTrigger>
@@ -139,7 +166,8 @@ export default function IBANGeneratorForm({
                 </p>
               ) : (
                 <p id="seed-help" className="text-sm text-muted-foreground">
-                  Use a seed for deterministic generation (max {SEED_MAX_LENGTH} chars, alphanumeric + . _ -)
+                  Use a seed for deterministic generation (max {SEED_MAX_LENGTH}{" "}
+                  chars, alphanumeric + . _ -)
                 </p>
               )}
             </div>
@@ -151,7 +179,12 @@ export default function IBANGeneratorForm({
               </Alert>
             )}
 
-            <Button type="submit" className="w-full" disabled={isLoading || !!seedError}>
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={isLoading || !!seedError}
+              data-testid="generate-iban-button"
+            >
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -166,7 +199,12 @@ export default function IBANGeneratorForm({
       </Card>
 
       {result && (
-        <div className="space-y-4" role="region" aria-live="polite" aria-label="Generation result">
+        <div
+          className="space-y-4"
+          role="region"
+          aria-live="polite"
+          aria-label="Generation result"
+        >
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold">Result</h3>
             <FormatToggle value={format} onChange={onFormatChange} />

@@ -22,12 +22,19 @@ export default function ValidationResult({ data }: ValidationResultProps) {
           <XCircle className="h-5 w-5" aria-hidden="true" />
         )}
         <div className="flex-1">
-          <AlertTitle className={cn(data.valid ? "text-green-900" : "", "line-clamp-none")}>
+          <AlertTitle
+            className={cn(
+              data.valid ? "text-green-900" : "",
+              "line-clamp-none",
+            )}
+          >
             {data.valid ? "Valid IBAN" : "Invalid IBAN"}
           </AlertTitle>
           {data.reason && (
             <AlertDescription className={data.valid ? "text-green-800" : ""}>
-              {data.valid ? "This IBAN passed all validation checks." : data.reason}
+              {data.valid
+                ? "This IBAN passed all validation checks."
+                : data.reason}
             </AlertDescription>
           )}
         </div>

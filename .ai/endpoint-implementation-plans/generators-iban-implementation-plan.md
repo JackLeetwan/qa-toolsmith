@@ -95,7 +95,12 @@ export interface IbanGenerateResponse {
 - W odpowiedzi JSON zwracamy spójny envelope błędu:
 
 ```json
-{ "error": { "code": "invalid_country", "message": "country must be 'DE' or 'AT'" } }
+{
+  "error": {
+    "code": "invalid_country",
+    "message": "country must be 'DE' or 'AT'"
+  }
+}
 ```
 
 - (Opcjonalnie) rejestracja do `usage_events` z `meta.error_code`.

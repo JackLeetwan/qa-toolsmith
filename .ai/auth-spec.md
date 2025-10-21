@@ -146,7 +146,11 @@ export interface AuthService {
   requestPasswordReset(email: string): Promise<void>;
   confirmPasswordReset(accessToken: string, newPassword: string): Promise<void>;
 }
-export type AuthErrorCode = "INVALID_INPUT" | "INVALID_CREDENTIALS" | "RATE_LIMITED" | "UNKNOWN_ERROR";
+export type AuthErrorCode =
+  | "INVALID_INPUT"
+  | "INVALID_CREDENTIALS"
+  | "RATE_LIMITED"
+  | "UNKNOWN_ERROR";
 ```
 
 ### 2.2 Walidacja wejścia (server‑side)

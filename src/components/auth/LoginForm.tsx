@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -19,21 +19,30 @@ const loginSchema = z.object({
     .max(254, "Email jest za długi")
     .email("Nieprawidłowy format email")
     .transform((val) => val.trim().toLowerCase()),
-  password: z.string().min(1, "Hasło jest wymagane").max(72, "Hasło jest za długie"),
+  password: z
+    .string()
+    .min(1, "Hasło jest wymagane")
+    .max(72, "Hasło jest za długie"),
 });
 
-type LoginFormData = z.infer<typeof loginSchema>;
+export type LoginFormData = z.infer<typeof loginSchema>;
 
 interface LoginFormProps {
   onSubmit?: (data: LoginFormData) => Promise<void>;
   isLoading?: boolean;
   error?: string;
+  onRedirect?: (url: string) => void; // For testing purposes
 }
 
-export default function LoginForm({ onSubmit, isLoading = false, error }: LoginFormProps) {
+export default function LoginForm({
+  onSubmit,
+  isLoading = false,
+  error,
+  onRedirect,
+}: LoginFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [apiError, setApiError] = useState<string>("");
-  const [isMounted, setIsMounted] = useState(false);
+  const isSubmittingRef = useRef(false);
 
   const {
     register,
@@ -43,13 +52,17 @@ export default function LoginForm({ onSubmit, isLoading = false, error }: LoginF
     resolver: zodResolver(loginSchema),
   });
 
-  // Fix hydration mismatch by ensuring component is mounted
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
   const handleFormSubmit = async (data: LoginFormData) => {
-    logger.debug("🔐 Login attempt started:", { email: data.email, timestamp: new Date().toISOString() });
+    // Prevent multiple simultaneous submissions
+    if (isSubmittingRef.current) {
+      return;
+    }
+
+    isSubmittingRef.current = true;
+    logger.debug("🔐 Login attempt started:", {
+      email: data.email,
+      timestamp: new Date().toISOString(),
+    });
 
     if (onSubmit) {
       setIsSubmitting(true);
@@ -61,6 +74,7 @@ export default function LoginForm({ onSubmit, isLoading = false, error }: LoginF
         // Error handling is done by parent component
       } finally {
         setIsSubmitting(false);
+        isSubmittingRef.current = false;
       }
       return;
     }
@@ -80,7 +94,11 @@ export default function LoginForm({ onSubmit, isLoading = false, error }: LoginF
       });
 
       const result = await response.json();
-      logger.debug("📥 Login response:", { status: response.status, ok: response.ok, result });
+      logger.debug("📥 Login response:", {
+        status: response.status,
+        ok: response.ok,
+        result,
+      });
 
       if (!response.ok) {
         logger.error("❌ Login failed:", result);
@@ -99,41 +117,34 @@ export default function LoginForm({ onSubmit, isLoading = false, error }: LoginF
 
       // Small delay to show success message
       setTimeout(() => {
-        window.location.href = nextUrl;
+        if (onRedirect) {
+          onRedirect(nextUrl);
+        } else {
+          window.location.href = nextUrl;
+        }
       }, 500);
     } catch (error) {
       logger.error("❌ Login network error:", error);
       setApiError("Wystąpił błąd podczas logowania");
     } finally {
       setIsSubmitting(false);
+      isSubmittingRef.current = false;
     }
   };
 
   const isFormLoading = isLoading || isSubmitting;
 
-  // Prevent hydration mismatch by not rendering form until mounted
-  if (!isMounted) {
-    return (
-      <Card className="w-full">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl text-center">Zaloguj się</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-center py-8">
-            <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
     <Card className="w-full">
       <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl text-center">Zaloguj się</CardTitle>
+        <CardTitle className="text-2xl text-center">Logowanie</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
+        <form
+          onSubmit={handleSubmit(handleFormSubmit)}
+          className="space-y-4"
+          noValidate
+        >
           {/* Email field */}
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>

@@ -22,7 +22,10 @@ const registerSchema = z
       .string()
       .min(8, "Hasło musi mieć co najmniej 8 znaków")
       .max(72, "Hasło jest za długie")
-      .regex(/^(?=.*[A-Za-z])(?=.*\d)/, "Hasło musi zawierać co najmniej jedną literę i jedną cyfrę"),
+      .regex(
+        /^(?=.*[A-Za-z])(?=.*\d)/,
+        "Hasło musi zawierać co najmniej jedną literę i jedną cyfrę",
+      ),
     confirmPassword: z.string().min(1, "Potwierdzenie hasła jest wymagane"),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -38,7 +41,11 @@ interface RegisterFormProps {
   error?: string;
 }
 
-export default function RegisterForm({ onSubmit, isLoading = false, error }: RegisterFormProps) {
+export default function RegisterForm({
+  onSubmit,
+  isLoading = false,
+  error,
+}: RegisterFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
@@ -73,7 +80,11 @@ export default function RegisterForm({ onSubmit, isLoading = false, error }: Reg
         <CardTitle className="text-2xl text-center">Utwórz konto</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
+        <form
+          onSubmit={handleSubmit(handleFormSubmit)}
+          className="space-y-4"
+          noValidate
+        >
           {/* Email field */}
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
@@ -116,7 +127,9 @@ export default function RegisterForm({ onSubmit, isLoading = false, error }: Reg
                 {errors.password.message}
               </p>
             )}
-            <p className="text-xs text-muted-foreground">Minimum 8 znaków, co najmniej jedna litera i jedna cyfra</p>
+            <p className="text-xs text-muted-foreground">
+              Minimum 8 znaków, co najmniej jedna litera i jedna cyfra
+            </p>
           </div>
 
           {/* Confirm Password field */}

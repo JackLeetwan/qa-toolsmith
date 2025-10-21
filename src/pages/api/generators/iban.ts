@@ -14,7 +14,10 @@ const QuerySchema = z.object({
   seed: z
     .string()
     .max(64, "seed must be at most 64 characters")
-    .regex(/^[A-Za-z0-9._-]+$/, "seed must contain only alphanumeric, dots, underscores, or hyphens")
+    .regex(
+      /^[A-Za-z0-9._-]+$/,
+      "seed must contain only alphanumeric, dots, underscores, or hyphens",
+    )
     .optional(),
 });
 
@@ -48,7 +51,7 @@ export const GET: APIRoute = async ({ request }) => {
       return createErrorResponse(
         "VALIDATION_ERROR",
         "Query parameter 'country' is required and must be 'DE', 'AT', or 'PL'",
-        400
+        400,
       );
     }
 
@@ -67,7 +70,9 @@ export const GET: APIRoute = async ({ request }) => {
     }
 
     // Determine cache headers based on whether seed was provided
-    const cacheControl = parsed.seed ? "public, max-age=31536000, immutable" : "no-store";
+    const cacheControl = parsed.seed
+      ? "public, max-age=31536000, immutable"
+      : "no-store";
 
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
@@ -86,7 +91,9 @@ export const GET: APIRoute = async ({ request }) => {
   } catch (error) {
     // Handle validation errors
     if (error instanceof z.ZodError) {
-      const message = error.errors.map((e) => `${e.path.join(".")}: ${e.message}`).join("; ");
+      const message = error.errors
+        .map((e) => `${e.path.join(".")}: ${e.message}`)
+        .join("; ");
 
       return createErrorResponse("VALIDATION_ERROR", message, 400);
     }
@@ -96,7 +103,7 @@ export const GET: APIRoute = async ({ request }) => {
       "INTERNAL",
       "An unexpected server error occurred",
       500,
-      error instanceof Error ? error.message : String(error)
+      error instanceof Error ? error.message : String(error),
     );
   }
 };
@@ -105,7 +112,12 @@ export const GET: APIRoute = async ({ request }) => {
  * Create a standardized error response
  * Follows the ErrorResponse interface from src/types/types.ts
  */
-function createErrorResponse(code: string, message: string, status: number, details?: string): Response {
+function createErrorResponse(
+  code: string,
+  message: string,
+  status: number,
+  details?: string,
+): Response {
   const payload: Record<string, unknown> = {
     error: {
       code,

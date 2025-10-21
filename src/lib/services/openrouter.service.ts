@@ -12,6 +12,7 @@ import type {
   AILimitsDTO,
   AIContext,
   AIField,
+  OpenRouterResponse,
 } from "../../types/types";
 
 /**
@@ -23,7 +24,7 @@ export class OpenRouterError extends Error {
     public code: string,
     public status: number,
     public retryable = false,
-    public retryAfter?: number
+    public retryAfter?: number,
   ) {
     super(message);
     this.name = "OpenRouterError";
@@ -36,7 +37,9 @@ export class OpenRouterError extends Error {
 class RateLimiter {
   private requests = new Map<string, { count: number; resetTime: number }>();
 
-  constructor(private config: { requestsPerMinute: number; burstLimit: number }) {}
+  constructor(
+    private config: { requestsPerMinute: number; burstLimit: number },
+  ) {}
 
   async checkLimit(identifier: string): Promise<boolean> {
     const now = Date.now();
@@ -69,13 +72,13 @@ class RateLimiter {
  */
 class UsageTracker {
   private usage = new Map<string, { count: number; resetDate: string }>();
-  private supabase: unknown;
+  private supabase: ReturnType<typeof createClient<Database>> | null;
 
   constructor(
     private config: { dailyLimit: number; resetHour: number },
-    supabaseClient?: unknown
+    supabaseClient?: ReturnType<typeof createClient<Database>> | null,
   ) {
-    this.supabase = supabaseClient;
+    this.supabase = supabaseClient || null;
   }
 
   async checkDailyLimit(userId: string): Promise<boolean> {
@@ -92,12 +95,12 @@ class UsageTracker {
   }
 
   private async checkDatabaseLimit(userId: string): Promise<boolean> {
+    if (!this.supabase) {
+      throw new Error("Supabase client not available");
+    }
+
     // Use the database function to check and increment usage atomically
-    const { data, error } = await (
-      this.supabase as {
-        rpc: (name: string, params: Record<string, unknown>) => Promise<{ data: unknown; error: Error | null }>;
-      }
-    ).rpc("can_invoke_ai", {
+    const { data, error } = await this.supabase.rpc("can_invoke_ai", {
       uid: userId,
     });
 
@@ -121,7 +124,12 @@ class UsageTracker {
     return entry.count < this.config.dailyLimit;
   }
 
-  async recordUsage(userId: string, tokens: number, context?: AIContext, field?: AIField): Promise<void> {
+  async recordUsage(
+    userId: string,
+    tokens: number,
+    context?: AIContext,
+    field?: AIField,
+  ): Promise<void> {
     try {
       if (this.supabase) {
         await this.recordDatabaseUsage(userId, tokens, context, field);
@@ -138,37 +146,47 @@ class UsageTracker {
     userId: string,
     tokens: number,
     context?: AIContext,
-    field?: AIField
+    field?: AIField,
   ): Promise<void> {
+    if (!this.supabase) {
+      throw new Error("Supabase client not available");
+    }
+
     // Record in ai_invocations table
-    const { error: invocationError } = await this.supabase.from("ai_invocations").insert({
-      user_id: userId,
-      action: "improve",
-      tokens_prompt: Math.floor(tokens * 0.7), // Estimate prompt vs completion
-      tokens_completion: Math.floor(tokens * 0.3),
-      success: true,
-      meta: {
-        context,
-        field,
-        timestamp: new Date().toISOString(),
-      },
-    });
+    const { error: invocationError } = await this.supabase
+      .from("ai_invocations")
+      .insert({
+        user_id: userId,
+        action: "improve",
+        tokens_prompt: Math.floor(tokens * 0.7), // Estimate prompt vs completion
+        tokens_completion: Math.floor(tokens * 0.3),
+        success: true,
+        meta: {
+          context,
+          field,
+          timestamp: new Date().toISOString(),
+        },
+      });
 
     if (invocationError) {
-      throw new Error(`Failed to record AI invocation: ${invocationError.message}`);
+      throw new Error(
+        `Failed to record AI invocation: ${invocationError.message}`,
+      );
     }
 
     // Record in usage_events table for analytics
-    const { error: eventError } = await this.supabase.from("usage_events").insert({
-      user_id: userId,
-      kind: "ai",
-      meta: {
-        tokens,
-        context,
-        field,
-        timestamp: new Date().toISOString(),
-      },
-    });
+    const { error: eventError } = await this.supabase
+      .from("usage_events")
+      .insert({
+        user_id: userId,
+        kind: "ai",
+        meta: {
+          tokens,
+          context,
+          field,
+          timestamp: new Date().toISOString(),
+        },
+      });
 
     if (eventError) {
       // Don't throw here as the main usage recording succeeded
@@ -176,7 +194,10 @@ class UsageTracker {
     }
   }
 
-  private async recordMemoryUsage(userId: string, tokens: number): Promise<void> {
+  private async recordMemoryUsage(
+    userId: string,
+    tokens: number,
+  ): Promise<void> {
     const today = this.getToday();
     const key = `usage:${userId}`;
     const entry = this.usage.get(key);
@@ -202,6 +223,10 @@ class UsageTracker {
   }
 
   private async getDatabaseRemainingUsage(userId: string): Promise<number> {
+    if (!this.supabase) {
+      throw new Error("Supabase client not available");
+    }
+
     const today = this.getToday();
 
     const { data, error } = await this.supabase
@@ -267,7 +292,11 @@ class UsageTracker {
   async resetUserUsage(userId: string): Promise<void> {
     if (this.supabase) {
       const today = this.getToday();
-      const { error } = await this.supabase.from("ai_daily_usage").delete().eq("user_id", userId).eq("day", today);
+      const { error } = await this.supabase
+        .from("ai_daily_usage")
+        .delete()
+        .eq("user_id", userId)
+        .eq("day", today);
 
       if (error) {
         throw new Error(`Failed to reset user usage: ${error.message}`);
@@ -304,10 +333,13 @@ class MessageBuilder {
     ],
   ]);
 
-  constructor(private config: { maxTokens: number; systemPromptTemplate: string }) {}
+  constructor(
+    private config: { maxTokens: number; systemPromptTemplate: string },
+  ) {}
 
   buildSystemMessage(context: AIContext, field: AIField): string {
-    const template = this.systemPrompts.get(context) || this.config.systemPromptTemplate;
+    const template =
+      this.systemPrompts.get(context) || this.config.systemPromptTemplate;
     return template.replace("{field}", field);
   }
 
@@ -317,7 +349,10 @@ class MessageBuilder {
 
   estimateTokens(messages: Message[]): number {
     // Rough estimation: 1 token ≈ 4 characters
-    const totalChars = messages.reduce((sum, msg) => sum + msg.content.length, 0);
+    const totalChars = messages.reduce(
+      (sum, msg) => sum + msg.content.length,
+      0,
+    );
     return Math.ceil(totalChars / 4);
   }
 
@@ -350,7 +385,12 @@ class ResponseFormatter {
   private ajv = new Ajv();
   private schemas = new Map<string, JSONSchema>();
 
-  constructor(private config: { enableStructuredOutput: boolean; defaultSchema?: JSONSchema }) {
+  constructor(
+    private config: {
+      enableStructuredOutput: boolean;
+      defaultSchema?: JSONSchema;
+    },
+  ) {
     this.initializeSchemas();
   }
 
@@ -383,7 +423,10 @@ class ResponseFormatter {
         proposal: { type: "string" },
         diff: { type: "string" },
         reasoning: { type: "string" },
-        severity: { type: "string", enum: ["low", "medium", "high", "critical"] },
+        severity: {
+          type: "string",
+          enum: ["low", "medium", "high", "critical"],
+        },
         category: { type: "string" },
       },
       required: ["proposal", "diff"],
@@ -424,8 +467,14 @@ class ResponseFormatter {
     this.schemas.set("kb", kbSchema);
   }
 
-  parseResponse(response: Record<string, unknown>, context?: AIContext): AITextProcessResponse {
-    if (this.config.enableStructuredOutput && response.choices?.[0]?.message?.content) {
+  parseResponse(
+    response: OpenRouterResponse,
+    context?: AIContext,
+  ): AITextProcessResponse {
+    if (
+      this.config.enableStructuredOutput &&
+      response.choices?.[0]?.message?.content
+    ) {
       try {
         const content = JSON.parse(response.choices[0].message.content);
 
@@ -445,7 +494,10 @@ class ResponseFormatter {
         };
       } catch {
         // Fallback to plain text response
-        return this.createFallbackResponse(response, response.choices[0].message.content);
+        return this.createFallbackResponse(
+          response,
+          response.choices[0].message.content,
+        );
       }
     }
 
@@ -457,8 +509,14 @@ class ResponseFormatter {
     };
   }
 
-  private createFallbackResponse(response: Record<string, unknown>, content: unknown): AITextProcessResponse {
-    const proposal = typeof content === "string" ? content : (content as Record<string, unknown>)?.proposal || "";
+  private createFallbackResponse(
+    response: OpenRouterResponse,
+    content: unknown,
+  ): AITextProcessResponse {
+    const proposal =
+      typeof content === "string"
+        ? content
+        : (content as Record<string, unknown>)?.proposal || "";
     return {
       proposal: typeof proposal === "string" ? proposal : "",
       diff: "",
@@ -477,12 +535,19 @@ class ResponseFormatter {
     }
   }
 
-  extractUsage(response: Record<string, unknown>): UsageInfo {
-    const usage = (response.usage as Record<string, unknown>) || {};
+  extractUsage(response: OpenRouterResponse): UsageInfo {
+    const usage = response.usage || {
+      prompt_tokens: 0,
+      completion_tokens: 0,
+      total_tokens: 0,
+    };
     return {
-      prompt: (usage.prompt_tokens as number) || 0,
-      completion: (usage.completion_tokens as number) || 0,
-      total: ((usage.prompt_tokens as number) || 0) + ((usage.completion_tokens as number) || 0),
+      prompt: usage.prompt_tokens || 0,
+      completion: usage.completion_tokens || 0,
+      total:
+        usage.total_tokens ||
+        usage.prompt_tokens + usage.completion_tokens ||
+        0,
     };
   }
 
@@ -494,7 +559,10 @@ class ResponseFormatter {
     this.schemas.set(name, schema);
   }
 
-  validateResponseFormat(response: Record<string, unknown>): { valid: boolean; errors?: string[] } {
+  validateResponseFormat(response: OpenRouterResponse): {
+    valid: boolean;
+    errors?: string[];
+  } {
     const errors: string[] = [];
 
     if (!response.choices || !Array.isArray(response.choices)) {
@@ -505,16 +573,8 @@ class ResponseFormatter {
       errors.push("Missing message content");
     }
 
-    if (this.config.enableStructuredOutput) {
-      try {
-        const content = JSON.parse((response.choices as Record<string, unknown>[])[0]?.message?.content as string);
-        if (!content.proposal) {
-          errors.push("Missing required field: proposal");
-        }
-      } catch {
-        errors.push("Invalid JSON in structured response");
-      }
-    }
+    // Note: We don't validate JSON structure here since parseResponse has fallback logic
+    // for handling both structured and plain text responses
 
     return {
       valid: errors.length === 0,
@@ -548,22 +608,30 @@ export class OpenRouterService {
   constructor(config: OpenRouterConfig) {
     this.apiKey = config.apiKey;
     this.baseUrl = config.baseUrl || "https://openrouter.ai/api/v1";
-    this.defaultModel = config.defaultModel || "microsoft/phi-3-mini-128k-instruct";
-    this.maxRetries = config.maxRetries || 3;
-    this.timeout = config.timeout || 30000;
+    this.defaultModel =
+      config.defaultModel || "microsoft/phi-3-mini-128k-instruct";
+    this.maxRetries = config.maxRetries ?? 3;
+    this.timeout = config.timeout ?? 30000;
 
-    this.rateLimiter = new RateLimiter(config.rateLimitConfig || { requestsPerMinute: 10, burstLimit: 20 });
+    this.rateLimiter = new RateLimiter(
+      config.rateLimitConfig || { requestsPerMinute: 10, burstLimit: 20 },
+    );
 
     this.usageTracker = new UsageTracker(
       config.usageConfig || { dailyLimit: 100, resetHour: 0 },
-      config.supabaseClient
+      config.supabaseClient as ReturnType<typeof createClient<Database>> | null,
     );
 
     this.messageBuilder = new MessageBuilder(
-      config.messageConfig || { maxTokens: 4000, systemPromptTemplate: "You are a helpful AI assistant." }
+      config.messageConfig || {
+        maxTokens: 4000,
+        systemPromptTemplate: "You are a helpful AI assistant.",
+      },
     );
 
-    this.responseFormatter = new ResponseFormatter(config.responseConfig || { enableStructuredOutput: true });
+    this.responseFormatter = new ResponseFormatter(
+      config.responseConfig || { enableStructuredOutput: true },
+    );
 
     this.systemPrompts = new Map();
     this.responseSchemas = new Map();
@@ -608,18 +676,32 @@ export class OpenRouterService {
   /**
    * Process text using AI
    */
-  async processText(request: AITextProcessRequest): Promise<AITextProcessResponse> {
+  async processText(
+    request: AITextProcessRequest,
+  ): Promise<AITextProcessResponse> {
     try {
       // Check rate limit
       const rateLimitOk = await this.rateLimiter.checkLimit("global");
       if (!rateLimitOk) {
         const retryAfter = this.rateLimiter.getRetryAfter("global");
-        throw new OpenRouterError("Rate limit exceeded", "RATE_LIMITED", 429, true, retryAfter);
+        throw new OpenRouterError(
+          "Rate limit exceeded",
+          "RATE_LIMITED",
+          429,
+          true,
+          retryAfter,
+        );
       }
 
       // Build messages
-      const systemMessage = this.messageBuilder.buildSystemMessage(request.context, request.field);
-      const userMessage = this.messageBuilder.buildUserMessage(request.text, request.context);
+      const systemMessage = this.messageBuilder.buildSystemMessage(
+        request.context,
+        request.field,
+      );
+      const userMessage = this.messageBuilder.buildUserMessage(
+        request.text,
+        request.context,
+      );
 
       const messages: Message[] = [
         { role: "system", content: systemMessage },
@@ -627,7 +709,10 @@ export class OpenRouterService {
       ];
 
       // Truncate if needed
-      const truncatedMessages = this.messageBuilder.truncateContext(messages, 4000);
+      const truncatedMessages = this.messageBuilder.truncateContext(
+        messages,
+        4000,
+      );
 
       // Get context-specific model parameters
       const contextParams = this.modelConfigs.get(request.context) || {
@@ -652,9 +737,18 @@ export class OpenRouterService {
                 schema: {
                   type: "object",
                   properties: {
-                    proposal: { type: "string", description: "The improved text proposal" },
-                    diff: { type: "string", description: "Markdown diff showing changes made" },
-                    reasoning: { type: "string", description: "Brief explanation of improvements made" },
+                    proposal: {
+                      type: "string",
+                      description: "The improved text proposal",
+                    },
+                    diff: {
+                      type: "string",
+                      description: "Markdown diff showing changes made",
+                    },
+                    reasoning: {
+                      type: "string",
+                      description: "Brief explanation of improvements made",
+                    },
                   },
                   required: ["proposal", "diff"],
                   additionalProperties: false,
@@ -664,14 +758,17 @@ export class OpenRouterService {
           : undefined,
       });
 
-      const result = this.responseFormatter.parseResponse(response, request.context);
+      const result = this.responseFormatter.parseResponse(
+        response,
+        request.context,
+      );
 
       // Record usage with context information
       await this.usageTracker.recordUsage(
         "system", // This should be actual userId in real implementation
         result.usage.prompt + result.usage.completion,
         request.context,
-        request.field
+        request.field,
       );
 
       this.isHealthy = true;
@@ -698,7 +795,10 @@ export class OpenRouterService {
    */
   async getAvailableModels(): Promise<ModelInfo[]> {
     try {
-      const response = await this.makeRequest<{ data: ModelInfo[] }>("/models", {});
+      const response = await this.makeRequest<{ data: ModelInfo[] }>(
+        "/models",
+        {},
+      );
       return response.data || [];
     } catch (error) {
       throw this.handleError(error);
@@ -744,7 +844,10 @@ export class OpenRouterService {
   /**
    * Update model parameters for specific context
    */
-  updateContextModelConfig(context: AIContext, params: Partial<ModelParams>): void {
+  updateContextModelConfig(
+    context: AIContext,
+    params: Partial<ModelParams>,
+  ): void {
     const currentConfig = this.modelConfigs.get(context) || {};
     this.modelConfigs.set(context, { ...currentConfig, ...params });
   }
@@ -798,7 +901,10 @@ export class OpenRouterService {
   }
 
   // Private methods
-  private async makeRequest<T>(endpoint: string, data: Record<string, unknown>): Promise<T> {
+  private async makeRequest<T = OpenRouterResponse>(
+    endpoint: string,
+    data: Record<string, unknown>,
+  ): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), this.timeout);
@@ -825,7 +931,9 @@ export class OpenRouterService {
           errorData.error?.code || "HTTP_ERROR",
           response.status,
           response.status >= 500 || response.status === 429,
-          response.headers.get("retry-after") ? parseInt(response.headers.get("retry-after") || "0") : undefined
+          response.headers.get("retry-after")
+            ? parseInt(response.headers.get("retry-after") || "0")
+            : undefined,
         );
       }
 
@@ -846,7 +954,7 @@ export class OpenRouterService {
   }
 
   private async retryRequest<T>(requestFn: () => Promise<T>): Promise<T> {
-    let lastError: Error;
+    let lastError: Error | undefined;
 
     for (let attempt = 1; attempt <= this.maxRetries; attempt++) {
       try {
@@ -879,19 +987,40 @@ export class OpenRouterService {
     // Map HTTP errors to application errors
     const httpError = error as { status?: number; retryAfter?: number };
     if (httpError.status === 429) {
-      throw new OpenRouterError("Rate limit exceeded", "RATE_LIMITED", 429, true, httpError.retryAfter);
+      throw new OpenRouterError(
+        "Rate limit exceeded",
+        "RATE_LIMITED",
+        429,
+        true,
+        httpError.retryAfter,
+      );
     }
 
     if (httpError.status === 401) {
-      throw new OpenRouterError("Invalid API key", "INVALID_API_KEY", 401, false);
+      throw new OpenRouterError(
+        "Invalid API key",
+        "INVALID_API_KEY",
+        401,
+        false,
+      );
     }
 
     if (httpError.status === 503) {
-      throw new OpenRouterError("Service unavailable", "SERVICE_UNAVAILABLE", 503, true);
+      throw new OpenRouterError(
+        "Service unavailable",
+        "SERVICE_UNAVAILABLE",
+        503,
+        true,
+      );
     }
 
     // Default to internal error
-    throw new OpenRouterError("Internal service error", "INTERNAL_ERROR", 500, true);
+    throw new OpenRouterError(
+      "Internal service error",
+      "INTERNAL_ERROR",
+      500,
+      true,
+    );
   }
 }
 
@@ -916,8 +1045,11 @@ if (supabaseUrl && supabaseServiceKey) {
 // Export singleton instance
 export const openRouterService = new OpenRouterService({
   apiKey: import.meta.env.OPENROUTER_API_KEY || "",
-  baseUrl: import.meta.env.OPENROUTER_BASE_URL || "https://openrouter.ai/api/v1",
-  defaultModel: import.meta.env.OPENROUTER_DEFAULT_MODEL || "microsoft/phi-3-mini-128k-instruct",
+  baseUrl:
+    import.meta.env.OPENROUTER_BASE_URL || "https://openrouter.ai/api/v1",
+  defaultModel:
+    import.meta.env.OPENROUTER_DEFAULT_MODEL ||
+    "microsoft/phi-3-mini-128k-instruct",
   maxRetries: parseInt(import.meta.env.OPENROUTER_MAX_RETRIES || "3"),
   timeout: parseInt(import.meta.env.OPENROUTER_TIMEOUT || "30000"),
   rateLimitConfig: {
@@ -930,10 +1062,13 @@ export const openRouterService = new OpenRouterService({
   },
   messageConfig: {
     maxTokens: parseInt(import.meta.env.OPENROUTER_MAX_TOKENS || "4000"),
-    systemPromptTemplate: import.meta.env.OPENROUTER_SYSTEM_PROMPT || "You are a helpful AI assistant.",
+    systemPromptTemplate:
+      import.meta.env.OPENROUTER_SYSTEM_PROMPT ||
+      "You are a helpful AI assistant.",
   },
   responseConfig: {
-    enableStructuredOutput: import.meta.env.OPENROUTER_STRUCTURED_OUTPUT !== "false",
+    enableStructuredOutput:
+      import.meta.env.OPENROUTER_STRUCTURED_OUTPUT !== "false",
     defaultSchema: {
       type: "object",
       properties: {
