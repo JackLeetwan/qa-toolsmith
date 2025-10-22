@@ -1,5 +1,4 @@
-import { chromium, FullConfig } from "@playwright/test";
-
+/* eslint-disable no-console */
 /**
  * Global setup for E2E tests
  *
@@ -10,7 +9,7 @@ import { chromium, FullConfig } from "@playwright/test";
  * Reference: Playwright Global Setup
  * https://playwright.dev/docs/test-global-setup-teardown
  */
-async function globalSetup(config: FullConfig) {
+async function globalSetup() {
   console.log("🚀 Starting E2E Global Setup...");
 
   // Validate required environment variables

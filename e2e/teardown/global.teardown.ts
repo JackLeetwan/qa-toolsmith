@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { createClient } from "@supabase/supabase-js";
 
 /**
@@ -38,8 +39,8 @@ async function globalTeardown() {
     // Step 1: Authenticate as test user (required for RLS policies)
     console.log("🔐 Authenticating as test user...");
     const { error: signInError } = await supabase.auth.signInWithPassword({
-      email: process.env.E2E_USERNAME!,
-      password: process.env.E2E_PASSWORD!,
+      email: process.env.E2E_USERNAME as string,
+      password: process.env.E2E_PASSWORD as string,
     });
 
     if (signInError) {
