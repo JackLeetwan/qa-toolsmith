@@ -1,6 +1,6 @@
-# AI Rules for {{project-name}}
+# AI Rules for QA Toolsmith
 
-{{project-description}}
+QA Toolsmith (MVP) is an open-source, lightweight web app that standardizes testers' daily work. It includes email/password auth with admin/user roles, defect report templates with quick copy/export to Markdown, an Exploration Charter (timer, tags, Markdown export), and a minimal Knowledge Base (CRUD, tags, search). Built-in generators/validators produce synthetic test data for PL/DE/AT (incl. IBAN DE/AT). An optional AI assistant can polish content with a per-user daily limit and a safe manual fallback. The MVP ships with unit and E2E tests plus a CI/CD pipeline, and deliberately excludes external integrations and file uploads to keep deployment simple and secure.
 
 ## Tech Stack
 
