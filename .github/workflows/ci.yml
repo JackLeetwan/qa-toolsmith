@@ -1,9 +1,8 @@
+---
 name: CI
 
 on:
   push:
-    branches: [main, master]
-  pull_request:
     branches: [main, master]
 
 jobs:
@@ -50,7 +49,7 @@ jobs:
       - name: Archive build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: build-output
+          name: ci-build-output
           path: dist/
           retention-days: 7
 
@@ -59,6 +58,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      checks: write
     steps:
       - uses: actions/checkout@v5
       - name: Enable Corepack
@@ -70,8 +70,52 @@ jobs:
           cache: "npm"
       - name: Install dependencies
         run: npm ci
-      - name: Run tests
-        run: npm test
+      - name: Run tests with coverage
+        run: npm run test:unit:coverage
+      - name: Upload test coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-unit-coverage
+          path: coverage/
+          retention-days: 30
+      - name: Publish test results
+        if: always()
+        uses: dorny/test-reporter@v2
+        with:
+          name: Unit Tests (CI)
+          path: coverage/lcov.info
+          reporter: lcov
+
+  coverage-summary:
+    name: Coverage Summary
+    runs-on: ubuntu-latest
+    needs: test
+    permissions:
+      contents: read
+      checks: write
+    steps:
+      - uses: actions/checkout@v5
+      - name: Download coverage artifacts
+        uses: actions/download-artifact@v5
+        with:
+          name: ci-unit-coverage
+          path: coverage/
+      - name: Generate coverage summary
+        run: |
+          echo "## 📊 Coverage Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Unit Test Coverage" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Coverage report generated successfully!" >> $GITHUB_STEP_SUMMARY
+          echo "- **Format**: LCOV" >> $GITHUB_STEP_SUMMARY
+          echo "- **Retention**: 30 days" >> $GITHUB_STEP_SUMMARY
+          echo "- **Artifact**: ci-unit-coverage" >> $GITHUB_STEP_SUMMARY
+      - name: Publish coverage summary
+        uses: dorny/test-reporter@v2
+        with:
+          name: Coverage Summary (CI)
+          path: coverage/lcov.info
+          reporter: lcov
 
   e2e:
     name: E2E Tests
@@ -95,7 +139,7 @@ jobs:
       - name: Download build artifacts
         uses: actions/download-artifact@v5
         with:
-          name: build-output
+          name: ci-build-output
           path: dist/
       - name: Install Playwright browsers
         run: npx playwright install chromium
@@ -128,12 +172,16 @@ jobs:
           echo "🔍 Environment variables check:"
           echo "SUPABASE_URL: ${SUPABASE_URL:+✅ Set}"
           echo "SUPABASE_KEY: ${SUPABASE_KEY:+✅ Set}"
+          echo "SUPABASE_SERVICE_KEY: ${SUPABASE_SERVICE_KEY:+✅ Set}"
+          echo "OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:+✅ Set}"
           echo "E2E_USERNAME: ${E2E_USERNAME:+✅ Set}"
           echo "E2E_PASSWORD: ${E2E_PASSWORD:+✅ Set}"
           echo "E2E_USERNAME_ID: ${E2E_USERNAME_ID:+✅ Set}"
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           E2E_USERNAME: ${{ secrets.E2E_USERNAME }}
           E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
           E2E_USERNAME_ID: ${{ secrets.E2E_USERNAME_ID }}
@@ -142,6 +190,8 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           E2E_USERNAME: ${{ secrets.E2E_USERNAME }}
           E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
           E2E_USERNAME_ID: ${{ secrets.E2E_USERNAME_ID }}
@@ -149,21 +199,21 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-html-report
+          name: ci-e2e-html-report
           path: playwright-report/
           retention-days: 30
       - name: Upload Test Results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-results
+          name: ci-e2e-test-results
           path: test-results/
           retention-days: 30
       - name: Publish test results
         if: always()
         uses: dorny/test-reporter@v2
         with:
-          name: E2E Tests
+          name: E2E Tests (CI)
           path: test-results/junit.xml
           reporter: java-junit
       - name: Stop server
@@ -178,7 +228,7 @@ jobs:
   health-check:
     name: Health Check
     runs-on: ubuntu-latest
-    needs: e2e
+    needs: [e2e, coverage-summary]
     permissions:
       contents: read
     steps:
@@ -195,7 +245,7 @@ jobs:
       - name: Download build artifacts
         uses: actions/download-artifact@v5
         with:
-          name: build-output
+          name: ci-build-output
           path: dist/
       - name: Start server
         run: |
@@ -220,7 +270,8 @@ jobs:
           done
       - name: Check health endpoint
         run: |
-          response=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/api/health)
+          response=$(curl -s -o /dev/null -w "%{http_code}" \
+            http://localhost:3000/api/health)
           echo "Health endpoint response: $response"
           if [ "$response" != "200" ]; then
             echo "Health check failed with status code $response"
