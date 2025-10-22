@@ -6,15 +6,16 @@ This directory contains documentation for the QA Toolsmith REST API endpoints.
 
 ### 🔐 Authentication
 
-- **[POST /auth/login](/api/auth-login.md)** - User authentication with email/password, returns JWT token + profile
+- **[POST /auth/login](#post-authlogin--user-authentication)** - User authentication with email/password, returns JWT token + profile
 
 ### 🏥 Health & Status
 
-- **[GET /health](/api/health.md)** - Simple application health check endpoint (liveness/readiness probe)
+- **[GET /health](#get-health--health-check-endpoint)** - Simple application health check endpoint (liveness/readiness probe)
 
 ### 🔢 Data Generators
 
-- **[GET /generators/iban](/api/generators-iban.md)** - Generate valid IBAN codes (DE, AT, PL) with optional seed
+- **[GET /generators/iban](#get-apigeneratorsiban--iban-generator-endpoint)** - Generate valid IBAN codes (DE, AT, PL) with optional seed
+- **[GET /validators/iban](#get-apivalidatorsiban--iban-validator-endpoint)** - Validate existing IBANs
 
 ---
 
@@ -104,6 +105,66 @@ Obtain token via `POST /auth/login`.
 ## Postman Collection
 
 Import the collection from `.postman/` directory to test all endpoints with pre-configured requests and tests.
+
+---
+
+## Caching Strategy
+
+### IBAN Generator Caching
+
+**Random IBAN (no seed):**
+```
+Cache-Control: no-store
+```
+- Response is **never cached** (each request generates different IBAN)
+
+**Deterministic IBAN (with seed):**
+```
+Cache-Control: public, max-age=31536000, immutable
+ETag: "encoded-hash"
+```
+- Response is **cached for 1 year** (same seed always produces same IBAN)
+- Safe for CDN caching
+
+### IBAN Validator Caching
+
+```
+Cache-Control: public, max-age=300
+```
+- Validation results are cached for 5 minutes
+
+---
+
+## Error Handling
+
+### Client-Side Validation
+- **Inline Errors**: Display immediately for format violations
+- **Submit Prevention**: Block API calls for invalid inputs
+- **User Feedback**: Clear error messages with suggestions
+
+### API Error Mapping
+| HTTP Code | Error Code | UI Handling |
+|-----------|------------|-------------|
+| 400 | `invalid_country` | Inline error on country select |
+| 400 | `invalid_seed` | Inline error on seed input |
+| 400 | `bad_params` | Form validation errors |
+| 429 | `rate_limited` | Toast + retry after delay |
+| 500 | `internal` | Error boundary fallback |
+
+### Network Error Handling
+- **Timeout**: 30s default, graceful degradation
+- **Offline**: Banner notification, queue requests
+- **Retry**: Exponential backoff for 5xx errors
+- **AbortController**: Cancel in-flight requests on unmount/param change
+
+---
+
+## Local Storage Keys
+
+### Generator Preferences & History
+
+- `gen_pref_iban` - user preferences (country, format, mode)
+- `gen_history_iban` - IBAN generation history (max 10 items)
 
 ---
 
@@ -977,8 +1038,18 @@ console.log(ibans);
 ## Related Endpoints
 
 - **GET `/api/generators/iban`** — This endpoint
-- **GET `/validators/iban`** — Validate existing IBANs (coming soon)
-- **GET `/api/generators/{kind}`** — Other data generators (address, phone, etc.)
+- **GET `/validators/iban`** — Validate existing IBANs
+- **GET `/api/generators/{kind}`** — Other data generators:
+
+### Planned Generators
+- `phone` - Phone Number Generator
+- `address` - Address Generator
+- `plates` - License Plate Generator
+- `email` - Email Generator
+- `company` - Company Name Generator
+- `card` - Payment Card Generator
+- `guid` - GUID Generator
+- `string` - Random String Generator
 
 ---
 
