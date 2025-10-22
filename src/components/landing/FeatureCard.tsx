@@ -7,6 +7,7 @@ interface FeatureCardProps {
   description: string;
   href: string;
   icon: LucideIcon;
+  linkText?: string;
 }
 
 /**
@@ -18,6 +19,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
   description,
   href,
   icon: Icon,
+  linkText = "Przejdź →",
 }) => {
   return (
     <Card className="bg-card/50 hover:bg-muted/50 transition-all duration-300 cursor-pointer">
@@ -33,7 +35,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
           href={href}
           className="inline-flex items-center text-primary hover:text-primary/80 font-medium"
         >
-          Przejdź →
+          {linkText}
         </a>
       </CardContent>
     </Card>

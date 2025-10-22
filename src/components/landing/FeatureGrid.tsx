@@ -14,6 +14,7 @@ const FeatureGrid: React.FC = () => {
       description:
         "Gotowe szablony do tworzenia profesjonalnych raportów QA. Szybko generuj dokumentację testową i analizy.",
       href: "/templates",
+      linkText: "Przejdź do szablonów →",
     },
     {
       icon: Clock,
@@ -21,6 +22,7 @@ const FeatureGrid: React.FC = () => {
       description:
         "Strukturyzowane podejście do eksploracyjnego testowania oprogramowania. Planuj i dokumentuj sesje testowe.",
       href: "/charters",
+      linkText: "Rozpocznij eksplorację →",
     },
     {
       icon: BookOpen,
@@ -28,6 +30,7 @@ const FeatureGrid: React.FC = () => {
       description:
         "Bogata kolekcja wiedzy QA, najlepszych praktyk i przewodników. Rozwijaj swoje umiejętności testowania.",
       href: "/kb",
+      linkText: "Przeglądaj bazę wiedzy →",
     },
     {
       icon: Zap,
@@ -35,6 +38,7 @@ const FeatureGrid: React.FC = () => {
       description:
         "Automatycznie generuj dane testowe dla różnych scenariuszy. IBAN, adresy, dane osobowe i wiele więcej.",
       href: "/generators",
+      linkText: "Generuj dane testowe →",
     },
   ];
 
@@ -47,6 +51,7 @@ const FeatureGrid: React.FC = () => {
           title={feature.title}
           description={feature.description}
           href={feature.href}
+          linkText={feature.linkText}
         />
       ))}
     </div>

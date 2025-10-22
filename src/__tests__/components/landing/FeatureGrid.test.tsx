@@ -83,7 +83,10 @@ describe("FeatureGrid", () => {
   it("renders all link texts correctly", () => {
     render(<FeatureGrid />);
 
-    const linkTexts = screen.getAllByText("Przejdź →");
-    expect(linkTexts).toHaveLength(4);
+    // Check each specific link text exists
+    expect(screen.getByText("Przejdź do szablonów →")).toBeInTheDocument();
+    expect(screen.getByText("Rozpocznij eksplorację →")).toBeInTheDocument();
+    expect(screen.getByText("Przeglądaj bazę wiedzy →")).toBeInTheDocument();
+    expect(screen.getByText("Generuj dane testowe →")).toBeInTheDocument();
   });
 });

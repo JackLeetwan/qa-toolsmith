@@ -94,4 +94,19 @@ describe("FeatureCard", () => {
     const link = screen.getByRole("link", { name: "Przejdź →" });
     expect(link).toBeInTheDocument();
   });
+
+  it("renders custom link text when provided", () => {
+    render(
+      <FeatureCard
+        title="Test Feature"
+        description="Description"
+        href="/test"
+        icon={FileText}
+        linkText="Custom Link Text"
+      />,
+    );
+
+    const link = screen.getByRole("link", { name: "Custom Link Text" });
+    expect(link).toBeInTheDocument();
+  });
 });

@@ -65,31 +65,31 @@ export class HomePage extends BasePage {
   }
 
   /**
-   * Get the "Przejdź do szablonów" (Go to templates) link
+   * Get the "Przejdź do szablonów →" (Go to templates) link
    */
   getTemplatesLink(): Locator {
-    return this.page.getByRole("link", { name: "Przejdź do szablonów" });
+    return this.page.getByRole("link", { name: "Przejdź do szablonów →" });
   }
 
   /**
-   * Get the "Rozpocznij eksplorację" (Start exploration) link
+   * Get the "Rozpocznij eksplorację →" (Start exploration) link
    */
   getExplorationLink(): Locator {
-    return this.page.getByRole("link", { name: "Rozpocznij eksplorację" });
+    return this.page.getByRole("link", { name: "Rozpocznij eksplorację →" });
   }
 
   /**
-   * Get the "Przeglądaj bazę wiedzy" (Browse knowledge base) link
+   * Get the "Przeglądaj bazę wiedzy →" (Browse knowledge base) link
    */
   getKnowledgeBaseLink(): Locator {
-    return this.page.getByRole("link", { name: "Przeglądaj bazę wiedzy" });
+    return this.page.getByRole("link", { name: "Przeglądaj bazę wiedzy →" });
   }
 
   /**
-   * Get the "Generuj dane testowe" (Generate test data) link
+   * Get the "Generuj dane testowe →" (Generate test data) link
    */
   getGenerateDataLink(): Locator {
-    return this.page.getByRole("link", { name: "Generuj dane testowe" });
+    return this.page.getByRole("link", { name: "Generuj dane testowe →" });
   }
 
   /**
