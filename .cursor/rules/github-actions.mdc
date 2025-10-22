@@ -1,0 +1,39 @@
+# AI Rules for QA Toolsmith
+
+QA Toolsmith (MVP) is an open-source, lightweight web app that standardizes testers' daily work. It includes email/password auth with admin/user roles, defect report templates with quick copy/export to Markdown, an Exploration Charter (timer, tags, Markdown export), and a minimal Knowledge Base (CRUD, tags, search). Built-in generators/validators produce synthetic test data for PL/DE/AT (incl. IBAN DE/AT). An optional AI assistant can polish content with a per-user daily limit and a safe manual fallback. The MVP ships with unit and E2E tests plus a CI/CD pipeline, and deliberately excludes external integrations and file uploads to keep deployment simple and secure.
+
+## DEVOPS
+
+### Guidelines for CI_CD
+
+#### GITHUB_ACTIONS
+
+- Check if `package.json` exists in project root and summarize key scripts
+- Check if `.nvmrc` exists in project root
+- Check if `.env.example` exists in project root to identify key `env:` variables
+- Always use terminal command: `git branch -a | cat` to verify whether we use `main` or `master` branch
+- Always use `env:` variables and secrets attached to jobs instead of global workflows
+- Always use `npm ci` for Node-based dependency setup
+- Extract common steps into composite actions in separate files
+
+### Version Verification
+
+1. Identify public actions used within the workflow
+2. For each action always check what is the most up-to-date version with the following command:
+```bash
+curl -s https://api.github.com/repos/{owner}/{repo}/releases/latest | grep '"tag_name"' |
+sed -E 's/.*"v([0-9]+).*/\1/'
+```
+
+### Security Best Practices
+
+- **Pin actions to full SHA commits** instead of tags for immutability and security
+- **Use principle of least privilege** - grant only necessary permissions to jobs
+- **Store secrets securely** - never expose secrets in workflow files
+- **Review external actions** - verify source and reputation before using
+- **Enable Dependabot** for automatic dependency updates and security monitoring
+- **Use composite actions** to reduce duplication and improve maintainability
+
+### Setup Node
+
+Always check the existence of `.nvmrc` in the project to make sure Node up (hardcoded LTS or version from file - if it exists).
