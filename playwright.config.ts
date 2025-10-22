@@ -11,7 +11,7 @@ export default defineConfig({
 
   fullyParallel: process.env.CI ? false : true,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
+  retries: process.env.CI ? 0 : 0, // Disable retries in CI to prevent multiple runs
   workers: process.env.CI ? 1 : undefined,
 
   // Global setup and teardown for E2E tests
@@ -42,10 +42,12 @@ export default defineConfig({
     },
   ],
 
-  webServer: process.env.CI ? undefined : {
-    command: "npm run dev:e2e",
-    url: "http://localhost:3000",
-    reuseExistingServer: true,
-    timeout: 120000,
-  },
+  webServer: process.env.CI
+    ? undefined
+    : {
+        command: "npm run dev:e2e",
+        url: "http://localhost:3000",
+        reuseExistingServer: true,
+        timeout: 120000,
+      },
 });

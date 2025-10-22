@@ -11,6 +11,11 @@
  */
 async function globalSetup() {
   console.log("🚀 Starting E2E Global Setup...");
+  console.log("🔍 Environment check:");
+  console.log(`   - SUPABASE_URL: ${process.env.SUPABASE_URL ? '✅ Set' : '❌ Missing'}`);
+  console.log(`   - SUPABASE_KEY: ${process.env.SUPABASE_KEY ? '✅ Set' : '❌ Missing'}`);
+  console.log(`   - E2E_USERNAME: ${process.env.E2E_USERNAME ? '✅ Set' : '❌ Missing'}`);
+  console.log(`   - E2E_PASSWORD: ${process.env.E2E_PASSWORD ? '✅ Set' : '❌ Missing'}`);
 
   // Validate required environment variables
   const requiredEnvVars = [
