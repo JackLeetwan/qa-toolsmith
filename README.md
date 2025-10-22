@@ -92,6 +92,7 @@ git commit --no-verify
 ## Available Scripts
 
 - `npm run dev` — Start development server
+- `npm run dev:e2e` — Start development server with E2E test environment (.env.test)
 - `npm run build` — Build for production
 - `npm run preview` — Preview production build
 - `npm run astro` — Run Astro CLI commands
@@ -105,8 +106,23 @@ git commit --no-verify
 - `npm run test:e2e:ui` — Open Playwright UI for test development
 - `npm run test:e2e:debug` — Run E2E tests in debug mode (step-through)
 - `npm run test:e2e:headed` — Run E2E tests in headed mode (visible browser)
-- `npm run test:e2e:visual` — Run visual regression tests
-- `npm run test:e2e:visual:update` — Update visual regression baselines (snapshots)
+
+### E2E Tests with Cloud Supabase
+
+E2E tests run against a dedicated cloud Supabase project for maximum stability and reproducibility. This approach:
+
+- ✅ Isolates test data from local development
+- ✅ Enables consistent CI/CD execution
+- ✅ Automatically cleans up test data after each run
+
+**Quick Setup:**
+
+1. Create a cloud Supabase project for E2E tests
+2. Copy `.env.test.example` to `.env.test` and fill in credentials
+3. Migrate database schema: `supabase link && supabase db push`
+4. Run tests: `npm run test:e2e`
+
+**Full Setup Guide**: See [docs/e2e-cloud-setup.md](docs/e2e-cloud-setup.md) for detailed instructions.
 
 ### E2E Diagnostics
 
@@ -129,27 +145,6 @@ For flaky IBAN generator tests, check:
 1. Timeline in HTML report to see exact failure step
 2. Video to watch selector interactions
 3. Trace to inspect network timing and DOM mutations
-
-### Visual Regression Testing
-
-The project includes comprehensive visual regression tests to verify UI consistency across viewport sizes and themes. See [docs/VISUAL_REGRESSION_TESTING.md](docs/VISUAL_REGRESSION_TESTING.md) for detailed documentation.
-
-```bash
-# Run all visual regression tests
-npm run test:e2e:visual
-
-# View detailed report
-npx playwright show-report
-
-# Update snapshots after approved design changes
-npm run test:e2e:visual:update
-```
-
-**Coverage:**
-- Pages: Homepage, IBAN Generator
-- Viewports: Desktop (1280x720), Tablet (768x1024)
-- Themes: Light, Dark
-- 30+ screenshot assertions verifying layouts, components, and theme consistency
 
 ## Project Scope
 

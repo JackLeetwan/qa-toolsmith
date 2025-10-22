@@ -64,9 +64,11 @@ jobs:
 
       - name: Publish test results
         if: always()
-        uses: daun/playwright-report-action@v3
+        uses: dorny/test-reporter@v1
         with:
-          report_path: playwright-report
+          name: E2E Tests
+          path: test-results/junit.xml
+          reporter: java-junit
 
       - name: Exit with test status
         if: steps.e2e.outcome == 'failure'

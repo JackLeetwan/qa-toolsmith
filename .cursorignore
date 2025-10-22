@@ -1,2 +1,6 @@
 # environment variables
 .env
+.env.test
+
+# Allow .env.*.example files (templates)
+!.env.*.example

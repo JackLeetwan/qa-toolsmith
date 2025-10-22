@@ -239,6 +239,98 @@ When adding a new tested page:
 | No clear separation between test logic and selectors | Clean separation: POM = selectors/actions, tests = scenarios |
 | Difficult to find which tests use a specific selector | Search for `get*()` method usage |
 
+## E2E Tests with Cloud Supabase
+
+### Overview
+
+E2E tests run against a dedicated cloud Supabase project to ensure:
+
+- **Isolation**: Test data is separate from local development and production
+- **Reproducibility**: Consistent database state for all test runs
+- **Stability**: No dependencies on local Docker or Supabase CLI
+- **CI/CD Compatibility**: Easy integration with GitHub Actions
+
+### Setup Summary
+
+1. **Create Cloud Project**: [https://supabase.com/dashboard/projects](https://supabase.com/dashboard/projects)
+2. **Configure Environment**: Copy `.env.test.example` to `.env.test` and fill in credentials
+3. **Migrate Schema**: Run `supabase link && supabase db push`
+4. **Create Test User**: Add user in Supabase Dashboard → Authentication
+5. **Run Tests**: `npm run test:e2e`
+
+📘 **Full Setup Guide**: [docs/e2e-cloud-setup.md](./e2e-cloud-setup.md)
+
+### Global Setup and Teardown
+
+#### Global Setup (`e2e/setup/global.setup.ts`)
+
+Runs **once before all tests**:
+
+- ✅ Validates required environment variables (`SUPABASE_URL`, `SUPABASE_KEY`, `E2E_USERNAME`, `E2E_PASSWORD`)
+- ✅ Confirms connection to cloud Supabase
+- 🔮 Future: Pre-authenticate and save auth state for reuse
+
+#### Global Teardown (`e2e/teardown/global.teardown.ts`)
+
+Runs **once after all tests**:
+
+- 🔐 Authenticates as test user (required for RLS policies)
+- 🧹 Cleans up test data from all tables:
+  - `charter_notes`, `kb_notes` (child tables first)
+  - `charters`, `kb_entries`, `drafts`
+  - `ai_invocations`, `ai_daily_usage`, `usage_events`
+  - `templates` (user-scoped only, not global)
+- 📊 Logs cleanup results
+
+**Important**: This teardown deletes **all data** created by the test user. For multi-developer teams, consider:
+- Per-developer test users
+- Supabase branching
+- Time-based cleanup (e.g., nightly cron job)
+
+### Environment Variables
+
+Required in `.env.test`:
+
+```bash
+SUPABASE_URL=https://xxxxx.supabase.co
+SUPABASE_KEY=eyJhbGciOiJIUzI1NiIs...
+E2E_USERNAME=e2e-test@example.com
+E2E_PASSWORD=your-secure-password
+E2E_USERNAME_ID=user-uuid-here
+```
+
+These are automatically loaded by `playwright.config.ts` using `dotenv`.
+
+### Running E2E Tests
+
+```bash
+# Run all E2E tests
+npm run test:e2e
+
+# Run with UI mode (interactive)
+npm run test:e2e:ui
+
+# Run in debug mode (step-through)
+npm run test:e2e:debug
+
+# Run with visible browser (headed mode)
+npm run test:e2e:headed
+```
+
+### Development Server for E2E
+
+E2E tests use a dedicated server command that loads `.env.test`:
+
+```bash
+# Started automatically by Playwright
+npm run dev:e2e
+```
+
+This runs `astro dev --mode test`, which:
+- Loads environment variables from `.env.test`
+- Connects to cloud Supabase instead of local instance
+- Runs on port 3000 (configured in `astro.config.mjs`)
+
 ## E2E Diagnostic Configuration
 
 ### Trace, Video & Screenshot Retention

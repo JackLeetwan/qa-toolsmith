@@ -1,4 +1,9 @@
 import { defineConfig, devices } from "@playwright/test";
+import dotenv from "dotenv";
+import path from "path";
+
+// Load environment variables from .env.test for E2E tests
+dotenv.config({ path: path.resolve(process.cwd(), ".env.test") });
 
 export default defineConfig({
   testDir: "./e2e",
@@ -8,6 +13,10 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
+
+  // Global setup and teardown for E2E tests
+  globalSetup: "./e2e/setup/global.setup.ts",
+  globalTeardown: "./e2e/teardown/global.teardown.ts",
 
   reporter: [
     ["html", { outputFolder: "./playwright-report" }],
@@ -34,9 +43,9 @@ export default defineConfig({
   ],
 
   webServer: {
-    command: "npm run build && npm run preview",
+    command: "npm run dev:e2e",
     url: "http://localhost:3000",
-    reuseExistingServer: true,
+    reuseExistingServer: !process.env.CI,
     timeout: 120000,
   },
 });
