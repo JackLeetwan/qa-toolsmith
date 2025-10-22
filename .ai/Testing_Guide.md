@@ -9,12 +9,13 @@ Comprehensive testing guide for QA Toolsmith MVP covering unit tests, E2E tests,
 3. [Unit Testing](#unit-testing)
 4. [API Testing](#api-testing)
 5. [E2E Testing](#e2e-testing)
-6. [Manual Testing](#manual-testing)
-7. [Contract Testing](#contract-testing)
-8. [Page Object Model (POM)](#page-object-model-pom)
-9. [Running Tests](#running-tests)
-10. [CI/CD Integration](#cicd-integration)
-11. [Debugging](#debugging)
+6. [Smoke Testing](#smoke-testing)
+7. [Manual Testing](#manual-testing)
+8. [Contract Testing](#contract-testing)
+9. [Page Object Model (POM)](#page-object-model-pom)
+10. [Running Tests](#running-tests)
+11. [CI/CD Integration](#cicd-integration)
+12. [Debugging](#debugging)
 
 ---
 
@@ -22,13 +23,15 @@ Comprehensive testing guide for QA Toolsmith MVP covering unit tests, E2E tests,
 
 Multi-layer testing approach using Vitest for unit tests and Playwright for E2E/API tests:
 
-| Test Type | Tool | Purpose | Location |
-|-----------|------|---------|----------|
-| **Unit Tests** | Vitest | Component logic, utilities, services | `src/__tests__/` |
-| **API Tests** | Playwright | Backend validation, contracts | `e2e/*.spec.ts` |
-| **E2E Tests** | Playwright | Full user workflows | `e2e/*.spec.ts` |
-| **Contract Tests** | Vitest | DTO validation, snake_case | `src/__tests__/contracts/` |
-| **RLS Tests** | Vitest | Database security policies | `src/__tests__/rls-*.test.ts` |
+| Test Type | Tool | Purpose | Location | Count |
+|-----------|------|---------|----------|-------|
+| **Unit Tests** | Vitest | Component logic, utilities, services | `src/__tests__/` | 1,167 tests (34 files) |
+| **API Tests** | Playwright | Backend validation, contracts | `e2e/*.spec.ts` | Included in E2E |
+| **E2E Tests** | Playwright | Full user workflows | `e2e/*.spec.ts` | 10 tests |
+| **Contract Tests** | Vitest | DTO validation, snake_case | `src/__tests__/contracts/` | Included in unit |
+| **RLS Tests** | Vitest | Database security policies | `src/__tests__/rls-*.test.ts` | Included in unit |
+| **Smoke Tests** | Playwright | Post-deployment readiness | `e2e/*.spec.ts` | Included in E2E |
+| **Property-Based Tests** | Vitest | IBAN validation edge cases | `src/__tests__/` | 1,000+ cases |
 
 **Architecture**: Development uses local Supabase CLI, E2E tests use dedicated cloud Supabase project for isolation and reproducibility.
 
@@ -128,6 +131,38 @@ it("should log errors", async () => {
 });
 ```
 
+### Specialized Test Patterns
+
+#### Generate-and-Validate Pattern
+Critical for IBAN generator testing - ensures generated values pass validation:
+
+```typescript
+describe('IBAN Generator Validation', () => {
+  it('should generate valid IBANs that pass validation', () => {
+    for (let i = 0; i < 100; i++) {
+      const generated = generateIBAN('DE');
+      const isValid = validateIBAN(generated);
+      expect(isValid).toBe(true);
+    }
+  });
+});
+```
+
+#### Property-Based Testing
+Comprehensive edge case testing for IBAN validation (1,000+ test cases):
+
+```typescript
+describe('IBAN Property-Based Tests', () => {
+  it('should validate all possible DE IBAN formats', () => {
+    const testCases = generateIBANTestCases(1000, 'DE');
+    testCases.forEach(testCase => {
+      const result = validateIBAN(testCase.iban);
+      expect(result).toBe(testCase.expected);
+    });
+  });
+});
+```
+
 ### Commands
 ```bash
 npm run test:unit              # Run all unit tests
@@ -206,6 +241,39 @@ npm run test:e2e               # Run all E2E tests
 npm run test:e2e:ui            # Run with UI mode (interactive)
 npm run test:e2e:debug         # Run in debug mode (step-through)
 npm run test:e2e:headed        # Run with visible browser
+```
+
+---
+
+## Smoke Testing
+
+**Purpose**: Verify basic application readiness after deployment  
+**Location**: `e2e/*.spec.ts` (integrated with E2E tests)  
+**Trigger**: Post-deployment verification
+
+### Smoke Test Checklist
+1. **Health Check**: `GET /api/health` returns 200
+2. **Homepage Render**: Main page loads without errors
+3. **Authentication**: Login/logout functionality works
+4. **Basic CRUD**: At least one CRUD operation succeeds (Knowledge Base)
+
+### Implementation
+```typescript
+describe('Smoke Tests', () => {
+  it('should pass basic readiness checks', async () => {
+    // Health check
+    const healthResponse = await page.request.get('/api/health');
+    expect(healthResponse.status()).toBe(200);
+    
+    // Homepage loads
+    await page.goto('/');
+    await expect(page).toHaveTitle(/QA Toolsmith/);
+    
+    // Login works
+    await page.goto('/auth/login');
+    // ... login test steps
+  });
+});
 ```
 
 ---
@@ -354,10 +422,16 @@ npm run typecheck              # TypeScript type checking
 
 ## CI/CD Integration
 
-**GitHub Actions**: API and E2E tests run automatically on `push` to any branch
-- **Workers**: 1 (sequential, deterministic)
-- **Artifacts**: HTML report, traces, videos (retained on failure only, 30 days)
-- **Secrets Required**: `E2E_SUPABASE_URL`, `E2E_SUPABASE_KEY`, `E2E_USERNAME`, `E2E_PASSWORD`, `E2E_USERNAME_ID`
+**GitHub Actions**: Comprehensive testing pipeline on `push` to main/master branches
+- **Pipeline Stages**: Lint → Build → Unit Tests → E2E Tests
+- **Workers**: 1 (sequential, deterministic for E2E)
+- **Artifacts**: HTML report, traces, videos (retained on failure only, 7 days)
+- **Secrets Required**: 
+  - `SUPABASE_URL`, `SUPABASE_KEY`, `SUPABASE_SERVICE_KEY`
+  - `OPENROUTER_API_KEY`
+  - `E2E_USERNAME`, `E2E_PASSWORD`, `E2E_USERNAME_ID`
+- **Timeout**: 30 minutes for E2E tests
+- **Browser**: Chromium only (matches local config)
 
 ---
 
