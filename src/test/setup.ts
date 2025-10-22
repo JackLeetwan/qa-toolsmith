@@ -136,36 +136,46 @@ function setupFetchMock() {
 
 export let mockNextValue: string | null = "/dashboard";
 
-export const mockURLSearchParams = vi
-  .fn()
-  .mockImplementation((input?: string) => {
-    // Use the input parameter if provided (e.g., window.location.search)
-    // Otherwise fall back to mockNextValue
-    let nextValue = mockNextValue;
+// Create a proper constructor mock for URLSearchParams
+class MockURLSearchParams {
+  private nextValue: string | null = null;
 
-    if (input && typeof input === "string" && input.length > 0) {
-      // Handle ?next=value format - parse from the actual search string
+  constructor(input?: string | URLSearchParams | Record<string, string>) {
+    // Handle different input types
+    if (typeof input === "string" && input.length > 0) {
+      // Parse string for next parameter
       const match = input.match(/[?&]next=([^&]*)/);
       if (match) {
-        nextValue = decodeURIComponent(match[1]);
-      } else {
-        // If no next param found, default to null (represents "/" redirect)
-        nextValue = null;
+        this.nextValue = decodeURIComponent(match[1]);
       }
+    } else if (!input) {
+      // Use the global mockNextValue if no input provided
+      this.nextValue = mockNextValue;
     }
+  }
 
-    return {
-      get: vi.fn((key: string) => {
-        if (key === "next") {
-          return nextValue;
-        }
-        return null;
-      }),
-    };
+  get = vi.fn((key: string) => {
+    if (key === "next") {
+      return this.nextValue;
+    }
+    return null;
   });
 
+  has = vi.fn((key: string) => key === "next" && this.nextValue !== null);
+  set = vi.fn();
+  delete = vi.fn();
+  toString = vi.fn(() => "");
+  entries = vi.fn(() => []);
+  keys = vi.fn(() => []);
+  values = vi.fn(() => []);
+  forEach = vi.fn();
+}
+
+export const mockURLSearchParams = MockURLSearchParams;
+
 function setupURLSearchParamsMock() {
-  global.URLSearchParams = mockURLSearchParams as typeof URLSearchParams;
+  global.URLSearchParams =
+    mockURLSearchParams as unknown as typeof URLSearchParams;
 }
 
 // ============================================================================
@@ -182,9 +192,11 @@ export let mockLocation: MockLocation;
 
 export function updateMockLocation(nextValue: string | null) {
   mockNextValue = nextValue;
+
+  // Update the mock location with the new search string
   mockLocation = {
     search: nextValue ? `?next=${nextValue}` : "",
-    href: "",
+    href: nextValue ? `?next=${nextValue}` : "",
     reload: vi.fn(),
   };
 

@@ -1,4 +1,4 @@
-import { Page } from "@playwright/test";
+import type { Page } from "@playwright/test";
 
 /**
  * BasePage provides common functionality for all Page Object Model classes.
