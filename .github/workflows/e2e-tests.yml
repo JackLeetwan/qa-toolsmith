@@ -30,6 +30,9 @@ jobs:
 
       - name: Build application
         run: npm run build
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
 
       - name: Start preview server
         run: |
@@ -39,6 +42,8 @@ jobs:
           netstat -tlnp | grep 3000 || echo "Port 3000 not listening"
         env:
           NODE_ENV: production
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
 
       - name: Wait for server to start
         run: npx wait-on http://localhost:3000 --timeout 30000
