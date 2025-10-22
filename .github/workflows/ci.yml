@@ -159,14 +159,12 @@ jobs:
           echo "🔍 Environment variables check:"
           echo "SUPABASE_URL: ${SUPABASE_URL:+✅ Set}"
           echo "SUPABASE_KEY: ${SUPABASE_KEY:+✅ Set}"
-          echo "OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:+✅ Set}"
           echo "E2E_USERNAME: ${E2E_USERNAME:+✅ Set}"
           echo "E2E_PASSWORD: ${E2E_PASSWORD:+✅ Set}"
           echo "E2E_USERNAME_ID: ${E2E_USERNAME_ID:+✅ Set}"
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           E2E_USERNAME: ${{ secrets.E2E_USERNAME }}
           E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
           E2E_USERNAME_ID: ${{ secrets.E2E_USERNAME_ID }}
@@ -175,7 +173,6 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           E2E_USERNAME: ${{ secrets.E2E_USERNAME }}
           E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
           E2E_USERNAME_ID: ${{ secrets.E2E_USERNAME_ID }}
