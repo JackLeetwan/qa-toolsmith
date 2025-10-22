@@ -99,7 +99,9 @@ describe("RLS Integration Tests", () => {
 
       expect(error).toBeNull();
       expect(data).toHaveLength(2);
-      expect(data.every((t: { scope: string }) => t.scope === "global")).toBe(true);
+      expect(data.every((t: { scope: string }) => t.scope === "global")).toBe(
+        true,
+      );
     });
 
     it("should simulate admin access to manage global templates", async () => {
