@@ -50,13 +50,6 @@ jobs:
           name: pr-unit-coverage
           path: coverage/
           retention-days: 7
-      - name: Publish unit test results
-        if: always()
-        uses: dorny/test-reporter@v2
-        with:
-          name: Unit Tests (PR)
-          path: coverage/lcov.info
-          reporter: lcov
 
   e2e-tests:
     name: E2E Tests

@@ -78,13 +78,6 @@ jobs:
           name: ci-unit-coverage
           path: coverage/
           retention-days: 30
-      - name: Publish test results
-        if: always()
-        uses: dorny/test-reporter@v2
-        with:
-          name: Unit Tests (CI)
-          path: coverage/lcov.info
-          reporter: lcov
 
   coverage-summary:
     name: Coverage Summary
@@ -110,12 +103,6 @@ jobs:
           echo "- **Format**: LCOV" >> $GITHUB_STEP_SUMMARY
           echo "- **Retention**: 30 days" >> $GITHUB_STEP_SUMMARY
           echo "- **Artifact**: ci-unit-coverage" >> $GITHUB_STEP_SUMMARY
-      - name: Publish coverage summary
-        uses: dorny/test-reporter@v2
-        with:
-          name: Coverage Summary (CI)
-          path: coverage/lcov.info
-          reporter: lcov
 
   e2e:
     name: E2E Tests
