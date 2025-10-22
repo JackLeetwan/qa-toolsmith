@@ -32,7 +32,11 @@ jobs:
         run: npm run build
 
       - name: Start preview server
-        run: npm run preview &
+        run: |
+          npm run preview &
+          sleep 10
+          ps aux | grep node
+          netstat -tlnp | grep 3000 || echo "Port 3000 not listening"
         env:
           NODE_ENV: production
 
