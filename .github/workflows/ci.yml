@@ -70,6 +70,10 @@ jobs:
   e2e:
     name: E2E Tests
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      checks: write
+      contents: read
     needs: build
     steps:
       - uses: actions/checkout@v4
@@ -89,11 +93,49 @@ jobs:
           path: dist/
       - name: Install Playwright browsers
         run: npx playwright install chromium
+      - name: Debug environment variables
+        run: |
+          echo "🔍 Environment variables check:"
+          echo "SUPABASE_URL: ${SUPABASE_URL:+✅ Set}"
+          echo "SUPABASE_KEY: ${SUPABASE_KEY:+✅ Set}"
+          echo "E2E_USERNAME: ${E2E_USERNAME:+✅ Set}"
+          echo "E2E_PASSWORD: ${E2E_PASSWORD:+✅ Set}"
+          echo "E2E_USERNAME_ID: ${E2E_USERNAME_ID:+✅ Set}"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          E2E_USERNAME: ${{ secrets.E2E_USERNAME }}
+          E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
+          E2E_USERNAME_ID: ${{ secrets.E2E_USERNAME_ID }}
       - name: Run E2E tests with preview server
         run: npm run test:e2e
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          E2E_USERNAME: ${{ secrets.E2E_USERNAME }}
+          E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
+          E2E_USERNAME_ID: ${{ secrets.E2E_USERNAME_ID }}
+      - name: Upload HTML Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-html-report
+          path: playwright-report/
+          retention-days: 30
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: test-results/
+          retention-days: 30
+      - name: Publish test results
+        if: always()
+        uses: dorny/test-reporter@v1
+        with:
+          name: E2E Tests
+          path: test-results/junit.xml
+          reporter: java-junit
 
   health-check:
     name: Health Check
