@@ -51,6 +51,21 @@ jobs:
       - name: Wait for server to start
         run: npx wait-on http://localhost:3000 --timeout 30000
 
+      - name: Debug environment variables
+        run: |
+          echo "🔍 Environment variables check:"
+          echo "SUPABASE_URL: ${SUPABASE_URL:+✅ Set}"
+          echo "SUPABASE_KEY: ${SUPABASE_KEY:+✅ Set}"
+          echo "E2E_USERNAME: ${E2E_USERNAME:+✅ Set}"
+          echo "E2E_PASSWORD: ${E2E_PASSWORD:+✅ Set}"
+          echo "E2E_USERNAME_ID: ${E2E_USERNAME_ID:+✅ Set}"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          E2E_USERNAME: ${{ secrets.E2E_USERNAME }}
+          E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
+          E2E_USERNAME_ID: ${{ secrets.E2E_USERNAME_ID }}
+
       - name: Run E2E tests
         id: e2e
         run: npm run test:e2e
