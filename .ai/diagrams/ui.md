@@ -1,5 +1,46 @@
 # Diagram architektury UI - Moduł autentykacji QA Toolsmith
 
+<!-- Instrukcje generowania diagramów Mermaid dla architektury UI
+
+Jesteś doświadczonym architektem oprogramowania, którego zadaniem jest utworzenie diagramu Mermaid w celu wizualizacji architektury stron Astro i komponentów React dla modułu logowania i rejestracji. Diagram powinien zostać utworzony w następującym pliku: .ai/diagrams/ui.md
+
+Przed utworzeniem diagramu, przeanalizuj wymagania i zaplanuj swoje podejście. Umieść swoją analizę wewnątrz tagów <architecture_analysis>.
+
+Elementy do uwzględnienia w diagramie:
+- Zaktualizowaną strukturę UI po wdrożeniu nowych wymagań
+- Layouts, server pages i aktualizacje istniejących komponentów
+- Grupowanie elementów według funkcjonalności
+- Kierunek przepływu danych między komponentami
+- Moduły odpowiedzialne za stan aplikacji
+- Podział na komponenty współdzielone i komponenty specyficzne dla stron
+- Zależności między komponentami związanymi z autentykacją a resztą aplikacji
+- Wyróżnij komponenty, które wymagały aktualizacji ze względu na nowe wymagania
+
+Rozpocznij diagram od składni:
+```mermaid
+flowchart TD
+```
+
+Przestrzegaj zasad składni Mermaid:
+- Używaj spójnego formatowania ID węzłów
+- Pamiętaj, że ID węzłów rozróżniają wielkość liter i muszą być unikalne
+- Używaj poprawnych kształtów węzłów: [Tekst] dla prostokątów, (Tekst) dla zaokrąglonych
+- Grupuj powiązane elementy za pomocą subgrafów
+- Używaj węzłów pośrednich dla złożonych relacji
+- Preferuj układ pionowy dla hierarchii
+- Używaj poprawnych typów połączeń: --> , --- , -.-> , ==> , --Tekst-->
+- Unikaj używania adresów URL, endpointów, nawiasów w nazwach węzłów
+- Używaj spójnego nazewnictwa w całym dokumencie
+
+Unikaj błędów:
+- Brak deklaracji sekcji Mermaid i typu diagramu na początku
+- Nieprawidłowe ID węzłów (niedozwolone znaki)
+- Niezamknięte subgrafy (brakujący "end")
+- Niezamknięte nawiasy kwadratowe w opisach węzłów
+
+Po utworzeniu diagramu, przejrzyj go dokładnie pod kątem błędów składniowych. Umieść końcowy diagram w tagach <mermaid_diagram>.
+-->
+
 <architecture_analysis>
 
 ## Analiza architektury systemu autentykacji

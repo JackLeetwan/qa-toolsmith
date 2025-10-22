@@ -122,6 +122,171 @@ This document consolidates the comprehensive architecture specifications for QA 
 - **POST `/events`** — record usage event `{ kind: 'charter'|'generator'|'kb', meta: {...} }`.
 - **GET `/stats/summary`** — aggregate counts for charters, generators, kb (admin can view global; users see own).
 
+---
+
+## Detailed Endpoint Implementation Plans
+
+### GET `/generators/iban`
+
+**Overview**: Generates syntactically correct IBAN numbers for Germany (DE) and Austria (AT) with optional deterministic seeding.
+
+**Request Details**:
+- **Method**: GET
+- **URL**: `/generators/iban`
+- **Query Parameters**:
+  - `country` (required): `"DE"` | `"AT"`
+  - `seed` (optional): string ≤64 chars, pattern `/^[A-Za-z0-9._-]+$/`
+
+**Response**:
+```json
+{
+  "iban": "DE50185482443452538353",
+  "country": "DE",
+  "seed": "optional_seed"
+}
+```
+
+**Implementation Details**:
+- **Algorithm**: FNV-1a hash → SplitMix32 PRNG → BBAN generation → mod-97 checksum
+- **DE Format**: 8-digit BLZ + 10-digit account → 22-char IBAN
+- **AT Format**: 5-digit BLZ + 11-digit account → 20-char IBAN
+- **Caching**: Immutable for seeded requests (31,536,000s), no-store for random
+- **Validation**: Zod schema with regex patterns and length limits
+
+**Error Codes**: `invalid_country`, `invalid_seed`, `rate_limited`
+
+### GET `/templates`
+
+**Overview**: Returns effective template list visible to authenticated user (global + owned, excluding overridden globals).
+
+**Request Details**:
+- **Method**: GET
+- **URL**: `/templates`
+- **Query Parameters**:
+  - `limit` (optional): 1-100, default 20
+  - `after` (optional): base64 cursor for keyset pagination
+  - `preset` (optional): `"ui_bug"` | `"api_bug"`
+
+**Response**:
+```json
+{
+  "items": [
+    {
+      "id": "uuid",
+      "name": "UI Bug Report",
+      "scope": "global",
+      "preset": "ui_bug",
+      "fields": [...],
+      "required_fields": ["title", "steps"],
+      "is_readonly": true
+    }
+  ],
+  "next_cursor": "base64_encoded_cursor"
+}
+```
+
+**Implementation Details**:
+- **Data Source**: `templates_effective` view with UNION to handle overrides
+- **Pagination**: Keyset on `(updated_at, id)` for stable performance
+- **RLS**: Enforced via view policies, admin sees all, users see global + owned
+- **Indexing**: BTREE on `(owner_id, updated_at DESC, id DESC)`
+- **Sorting**: `ORDER BY updated_at DESC, id DESC`
+
+**Error Codes**: `unauthenticated`, `validation_error`
+
+### GET `/health`
+
+**Overview**: Simple application health check endpoint for monitoring and deployment verification.
+
+**Request Details**:
+- **Method**: GET
+- **URL**: `/health`
+- **Parameters**: None
+
+**Response**:
+```json
+{
+  "status": "ok"
+}
+```
+
+**Implementation Details**:
+- **Purpose**: Required by PRD smoke tests
+- **No Authentication**: Public endpoint for monitoring
+- **Caching**: Optional TTL=5s for frequent monitoring
+- **Future Extensibility**: Can add database checks, external service pings
+
+### PATCH `/profiles/me`
+
+**Overview**: Updates current user's profile with email change requiring verification.
+
+**Request Details**:
+- **Method**: PATCH
+- **URL**: `/profiles/me`
+- **Body**:
+```json
+{
+  "email": "new@example.com"
+}
+```
+
+**Response (Email Change)**:
+```json
+{
+  "status": "pending_verification",
+  "message": "Verification email sent to new@example.com"
+}
+```
+
+**Response (Other Changes)**:
+```json
+{
+  "id": "uuid",
+  "email": "user@example.com",
+  "role": "user",
+  "created_at": "2025-10-15T08:30:00.000Z",
+  "updated_at": "2025-10-15T08:35:00.000Z"
+}
+```
+
+**Implementation Details**:
+- **Email Changes**: Supabase Auth `updateUser()` → automatic verification email
+- **Rate Limiting**: Per-user IP sliding window (10 attempts/15min)
+- **Synchronization**: Database trigger syncs email from `auth.users` to `profiles`
+- **Security**: RLS prevents role/org updates, whitelists allowed fields
+- **Validation**: Email normalization, RFC5322-lite format, uniqueness checks
+
+**Error Codes**: `unauthenticated`, `forbidden_field`, `email_taken`, `rate_limited`
+
+### GET `/profiles/me`
+
+**Overview**: Retrieves current authenticated user's profile information.
+
+**Request Details**:
+- **Method**: GET
+- **URL**: `/profiles/me`
+- **Headers**: `Authorization: Bearer <token>`
+
+**Response**:
+```json
+{
+  "id": "uuid",
+  "email": "user@example.com",
+  "role": "user",
+  "created_at": "2025-10-15T08:30:00.000Z",
+  "updated_at": "2025-10-15T08:30:00.000Z"
+}
+```
+
+**Implementation Details**:
+- **Data Source**: `profiles` table with RLS
+- **Performance**: PK lookup, minimal payload (<1KB)
+- **Caching**: Private cache (max-age=30s), ETag support
+- **Security**: RLS `id = auth.uid()`, no IDOR vulnerability
+- **Error Handling**: 401 (no session), 404 (profile missing), 500 (DB error)
+
+**Error Codes**: `unauthenticated`, `internal`
+
 ### Authentication & Authorization
 
 - **Mechanism:** Supabase Auth JWT; include `Authorization: Bearer <token>` in requests. Profiles store role `admin|user`.
@@ -725,6 +890,23 @@ Mobile-first CTA:
   - Access to wide range of models (OpenAI, Anthropic, Google, and many others)
   - Allows setting financial limits on API keys
 
+#### OpenRouter Service Architecture
+
+**Purpose**: Provides AI-powered text improvement and expansion for defect reports, charters, and knowledge base entries.
+
+**Core Features**:
+- Multi-model support with automatic fallbacks (OpenAI, Anthropic, Google)
+- Per-user daily usage limits and quota management
+- Structured JSON responses with schema validation
+- Comprehensive error handling and retry logic
+- Rate limiting and circuit breaker patterns
+
+**Integration Points**:
+- **Database**: `ai_invocations`, `ai_daily_usage` tables for tracking and limits
+- **Authentication**: User context for quota enforcement
+- **Configuration**: Environment-based API key and model settings
+- **Monitoring**: Health checks, usage metrics, error rates
+
 ### CI/CD and Hosting
 
 - **GitHub Actions**: Creating CI/CD pipelines
@@ -742,8 +924,6 @@ Mobile-first CTA:
 ---
 
 ## Testing Strategy
-
-### Testing Strategy
 
 Multi-layer testing approach using Vitest for unit tests and Playwright for E2E/API tests:
 
