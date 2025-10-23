@@ -1,0 +1,41 @@
+---
+description: Key rules and architecture for the QA Toolsmith project.
+globs: ["**/*"]
+alwaysApply: true
+---
+
+# AI Rules for QA Toolsmith
+
+QA Toolsmith to otwartoźródłowa aplikacja internetowa dla testerów oprogramowania, która standaryzuje ich codzienne zadania, takie jak raportowanie błędów, testy eksploracyjne i generowanie danych testowych.
+
+## Tech Stack
+
+- **Framework:** Astro 5 (SSR)
+- **UI:** React 19 z TypeScript 5
+- **Stylowanie:** Tailwind 4 i shadcn/ui
+- **Backend:** Supabase (PostgreSQL, Auth)
+- **Testowanie:** Vitest (testy jednostkowe), Playwright (testy E2E)
+
+## Project Structure
+
+Zawsze przestrzegaj poniższej struktury katalogów:
+
+- `src/pages/`: Strony Astro (`.astro`) i punkty końcowe API (`.ts`).
+- `src/components/`: Interaktywne komponenty React (`.tsx`).
+- `src/components/ui/`: Komponenty z biblioteki shadcn/ui.
+- `src/layouts/`: Główne układy stron Astro.
+- `src/lib/`: Logika biznesowa, podzielona na `services/`, `utils/`, `hooks/`.
+- `src/db/`: Klient Supabase i typy bazy danych.
+- `src/middleware/`: Middleware Astro do autentykacji i zarządzania sesją.
+- `src/__tests__/`: Testy jednostkowe Vitest.
+- `e2e/`: Testy End-to-End Playwright.
+
+## Kluczowe Zasady Kodowania i Architektury
+
+1.  **Astro vs React:** Używaj komponentów Astro (`.astro`) do statycznej zawartości i layoutów. Komponenty React (`.tsx`) implementuj **tylko** wtedy, gdy wymagana jest interaktywność po stronie klienta.
+2.  **Dostęp do Supabase (Server-side):** W stronach i punktach końcowych API Astro **zawsze** używaj instancji Supabase z `context.locals.supabase`. **Nigdy** nie importuj klienta bezpośrednio.
+3.  **Walidacja:** Używaj schematów **Zod** do walidacji wszystkich danych wejściowych w punktach końcowych API.
+4.  **Obsługa Błędów i Czysty Kod:**
+    - Priorytetyzuj obsługę błędów. Używaj "guard clauses" i wczesnych `return`, aby obsługiwać błędy na początku funkcji.
+    - Unikaj zagnieżdżonych instrukcji `if` oraz zbędnych bloków `else`.
+5.  **Testowanie:** Dodawaj testy jednostkowe Vitest dla nowej logiki w `src/lib/`. Dodawaj testy E2E Playwright dla nowych przepływów użytkownika.
