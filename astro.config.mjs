@@ -14,6 +14,12 @@ export default defineConfig({
   server: { port: 3000 },
   vite: {
     plugins: [tailwindcss()],
+    define: {
+      // Ensure ENV_NAME is available in test mode
+      "import.meta.env.ENV_NAME": JSON.stringify(
+        process.env.ENV_NAME || "local",
+      ),
+    },
   },
   adapter: node({
     mode: "standalone",

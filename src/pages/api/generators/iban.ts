@@ -1,6 +1,7 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
 import { generate } from "../../../lib/services/iban.service.js";
+import { isFeatureEnabled } from "../../../features";
 
 export const prerender = false;
 
@@ -36,6 +37,22 @@ const QuerySchema = z.object({
  * { "error": { "code": "VALIDATION_ERROR", "message": "..." } }
  */
 export const GET: APIRoute = async ({ request }) => {
+  // Check if generators feature is enabled
+  if (!isFeatureEnabled("collections.generators")) {
+    return new Response(
+      JSON.stringify({
+        error: {
+          code: "FEATURE_DISABLED",
+          message: "IBAN generator feature is not available",
+        },
+      }),
+      {
+        status: 404,
+        headers: { "Content-Type": "application/json" },
+      },
+    );
+  }
+
   try {
     const url = new URL(request.url);
     const queryParams = {

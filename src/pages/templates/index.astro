@@ -1,8 +1,14 @@
 ---
 import PublicLayout from "../../layouts/PublicLayout.astro";
+import { isFeatureEnabled } from "../../features";
 
 // This page requires authentication - middleware will redirect if not logged in
 // const { user } = Astro.locals;
+
+// Check if templates feature is enabled
+if (!isFeatureEnabled("collections.templates")) {
+  return Astro.redirect("/", 302);
+}
 ---
 
 <PublicLayout

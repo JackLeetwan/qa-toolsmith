@@ -14,13 +14,27 @@ interface TopBarProps {
   user?: User | null;
   isLoading?: boolean;
   onLogout?: () => void;
+  features?: {
+    generators: boolean;
+    knowledgeBase: boolean;
+    templates: boolean;
+    charters: boolean;
+  };
 }
 
 export default function TopBar({
   user,
   isLoading = false,
   onLogout,
+  features = {
+    generators: false,
+    knowledgeBase: false,
+    templates: false,
+    charters: false,
+  },
 }: TopBarProps) {
+  console.log("TopBar render", { user, isLoading, features });
+
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
   // Close user menu when clicking outside
@@ -80,40 +94,48 @@ export default function TopBar({
             </a>
             <nav aria-label="Main navigation">
               <ul className="flex items-center space-x-6">
-                <li>
-                  <a
-                    href="/generators"
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    Generators
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="/knowledge-base"
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    Knowledge Base
-                  </a>
-                </li>
+                {features.generators && (
+                  <li>
+                    <a
+                      href="/generators"
+                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      Generators
+                    </a>
+                  </li>
+                )}
+                {features.knowledgeBase && (
+                  <li>
+                    <a
+                      href="/knowledge-base"
+                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      Knowledge Base
+                    </a>
+                  </li>
+                )}
                 {user && (
                   <>
-                    <li>
-                      <a
-                        href="/templates"
-                        className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                      >
-                        Templates
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        href="/charters"
-                        className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                      >
-                        Charters
-                      </a>
-                    </li>
+                    {features.templates && (
+                      <li>
+                        <a
+                          href="/templates"
+                          className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                          Templates
+                        </a>
+                      </li>
+                    )}
+                    {features.charters && (
+                      <li>
+                        <a
+                          href="/charters"
+                          className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                          Charters
+                        </a>
+                      </li>
+                    )}
                     {user.role === "admin" && (
                       <li>
                         <a

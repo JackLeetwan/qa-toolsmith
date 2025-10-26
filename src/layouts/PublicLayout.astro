@@ -1,6 +1,7 @@
 ---
 import Layout from "./Layout.astro";
 import TopBar from "@/components/TopBar";
+import { isFeatureEnabled } from "@/features";
 
 interface Props {
   title: string;
@@ -17,11 +18,19 @@ const { user: localsUser } = Astro.locals;
 
 // Use user from locals (SSR) or props (fallback)
 const user = localsUser || propUser;
+
+// Check feature flags during SSR
+const features = {
+  generators: isFeatureEnabled("collections.generators"),
+  knowledgeBase: isFeatureEnabled("collections.knowledgeBase"),
+  templates: isFeatureEnabled("collections.templates"),
+  charters: isFeatureEnabled("collections.charters"),
+};
 ---
 
 <Layout title={`${title}`} description={description}>
   <div class="min-h-screen bg-background">
-    <TopBar client:load user={user} />
+    <TopBar client:load user={user} features={features} />
 
     {
       title !== "QA Toolsmith" && (

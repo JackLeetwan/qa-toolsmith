@@ -1,8 +1,14 @@
 ---
 import PublicLayout from "../../layouts/PublicLayout.astro";
 import IBANGeneratorView from "../../components/generators/iban/IBANGeneratorView";
+import { isFeatureEnabled } from "../../features";
 
 export const prerender = false;
+
+// Check if generators feature is enabled
+if (!isFeatureEnabled("collections.generators")) {
+  return Astro.redirect("/", 302);
+}
 ---
 
 <PublicLayout

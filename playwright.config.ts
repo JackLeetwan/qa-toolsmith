@@ -40,6 +40,17 @@ export default defineConfig({
       name: "chromium",
       use: { ...devices["Desktop Chrome"] },
     },
+    {
+      name: "feature-flags",
+      use: {
+        ...devices["Desktop Chrome"],
+        // Override ENV_NAME for feature flag testing
+        // This simulates an environment where some features are disabled
+      },
+      env: {
+        ENV_NAME: "local", // Ensure we use local config for feature flag testing
+      },
+    },
   ],
 
   webServer: process.env.CI

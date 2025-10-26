@@ -1,13 +1,19 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import type { APIContext, AstroCookies } from "astro";
-import { GET } from "./iban";
+
+// Mock feature flags to avoid environment issues
+vi.mock("../../../features", () => ({
+  isFeatureEnabled: vi.fn(() => true), // Default to enabled for most tests
+}));
 
 // Mock iban.service
 vi.mock("../../../lib/services/iban.service.js", () => ({
   generate: vi.fn(),
 }));
 
+import { GET } from "./iban";
 import { generate } from "../../../lib/services/iban.service.js";
+import { isFeatureEnabled } from "../../../features";
 
 // Helper to create APIContext for testing
 function createAPIContext(request: Request): APIContext {
@@ -184,6 +190,38 @@ describe("IBAN Generator API Endpoint", () => {
       });
 
       expect(generate).toHaveBeenCalledWith("DE", seed);
+    });
+  });
+
+  describe("feature flag checks", () => {
+    it("should return 404 when generators feature is disabled", async () => {
+      // Mock feature flag to return false
+      vi.mocked(isFeatureEnabled).mockReturnValue(false);
+
+      const request = new Request(
+        "https://example.com/api/generators/iban?country=DE",
+        {
+          method: "GET",
+          headers: new Headers(),
+        },
+      );
+
+      const response = await GET(createAPIContext(request));
+
+      expect(response.status).toBe(404);
+
+      const responseBody = await response.json();
+      expect(responseBody).toEqual({
+        error: {
+          code: "FEATURE_DISABLED",
+          message: "IBAN generator feature is not available",
+        },
+      });
+
+      expect(generate).not.toHaveBeenCalled();
+
+      // Reset mock for other tests
+      vi.mocked(isFeatureEnabled).mockReturnValue(true);
     });
   });
 

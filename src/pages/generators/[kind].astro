@@ -2,8 +2,14 @@
 import PublicLayout from "../../layouts/PublicLayout.astro";
 import GenericGeneratorView from "../../components/generators/generic/GenericGeneratorView";
 import type { GeneratorKind } from "../../types/types";
+import { isFeatureEnabled } from "../../features";
 
 export const prerender = false;
+
+// Check if generators feature is enabled
+if (!isFeatureEnabled("collections.generators")) {
+  return Astro.redirect("/", 302);
+}
 
 // Extract kind from params
 const { kind } = Astro.params;
