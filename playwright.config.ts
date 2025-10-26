@@ -47,8 +47,10 @@ export default defineConfig({
         // Override ENV_NAME for feature flag testing
         // This simulates an environment where some features are disabled
       },
-      env: {
-        ENV_NAME: "local", // Ensure we use local config for feature flag testing
+      metadata: {
+        env: {
+          ENV_NAME: "local", // Ensure we use local config for feature flag testing
+        },
       },
     },
   ],

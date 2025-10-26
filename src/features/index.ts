@@ -49,5 +49,5 @@ export function isFeatureEnabled(path: FeaturePath): boolean {
     return false;
   }
 
-  return (namespaceFlags as any)[key] === true;
+  return (namespaceFlags as unknown as Record<string, unknown>)[key] === true;
 }

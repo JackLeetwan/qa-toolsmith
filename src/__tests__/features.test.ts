@@ -8,6 +8,7 @@ describe("Feature Flags", () => {
     // Reset environment before each test
     vi.resetModules();
     // Reset import.meta.env for each test
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (import.meta.env as any).ENV_NAME = "local";
   });
 
@@ -15,6 +16,7 @@ describe("Feature Flags", () => {
     it("should throw error for invalid ENV_NAME", async () => {
       // Temporarily set invalid ENV_NAME
       const originalEnv = import.meta.env.ENV_NAME;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (import.meta.env as any).ENV_NAME = "invalid";
 
       const { isFeatureEnabled } = await import("../features");
@@ -24,12 +26,14 @@ describe("Feature Flags", () => {
       }).toThrow("Invalid or missing ENV_NAME");
 
       // Restore original env
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (import.meta.env as any).ENV_NAME = originalEnv;
     });
 
     it("should throw error for missing ENV_NAME", async () => {
       // Temporarily remove ENV_NAME
       const originalEnv = import.meta.env.ENV_NAME;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (import.meta.env as any).ENV_NAME = undefined;
 
       const { isFeatureEnabled } = await import("../features");
@@ -39,6 +43,7 @@ describe("Feature Flags", () => {
       }).toThrow("Invalid or missing ENV_NAME");
 
       // Restore original env
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (import.meta.env as any).ENV_NAME = originalEnv;
     });
   });
@@ -87,6 +92,7 @@ describe("Feature Flags", () => {
 
       const { isFeatureEnabled } = await import("../features");
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       expect(isFeatureEnabled("nonexistent.feature" as any)).toBe(false);
     });
 
@@ -95,6 +101,7 @@ describe("Feature Flags", () => {
 
       const { isFeatureEnabled } = await import("../features");
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       expect(isFeatureEnabled("auth.nonexistent" as any)).toBe(false);
     });
   });

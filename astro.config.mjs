@@ -17,6 +17,7 @@ export default defineConfig({
     define: {
       // Ensure ENV_NAME is available in test mode
       "import.meta.env.ENV_NAME": JSON.stringify(
+        // eslint-disable-next-line no-undef
         process.env.ENV_NAME || "local",
       ),
     },

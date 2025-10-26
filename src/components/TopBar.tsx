@@ -33,8 +33,6 @@ export default function TopBar({
     charters: false,
   },
 }: TopBarProps) {
-  console.log("TopBar render", { user, isLoading, features });
-
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
   // Close user menu when clicking outside
