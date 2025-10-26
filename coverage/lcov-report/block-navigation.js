@@ -1,25 +1,25 @@
- 
-let jumpToCode = (function init() {
+/* eslint-disable */
+var jumpToCode = (function init() {
     // Classes of code we would like to highlight in the file view
-    let missingCoverageClasses = ['.cbranch-no', '.cstat-no', '.fstat-no'];
+    var missingCoverageClasses = ['.cbranch-no', '.cstat-no', '.fstat-no'];
 
     // Elements to highlight in the file listing view
-    let fileListingElements = ['td.pct.low'];
+    var fileListingElements = ['td.pct.low'];
 
     // We don't want to select elements that are direct descendants of another match
-    let notSelector = ':not(' + missingCoverageClasses.join('):not(') + ') > '; // becomes `:not(a):not(b) > `
+    var notSelector = ':not(' + missingCoverageClasses.join('):not(') + ') > '; // becomes `:not(a):not(b) > `
 
     // Selector that finds elements on the page to which we can jump
-    let selector =
+    var selector =
         fileListingElements.join(', ') +
         ', ' +
         notSelector +
         missingCoverageClasses.join(', ' + notSelector); // becomes `:not(a):not(b) > a, :not(a):not(b) > b`
 
     // The NodeList of matching elements
-    let missingCoverageElements = document.querySelectorAll(selector);
+    var missingCoverageElements = document.querySelectorAll(selector);
 
-    let currentIndex;
+    var currentIndex;
 
     function toggleClass(index) {
         missingCoverageElements
@@ -39,7 +39,7 @@ let jumpToCode = (function init() {
     }
 
     function goToPrevious() {
-        let nextIndex = 0;
+        var nextIndex = 0;
         if (typeof currentIndex !== 'number' || currentIndex === 0) {
             nextIndex = missingCoverageElements.length - 1;
         } else if (missingCoverageElements.length > 1) {
@@ -50,7 +50,7 @@ let jumpToCode = (function init() {
     }
 
     function goToNext() {
-        let nextIndex = 0;
+        var nextIndex = 0;
 
         if (
             typeof currentIndex === 'number' &&

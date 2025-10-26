@@ -1,4 +1,4 @@
-import type { FeatureFlags } from './types';
+import type { FeatureFlags } from "./types";
 
 export const flags: FeatureFlags = {
   auth: {
