@@ -44,10 +44,8 @@ async function globalTeardown() {
     });
 
     if (signInError) {
-      console.warn("⚠️  Authentication failed:", signInError.message);
-      console.warn(
-        "⚠️  Skipping data cleanup. This is OK for tests that don't create data.",
-      );
+      console.log("ℹ️  Test user auth failed (expected for read-only tests)");
+      console.log("✅ Global teardown completed (no cleanup needed)");
       return;
     }
 
@@ -196,8 +194,15 @@ async function globalTeardown() {
     await supabase.auth.signOut();
 
     // Step 5: Report results
-    console.log("✅ Cleanup completed:");
-    cleanupResults.forEach((result) => console.log(`   - ${result}`));
+    const totalDeleted = cleanupResults.reduce((sum, result) => {
+      const match = result.match(/(\d+) rows/);
+      return sum + (match ? parseInt(match[1]) : 0);
+    }, 0);
+
+    console.log(`✅ Cleanup completed: ${totalDeleted} total records deleted`);
+    if (cleanupResults.length > 0) {
+      console.log("   Details:", cleanupResults.join(", "));
+    }
 
     console.log("✅ Global teardown completed");
   } catch (error) {

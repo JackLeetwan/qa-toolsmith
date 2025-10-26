@@ -49,8 +49,6 @@ async function globalSetup() {
   }
 
   console.log("✅ Environment variables validated");
-  console.log(`📍 Supabase URL: ${process.env.SUPABASE_URL}`);
-  console.log(`👤 Test user: ${process.env.E2E_USERNAME}`);
 
   // Future optimization: Pre-authenticate and store auth state
   // This would eliminate the need for login steps in each test
