@@ -349,7 +349,7 @@ describe("Reset Request API Endpoint", () => {
 
       expect(logger.error).toHaveBeenCalledWith(
         "Reset password email failed:",
-        expect.any(Error),
+        "Email service down",
       );
     });
 
@@ -407,7 +407,7 @@ describe("Reset Request API Endpoint", () => {
 
       expect(logger.error).toHaveBeenCalledWith(
         "Reset request error:",
-        expect.any(Error),
+        "Supabase connection failed",
       );
     });
 
@@ -429,7 +429,7 @@ describe("Reset Request API Endpoint", () => {
 
       expect(logger.error).toHaveBeenCalledWith(
         "Reset password email failed:",
-        expect.any(Error),
+        "Network timeout",
       );
     });
 
@@ -450,7 +450,7 @@ describe("Reset Request API Endpoint", () => {
       expect(response.status).toBe(200); // Still returns success
       expect(logger.error).toHaveBeenCalledWith(
         "Reset password email failed:",
-        "String error",
+        "Unknown error",
       );
     });
   });

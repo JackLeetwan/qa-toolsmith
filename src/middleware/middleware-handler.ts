@@ -94,9 +94,9 @@ export async function middlewareHandler(
   }
 
   // User is authenticated - fetch profile and set context
-  logger.info("✅ User authenticated, fetching profile:", {
-    id: user.id,
-    email: user.email,
+  logger.info("✅ User authenticated, fetching profile for user:", {
+    id: user.id.substring(0, 8) + "...", // Log only first 8 chars for security
+    email: user.email ? user.email.split("@")[0] + "@..." : "unknown", // Hide email domain
   });
 
   const { data: profile, error: profileError } = await supabase
@@ -122,8 +122,8 @@ export async function middlewareHandler(
   }
 
   logger.info("✅ User context set:", {
-    id: user.id,
-    email: user.email,
+    id: user.id.substring(0, 8) + "...", // Log only first 8 chars for security
+    email: user.email ? user.email.split("@")[0] + "@..." : "unknown", // Hide email domain
     role: context.locals.user.role,
     pathname,
   });

@@ -74,7 +74,10 @@ export default function TopBar({
         toast.error(result.message || "Wystąpił błąd podczas wylogowania");
       }
     } catch (error) {
-      logger.error("Logout error:", error);
+      logger.error(
+        "Logout error:",
+        (error as Error)?.message || "Unknown error",
+      );
       toast.error("Wystąpił błąd podczas wylogowania");
     }
   };

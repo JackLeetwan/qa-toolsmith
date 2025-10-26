@@ -480,7 +480,7 @@ describe("Reset Change API Endpoint", () => {
 
       expect(logger.error).toHaveBeenCalledWith(
         "Reset change error:",
-        expect.any(Error),
+        "Supabase connection failed",
       );
     });
 
@@ -502,7 +502,7 @@ describe("Reset Change API Endpoint", () => {
       expect(response.status).toBe(500);
       expect(logger.error).toHaveBeenCalledWith(
         "Reset change error:",
-        expect.any(Error),
+        "Network timeout",
       );
     });
 
@@ -524,7 +524,7 @@ describe("Reset Change API Endpoint", () => {
       expect(response.status).toBe(500);
       expect(logger.error).toHaveBeenCalledWith(
         "Reset change error:",
-        "String error",
+        "Unknown error",
       );
     });
   });

@@ -370,8 +370,8 @@ describe("Middleware", () => {
       expect(mockLocals.supabase).toBe(mockSupabaseClient);
       // Check that user context was set with correct info
       expect(mockLogger.info).toHaveBeenCalledWith("✅ User context set:", {
-        id: "user-123",
-        email: "user@example.com",
+        id: "user-123...",
+        email: "user@...",
         role: "admin",
         pathname: "/dashboard",
       });

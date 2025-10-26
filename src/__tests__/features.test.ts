@@ -12,8 +12,8 @@ describe("Feature Flags", () => {
     (import.meta.env as any).ENV_NAME = "local";
   });
 
-  describe("Environment validation", () => {
-    it("should throw error for invalid ENV_NAME", async () => {
+  describe("Safe defaults for invalid environment", () => {
+    it("should return false for all features when ENV_NAME is invalid", async () => {
       // Temporarily set invalid ENV_NAME
       const originalEnv = import.meta.env.ENV_NAME;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -21,16 +21,21 @@ describe("Feature Flags", () => {
 
       const { isFeatureEnabled } = await import("../features");
 
-      expect(() => {
-        isFeatureEnabled("collections.generators");
-      }).toThrow("Invalid or missing ENV_NAME");
+      expect(isFeatureEnabled("collections.generators")).toBe(false);
+      expect(isFeatureEnabled("collections.templates")).toBe(false);
+      expect(isFeatureEnabled("collections.charters")).toBe(false);
+      expect(isFeatureEnabled("collections.knowledgeBase")).toBe(false);
+      expect(isFeatureEnabled("collections.export")).toBe(false);
+      expect(isFeatureEnabled("auth.passwordReset")).toBe(false);
+      expect(isFeatureEnabled("auth.emailVerification")).toBe(false);
+      expect(isFeatureEnabled("auth.socialLogin")).toBe(false);
 
       // Restore original env
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (import.meta.env as any).ENV_NAME = originalEnv;
     });
 
-    it("should throw error for missing ENV_NAME", async () => {
+    it("should return false for all features when ENV_NAME is missing", async () => {
       // Temporarily remove ENV_NAME
       const originalEnv = import.meta.env.ENV_NAME;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -38,9 +43,14 @@ describe("Feature Flags", () => {
 
       const { isFeatureEnabled } = await import("../features");
 
-      expect(() => {
-        isFeatureEnabled("collections.generators");
-      }).toThrow("Invalid or missing ENV_NAME");
+      expect(isFeatureEnabled("collections.generators")).toBe(false);
+      expect(isFeatureEnabled("collections.templates")).toBe(false);
+      expect(isFeatureEnabled("collections.charters")).toBe(false);
+      expect(isFeatureEnabled("collections.knowledgeBase")).toBe(false);
+      expect(isFeatureEnabled("collections.export")).toBe(false);
+      expect(isFeatureEnabled("auth.passwordReset")).toBe(false);
+      expect(isFeatureEnabled("auth.emailVerification")).toBe(false);
+      expect(isFeatureEnabled("auth.socialLogin")).toBe(false);
 
       // Restore original env
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

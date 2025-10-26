@@ -25,7 +25,7 @@ export default defineConfig({
   ],
 
   use: {
-    baseURL: "http://localhost:3000",
+    // baseURL will be overridden per project
     // Diagnostic configuration: retain traces, screenshots, and videos only for failing tests
     // This enables full investigation of flaky tests without slowing down passing tests
     trace: "retain-on-failure", // Changed from "on-first-retry" to capture all failures
@@ -38,29 +38,39 @@ export default defineConfig({
   projects: [
     {
       name: "chromium",
-      use: { ...devices["Desktop Chrome"] },
+      use: {
+        ...devices["Desktop Chrome"],
+        baseURL: "http://localhost:3000",
+      },
     },
     {
       name: "feature-flags",
       use: {
         ...devices["Desktop Chrome"],
-        // Override ENV_NAME for feature flag testing
-        // This simulates an environment where some features are disabled
+        baseURL: "http://localhost:3000",
       },
-      metadata: {
-        env: {
-          ENV_NAME: "local", // Ensure we use local config for feature flag testing
-        },
+    },
+    {
+      name: "safe-defaults",
+      use: {
+        ...devices["Desktop Chrome"],
+        baseURL: "http://localhost:3001",
       },
     },
   ],
 
-  webServer: process.env.CI
-    ? undefined
-    : {
-        command: "npm run dev:e2e",
-        url: "http://localhost:3000",
-        reuseExistingServer: true,
-        timeout: 120000,
-      },
+  webServer: [
+    {
+      command: "node scripts/dev-e2e.js local",
+      url: "http://localhost:3000",
+      reuseExistingServer: true,
+      timeout: 120000,
+    },
+    {
+      command: "node scripts/dev-e2e.js",
+      url: "http://localhost:3001",
+      reuseExistingServer: true,
+      timeout: 120000,
+    },
+  ],
 });

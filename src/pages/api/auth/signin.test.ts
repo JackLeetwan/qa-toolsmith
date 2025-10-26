@@ -586,7 +586,7 @@ describe("Signin API Endpoint", () => {
       await POST(createAPIContext(mockRequest, mockCookies));
 
       expect(logger.debug).toHaveBeenCalledWith("📥 Request body received:", {
-        email: "user@example.com",
+        email: "user@...",
         hasPassword: true,
       });
     });
@@ -609,7 +609,7 @@ describe("Signin API Endpoint", () => {
 
       expect(logger.debug).toHaveBeenCalledWith(
         "✅ Input validation passed for email:",
-        "user@example.com",
+        "user@...",
       );
     });
 
@@ -673,10 +673,10 @@ describe("Signin API Endpoint", () => {
       await POST(createAPIContext(mockRequest, mockCookies));
 
       expect(logger.debug).toHaveBeenCalledWith("✅ Signin successful:", {
-        userId: "user-id",
-        email: "user@example.com",
+        userId: "user-id...",
+        email: "user@...",
         sessionExists: true,
-        duration: expect.any(String),
+        duration: "0ms",
       });
     });
 

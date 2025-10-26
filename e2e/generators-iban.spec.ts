@@ -18,6 +18,11 @@ test.describe("IBAN Generator - Copy Button Stability", () => {
   let ibanPage: IBANGeneratorPage;
 
   test.beforeEach(async ({ page }) => {
+    // Skip tests if features are disabled (ENV_NAME not set to local)
+    if (process.env.ENV_NAME !== "local") {
+      test.skip();
+    }
+
     // Initialize the page object
     ibanPage = new IBANGeneratorPage(page);
 
@@ -86,6 +91,13 @@ test.describe("IBAN Generator - Copy Button Stability", () => {
  * Reference: @playwright-e2e-testing.mdc guideline 5 (Leverage API testing for backend validation)
  */
 test.describe("IBAN Generator - API Endpoint", () => {
+  test.beforeAll(() => {
+    // Skip tests if features are disabled (ENV_NAME not set to local)
+    if (process.env.ENV_NAME !== "local") {
+      test.skip();
+    }
+  });
+
   test("should generate random IBAN for country DE without seed", async ({
     page,
   }) => {

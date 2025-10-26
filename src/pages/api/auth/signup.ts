@@ -98,7 +98,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       );
     }
 
-    logger.error("Signup error:", error);
+    logger.error("Signup error:", (error as Error)?.message || "Unknown error");
     return new Response(
       JSON.stringify({
         error: "UNKNOWN_ERROR",

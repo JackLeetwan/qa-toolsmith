@@ -26,12 +26,15 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   try {
     const body = await request.json();
     logger.debug("📥 Request body received:", {
-      email: body.email,
+      email: body.email ? body.email.split("@")[0] + "@..." : "missing",
       hasPassword: !!body.password,
     });
 
     const { email, password } = signinSchema.parse(body);
-    logger.debug("✅ Input validation passed for email:", email);
+    logger.debug(
+      "✅ Input validation passed for email:",
+      email.split("@")[0] + "@...",
+    );
 
     const supabase = createSupabaseServerInstance({
       cookies,
@@ -66,8 +69,10 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     }
 
     logger.debug("✅ Signin successful:", {
-      userId: data.user?.id,
-      email: data.user?.email,
+      userId: data.user?.id ? data.user.id.substring(0, 8) + "..." : "unknown",
+      email: data.user?.email
+        ? data.user.email.split("@")[0] + "@..."
+        : "unknown",
       sessionExists: !!data.session,
       duration: Date.now() - startTime + "ms",
     });

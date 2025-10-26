@@ -37,7 +37,10 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       });
     } catch (supabaseError) {
       // Log the error but don't fail - we want to hide if email exists
-      logger.error("Reset password email failed:", supabaseError);
+      logger.error(
+        "Reset password email failed:",
+        (supabaseError as Error)?.message || "Unknown error",
+      );
     }
 
     // Always return success to avoid revealing if email exists
@@ -65,7 +68,10 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       );
     }
 
-    logger.error("Reset request error:", error);
+    logger.error(
+      "Reset request error:",
+      (error as Error)?.message || "Unknown error",
+    );
     return new Response(
       JSON.stringify({
         error: "UNKNOWN_ERROR",

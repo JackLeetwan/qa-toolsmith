@@ -29,7 +29,10 @@ export const POST: APIRoute = async ({ cookies, request }) => {
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    logger.error("Signout error:", error);
+    logger.error(
+      "Signout error:",
+      (error as Error)?.message || "Unknown error",
+    );
     return new Response(
       JSON.stringify({
         error: "UNKNOWN_ERROR",

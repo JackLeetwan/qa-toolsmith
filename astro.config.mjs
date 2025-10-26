@@ -18,7 +18,12 @@ export default defineConfig({
       // Ensure ENV_NAME is available in test mode
       "import.meta.env.ENV_NAME": JSON.stringify(
         // eslint-disable-next-line no-undef
-        process.env.ENV_NAME || "local",
+        process.env.ENV_NAME || null,
+      ),
+      // Make ENV_NAME available for client-side components
+      "import.meta.env.PUBLIC_ENV_NAME": JSON.stringify(
+        // eslint-disable-next-line no-undef
+        process.env.ENV_NAME || null,
       ),
     },
   },

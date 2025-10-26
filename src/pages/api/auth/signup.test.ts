@@ -536,7 +536,7 @@ describe("Signup API Endpoint", () => {
 
       expect(logger.error).toHaveBeenCalledWith(
         "Signup error:",
-        expect.any(Error),
+        "Supabase connection failed",
       );
     });
 

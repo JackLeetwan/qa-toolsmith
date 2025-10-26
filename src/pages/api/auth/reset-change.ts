@@ -30,7 +30,10 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     });
 
     if (error) {
-      logger.error("Password update failed:", error);
+      logger.error(
+        "Password update failed:",
+        error?.message || "Unknown error",
+      );
       return new Response(
         JSON.stringify({
           error: "INVALID_CREDENTIALS",
@@ -67,7 +70,10 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       );
     }
 
-    logger.error("Reset change error:", error);
+    logger.error(
+      "Reset change error:",
+      (error as Error)?.message || "Unknown error",
+    );
     return new Response(
       JSON.stringify({
         error: "UNKNOWN_ERROR",
