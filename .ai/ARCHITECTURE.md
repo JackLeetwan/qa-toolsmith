@@ -909,8 +909,8 @@ Mobile-first CTA:
 
 ### CI/CD and Hosting
 
-- **GitHub Actions**: Creating CI/CD pipelines
-- **DigitalOcean**: Hosting application via Docker image
+- **GitHub Actions**: Automated CI/CD pipeline (lint → build → unit tests → E2E tests → health check)
+- **Cloudflare Pages**: Production hosting with SSR support via `@astrojs/cloudflare` adapter
 
 ### Testing
 

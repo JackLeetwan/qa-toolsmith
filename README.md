@@ -7,12 +7,13 @@
 
 1. [Project Description](#project-description)
 2. [Tech Stack](#tech-stack)
-3. [Getting Started Locally](#getting-started-locally)
-4. [Available Scripts](#available-scripts)
-5. [Project Scope](#project-scope)
-6. [API Documentation](#api-documentation)
-7. [Project Status](#project-status)
-8. [License](#license)
+3. [Deployment & Hosting](#deployment--hosting)
+4. [Getting Started Locally](#getting-started-locally)
+5. [Available Scripts](#available-scripts)
+6. [Project Scope](#project-scope)
+7. [API Documentation](#api-documentation)
+8. [Project Status](#project-status)
+9. [License](#license)
 
 ## Project Description
 
@@ -40,12 +41,42 @@ QA Toolsmith is an open-source, lightweight web application that standardizes an
 - **AI Integration**
   - Openrouter.ai (supports OpenAI, Anthropic, Google, etc.)
 - **CI/CD & Hosting**
-  - GitHub Actions
-  - Docker (DigitalOcean)
+  - GitHub Actions (CI/CD pipeline)
+  - Cloudflare Pages (production hosting)
 - **Testing**
   - Vitest (unit testing)
   - Playwright (E2E testing)
   - React Testing Library (component testing)
+
+## Deployment & Hosting
+
+QA Toolsmith is deployed on **Cloudflare Pages**, chosen after comprehensive analysis of hosting platforms for optimal balance of cost, performance, and developer experience.
+
+**Key Benefits:**
+- **Budget-optimized**: Generous free tier allowing commercial use (100,000 requests/day)
+- **Global performance**: Edge deployment via Cloudflare Workers
+- **SSR support**: Full compatibility with Astro's server-side rendering requirements
+- **Developer experience**: Git integration with automatic deployments and preview environments
+
+**Why Cloudflare Pages?**
+The application requires SSR due to server-side API endpoints (authentication, data generators). Cloudflare Pages provides the best combination of cost-effectiveness and technical compatibility among evaluated platforms (Netlify, Vercel, Render, DigitalOcean App Platform).
+
+For detailed technical architecture and API specifications, see [.ai/ARCHITECTURE.md](.ai/ARCHITECTURE.md).
+
+For detailed technical stack and deployment configuration, see [docs/tech-stack.md](docs/tech-stack.md).
+
+## Environment Configuration
+
+### Required Environment Variables
+- `SUPABASE_URL` - Supabase project URL
+- `SUPABASE_ANON_KEY` - Supabase anonymous key
+- `SUPABASE_SERVICE_ROLE_KEY` - Supabase service role key (server-side only)
+- `OPENROUTER_API_KEY` - AI integration key (optional)
+
+### Environment Files
+- `.env` - Local development
+- `.env.test` - E2E testing
+- Platform-specific environment variables configured in Cloudflare Pages dashboard
 
 ## Getting Started Locally
 
@@ -122,7 +153,7 @@ E2E tests run against a dedicated cloud Supabase project for maximum stability a
 3. Migrate database schema: `supabase link && supabase db push`
 4. Run tests: `npm run test:e2e`
 
-**Full Setup Guide**: See [docs/e2e-cloud-setup.md](docs/e2e-cloud-setup.md) for detailed instructions.
+**Setup Instructions**: Follow the steps above to configure your E2E testing environment.
 
 ### E2E Diagnostics
 
@@ -216,7 +247,7 @@ For flaky IBAN generator tests, check:
 
 ## API Documentation
 
-The QA Toolsmith API provides several endpoints for interacting with the application programmatically. Detailed documentation for each endpoint can be found in the [docs/api](docs/api) directory.
+The QA Toolsmith API provides several endpoints for interacting with the application programmatically. Detailed API specifications and endpoint documentation can be found in [.ai/ARCHITECTURE.md](.ai/ARCHITECTURE.md).
 
 - **Health Check**: `GET /api/health` - Simple application health check endpoint
 
