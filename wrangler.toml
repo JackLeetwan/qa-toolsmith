@@ -1,0 +1,23 @@
+# Cloudflare Pages Functions Configuration for QA Toolsmith
+# This file allows Cloudflare Pages to properly bind environment variables at runtime
+
+name = "qa-toolsmith"
+compatibility_date = "2024-01-01"
+pages_build_output_dir = "dist"
+
+# Note: Environment variables defined in Cloudflare Pages Dashboard
+# (Settings → Variables and Secrets) will be automatically merged with this config.
+#
+# Required environment variables in Dashboard:
+# - SUPABASE_URL
+# - SUPABASE_KEY (anon/public key)
+# - SUPABASE_SERVICE_KEY (service_role key)
+# - ENV_NAME (should be "production")
+# - OPENROUTER_API_KEY (optional, can be empty)
+
+# KV namespace for session storage (configured in Cloudflare Dashboard)
+# Uncomment and configure if needed:
+# [[kv_namespaces]]
+# binding = "SESSION"
+# id = "your-kv-namespace-id"
+

@@ -2,8 +2,8 @@
 
 ## 📋 Podsumowanie sytuacji
 
-**Data:** 2025-10-27  
-**Status:** 🔴 W TRAKCIE - zmienne środowiskowe nie są dostępne w runtime
+**Data:** 2025-10-27 (Ostatnia aktualizacja: 2025-10-27 10:45 UTC)  
+**Status:** 🔧 W TRAKCIE - dodano wrangler.toml, oczekuje na deploy
 
 ---
 
@@ -211,5 +211,27 @@ Oczekiwany wynik: `{"status":"ok"}`
 
 ---
 
-**Ostatnia aktualizacja:** 2025-10-27 10:40 UTC
+**Ostatnia aktualizacja:** 2025-10-27 10:45 UTC
+
+## 🔄 Najnowsze zmiany (2025-10-27 10:45 UTC)
+
+### Dodano wrangler.toml ✅
+
+Stworzono plik `wrangler.toml` w katalogu głównym projektu:
+
+```toml
+name = "qa-toolsmith"
+compatibility_date = "2024-01-01"
+pages_build_output_dir = "dist"
+```
+
+**Dlaczego to może pomóc:**
+- Cloudflare Pages automatycznie wykrywa `wrangler.toml` podczas buildu
+- Plik pomaga w prawidłowym binding'u zmiennych środowiskowych do runtime
+- Build logs pokazywały: `"No wrangler.toml file found. Continuing."` - teraz ta wiadomość powinna zniknąć
+
+**Następne kroki:**
+1. Push zmian do repozytorium
+2. Poczekać na automatyczny rebuild w Cloudflare Pages
+3. Sprawdzić `/api/env-check` po redeploy
 
