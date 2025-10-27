@@ -13,6 +13,31 @@ export async function middlewareHandler(
 
   logger.info("🛡️ Middleware processing:", { pathname, method, timestamp });
 
+  // Define public paths that don't require Supabase or authentication
+  const publicPaths = [
+    "/",
+    "/auth/login",
+    "/auth/register",
+    "/auth/reset",
+    "/auth/reset/confirm",
+    "/logout",
+    "/api/auth/signin",
+    "/api/auth/signup",
+    "/api/auth/signout",
+    "/api/auth/reset-request",
+    "/api/auth/reset-change",
+    "/api/health",
+    "/generators",
+    "/generators/iban",
+    "/api/generators/iban",
+    "/api/validators/iban",
+  ];
+
+  // Check if current path is public
+  const isPublicPath = publicPaths.some(
+    (path) => pathname === path || pathname.startsWith(path + "/"),
+  );
+
   // Create supabase client
   let supabase;
   try {
@@ -24,7 +49,7 @@ export async function middlewareHandler(
     logger.error("❌ Failed to create Supabase client:", error);
     
     // For public paths, continue without Supabase
-    if (pathname === "/" || pathname.startsWith("/api/health") || pathname.startsWith("/api/env-check")) {
+    if (isPublicPath) {
       logger.warn("⚠️ Continuing without Supabase for public path:", pathname);
       return next();
     }
@@ -47,28 +72,6 @@ export async function middlewareHandler(
 
   // Set supabase client in locals
   context.locals.supabase = supabase;
-
-  // Define public paths that don't require authentication
-  // Reserved for future use: enhance public path handling logic
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const publicPaths = [
-    "/",
-    "/auth/login",
-    "/auth/register",
-    "/auth/reset",
-    "/auth/reset/confirm",
-    "/logout",
-    "/api/auth/signin",
-    "/api/auth/signup",
-    "/api/auth/signout",
-    "/api/auth/reset-request",
-    "/api/auth/reset-change",
-    "/api/health",
-    "/generators",
-    "/generators/iban",
-    "/api/generators/iban",
-    "/api/validators/iban",
-  ];
 
   // Define protected paths that require authentication
   const protectedPaths = ["/kb", "/templates", "/charters", "/admin"];
