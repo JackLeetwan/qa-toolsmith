@@ -3,6 +3,8 @@ import { createSupabaseServerInstance } from "../../../db/supabase.client";
 import { z } from "zod";
 import { logger } from "../../../lib/utils/logger";
 
+export const prerender = false;
+
 const signupSchema = z.object({
   email: z
     .string()
@@ -39,6 +41,14 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     });
 
     if (error) {
+      // Log the actual error for debugging
+      logger.error("❌ Signup error from Supabase:", {
+        message: error.message,
+        status: error.status,
+        code: error.code,
+        email: email.split("@")[0] + "@...",
+      });
+
       // Always return generic error message to avoid revealing if email exists
       return new Response(
         JSON.stringify({
