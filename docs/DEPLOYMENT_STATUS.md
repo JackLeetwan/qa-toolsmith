@@ -34,11 +34,11 @@ vite: {
 **Wykonane kroki:**
 - ✅ Dodano alias w `astro.config.mjs`
 - ✅ Build lokalny przetestowany - **sukces** (exit code: 0)
-- ⏳ **OCZEKUJE**: Commit i push do GitHub
-- ⏳ **OCZEKUJE**: Deployment na Cloudflare Pages i weryfikacja
+- ✅ Commit i push do GitHub - **WYKONANE** (commit `fbb9d99`)
+- ⏳ **OCZEKUJE**: Deployment na Cloudflare Pages i weryfikacja (rebuild powinien się zacząć automatycznie za ~30 sekund)
 
 **Commity:**
-- W trakcie: zmiana w `astro.config.mjs`
+- ✅ Commit: `fbb9d99` - "fix: add react-dom/server.edge alias to fix MessageChannel error on Cloudflare"
 
 ---
 
