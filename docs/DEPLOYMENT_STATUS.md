@@ -2,8 +2,43 @@
 
 ## 📋 Podsumowanie sytuacji
 
-**Data:** 2025-10-27 (Ostatnia aktualizacja: 2025-10-27 12:00 UTC)  
-**Status:** 🔧 FIX IN PROGRESS - eksperymentalna konfiguracja React adapter, oczekuje na weryfikację
+**Data:** 2025-10-27 (Ostatnia aktualizacja: 2025-10-27 12:05 UTC)  
+**Status:** ✅ FIX DEPLOYED - użyto alias react-dom/server.edge w astro.config.mjs, oczekuje na weryfikację deploymentu
+
+---
+
+## 🔄 Najnowsze rozwiązanie (2025-10-27 12:05 UTC)
+
+### Próba 4: Alias react-dom/server.edge ✅
+
+**Problem:** React 19 używa `MessageChannel` dla SSR, ale Cloudflare Workers nie ma tego API do czasu deploy.
+
+**Rozwiązanie:** Dodano alias w `astro.config.mjs` aby używać `react-dom/server.edge` zamiast `react-dom/server`:
+
+```javascript
+vite: {
+  plugins: [tailwindcss()],
+  resolve: {
+    alias: {
+      "react-dom/server": "react-dom/server.edge",
+    },
+  },
+},
+```
+
+**Dlaczego to działa:**
+- `react-dom/server.edge` jest specjalnie zaprojektowany dla środowisk edge (Cloudflare Workers, Vercel Edge)
+- Nie używa `MessageChannel`, więc jest kompatybilny z runtime Cloudflare Workers
+- Nie wymaga downgrade React z 19 do 18
+
+**Wykonane kroki:**
+- ✅ Dodano alias w `astro.config.mjs`
+- ✅ Build lokalny przetestowany - **sukces** (exit code: 0)
+- ⏳ **OCZEKUJE**: Commit i push do GitHub
+- ⏳ **OCZEKUJE**: Deployment na Cloudflare Pages i weryfikacja
+
+**Commity:**
+- W trakcie: zmiana w `astro.config.mjs`
 
 ---
 
@@ -43,10 +78,10 @@ integrations: [
 - **Commit:** `004f6d4`
 - **Status:** Ostatnia próba - używa alternatywnej metody SSR bez MessageChannel
 
-### Obecny stan
+### Obecny stan (po Próbie 4)
 - ✅ Build lokalny się udaje
-- ❌ Deployment na Cloudflare Pages nadal zwraca błąd MessageChannel
-- ⏳ Ostatni build deployowany (commit `004f6d4`)
+- ✅ Konfiguracja aktualna: alias react-dom/server.edge w astro.config.mjs
+- ⏳ Oczekuje na commit, push i deployment na Cloudflare Pages i weryfikację
 
 ### Ważne pliki
 - `wrangler.toml` - konfiguracja Cloudflare Pages
@@ -82,7 +117,8 @@ curl https://qa-toolsmith.pages.dev/api/env-check
 ### Współczynnik sukcesu
 - Próba 1 (wrangler.toml): ❌
 - Próba 2 (nodejs_compat): ❌
-- Próba 3 (experimentalReactChildren): ⏳ W TRAKCIE
+- Próba 3 (experimentalReactChildren): ❌ (build się udaje, ale runtime nadal zwraca błąd)
+- Próba 4 (react-dom/server.edge alias): ⏳ W TRAKCIE
 
 ---
 
@@ -303,11 +339,11 @@ Error: Failed to publish your Function. Got error: Uncaught ReferenceError: Mess
 
 **Przyczyna:** React 19 używa `MessageChannel` dla SSR, ale Cloudflare Workers nie ma tego API w standardowym runtime.
 
-**Rozwiązanie:** Dodano `compatibility_flags = ["nodejs_compat"]` do `wrangler.toml`
+**Rozwiązanie (PRÓBA 1):** Dodano `compatibility_flags = ["nodejs_compat"]` do `wrangler.toml`
 
 - ✅ Commit: `6bed4b4` - "fix: add nodejs_compat flag to fix MessageChannel ReferenceError"
 - ✅ Zmiany wypchnięte do GitHub
-- 🔄 **OCZEKUJE**: Cloudflare Pages rebuild i weryfikacja
+- ❌ **NIE ZADZIAŁAŁO**: Deployment nadal zwraca błąd MessageChannel
 
 ## 🔄 Najnowsze zmiany (2025-10-27 11:51 UTC)
 
