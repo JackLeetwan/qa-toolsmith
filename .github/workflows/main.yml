@@ -234,6 +234,20 @@ jobs:
           name: e2e-test-results
           path: test-results/
           retention-days: ${{ github.event_name == 'push' && '30' || '7' }}
+      - name: Upload Server Logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: server-logs
+          path: server.log
+          retention-days: ${{ github.event_name == 'push' && '30' || '7' }}
+      - name: Print Server Logs
+        if: always()
+        run: |
+          echo "📄 Server logs from preview server:"
+          echo "=================================="
+          cat server.log || echo "No server.log found"
+          echo "=================================="
       - name: Publish test results
         if: always()
         uses: dorny/test-reporter@v2
