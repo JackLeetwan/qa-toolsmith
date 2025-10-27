@@ -54,7 +54,8 @@ Deployment zakończony sukcesem o 11:09:56 UTC (commit `912b792`)
 
 ## ⚠️ NOWY PROBLEM: Feature Flags nie działają na produkcji
 
-**Data odkrycia:** 2025-10-27 12:15 UTC
+**Data odkrycia:** 2025-10-27 12:15 UTC  
+**Status:** 🔴 **DO NAPRAWIENIA** - wymaga ręcznej interwencji w Cloudflare Dashboard
 
 ### Symptom
 Na produkcji (https://qa-toolsmith.pages.dev) **nie są widoczne** zakładki nawigacji (np. "Generators"), mimo że w konfiguracji produkcji (`src/features/config.production.ts`) są ustawione na `true`.
@@ -66,10 +67,31 @@ Niespójność w użyciu zmiennych środowiskowych:
 
 Rezultat: Client-side dostaje `undefined` i wraca do safe defaults (wszystko `false`).
 
-### Rozwiązanie
-**Dodać do Cloudflare Dashboard:**
-- **Name:** `PUBLIC_ENV_NAME`
-- **Value:** `production`
+### Rozwiązanie (wymaga ręcznej interwencji)
+
+#### ✅ Co zostało już zrobione:
+- Dodano dokumentację w `docs/FEATURE_FLAGS_FIX.md`
+- Dodano typ `PUBLIC_ENV_NAME` do `src/env.d.ts`
+- Zaktualizowano `README.md` z informacjami o wymaganej zmiennej
+
+#### ⏳ Do zrobienia w Cloudflare Dashboard:
+1. Otwórz: https://dash.cloudflare.com → Workers & Pages → qa-toolsmith
+2. Przejdź do: Settings → Environment Variables
+3. Dodaj nową zmienną:
+   - **Name:** `PUBLIC_ENV_NAME`
+   - **Value:** `production`
+   - **Environment:** Production
+4. Redeploy aplikacji (manual lub push commit)
+
+#### 📋 Weryfikacja po naprawie:
+```bash
+# 1. Sprawdź czy nawigacja działa
+curl https://qa-toolsmith.pages.dev
+
+# 2. Sprawdź ENV_NAME endpoint
+curl https://qa-toolsmith.pages.dev/api/env-check
+# Oczekiwany wynik: env_name: true, all_set: true
+```
 
 **Dokumentacja:** Zobacz `docs/FEATURE_FLAGS_FIX.md` dla pełnych instrukcji.
 
