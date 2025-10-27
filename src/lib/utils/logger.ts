@@ -7,7 +7,7 @@ type LogLevel = "debug" | "info" | "warn" | "error";
 
 class Logger {
   private isDevelopment =
-    import.meta.env.MODE === "development" || !!process.env.VITEST;
+    import.meta.env.MODE === "development" || !!import.meta.env.VITEST;
 
   private log(level: LogLevel, message: string, ...args: unknown[]) {
     // Early return in production to avoid any console references

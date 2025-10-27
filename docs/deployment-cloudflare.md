@@ -154,6 +154,27 @@ Visit `https://your-project.pages.dev` in your browser. You should see the landi
 - **Analytics:** Cloudflare Dashboard → Analytics
 - **Error Tracking:** Check browser console and server logs
 
+## Environment Variables Technical Details
+
+### How It Works
+
+QA Toolsmith uses `import.meta.env` to access environment variables, which is the standard Vite/Astro approach. Cloudflare Pages automatically makes all environment variables defined in the dashboard available through `import.meta.env` during build time.
+
+### Variable Types
+
+All environment variables are accessed as follows:
+- **Server-side code**: `import.meta.env.VARIABLE_NAME`
+- **Client-side code**: `import.meta.env.VARIABLE_NAME` (only public variables)
+
+### Important Technical Notes
+
+1. ✅ **Compliant**: The project uses `import.meta.env` instead of `process.env` (Cloudflare Workers compatible)
+2. ✅ **Working**: Environment variables from Cloudflare Pages dashboard are automatically available
+3. ⚠️ **Not using Astro 5 Runtime API**: The newer `context.locals.runtime.env` API is available but not required - current implementation works perfectly
+4. ✅ **Fixed**: Previously `process.env.VITEST` was used in logger.ts, now uses `import.meta.env.VITEST`
+
+For more details on implementation, see `src/db/supabase.client.ts` and `src/lib/services/health.service.ts`.
+
 ## Security Best Practices
 
 1. ✅ Never commit `.env` files to git

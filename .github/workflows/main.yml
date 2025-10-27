@@ -135,10 +135,20 @@ jobs:
         run: npx playwright install chromium
       - name: Start preview server
         run: |
-          npm run preview &
+          echo "🚀 Starting preview server..."
+          npm run preview > server.log 2>&1 &
           SERVER_PID=$!
           echo "SERVER_PID=$SERVER_PID" >> $GITHUB_ENV
           echo "Server started with PID: $SERVER_PID"
+          sleep 3
+          echo "📋 Checking if server process is still running..."
+          if ! ps -p $SERVER_PID > /dev/null 2>&1; then
+            echo "❌ Server process died immediately!"
+            echo "📄 Server logs:"
+            cat server.log
+            exit 1
+          fi
+          echo "✅ Server process is still running"
         env:
           PORT: 3000
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
@@ -146,16 +156,21 @@ jobs:
           ENV_NAME: production
       - name: Wait for server to start
         run: |
-          for i in {1..30}; do
+          echo "⏳ Waiting for server to be ready..."
+          for i in {1..40}; do
             if curl -f http://localhost:3000/api/health >/dev/null 2>&1; then
-              echo "Server is ready"
+              echo "✅ Server is ready after $((i * 2)) seconds"
               break
             fi
-            echo "Waiting for server... ($i/30)"
+            echo "Waiting for server... ($i/40)"
             sleep 2
           done
-          if [ $i -eq 30 ]; then
-            echo "Server failed to start"
+          if [ $i -eq 40 ]; then
+            echo "❌ Server failed to start after 80 seconds"
+            echo "📄 Server logs:"
+            cat server.log
+            echo "📊 Checking if server process is still running:"
+            ps aux | grep -E "astro|node" | grep -v grep || echo "No server process found"
             exit 1
           fi
       - name: Debug environment variables
@@ -200,10 +215,12 @@ jobs:
       - name: Publish test results
         if: always()
         uses: dorny/test-reporter@v2
+        continue-on-error: true
         with:
           name: E2E Tests
           path: test-results/junit.xml
           reporter: java-junit
+          fail-on-empty: false
       - name: Stop server
         if: always()
         run: |
@@ -238,9 +255,20 @@ jobs:
           path: dist/
       - name: Start server
         run: |
-          npm run preview &
+          echo "🚀 Starting preview server for health check..."
+          npm run preview > server.log 2>&1 &
           SERVER_PID=$!
           echo "SERVER_PID=$SERVER_PID" >> $GITHUB_ENV
+          echo "Server started with PID: $SERVER_PID"
+          sleep 3
+          echo "📋 Checking if server process is still running..."
+          if ! ps -p $SERVER_PID > /dev/null 2>&1; then
+            echo "❌ Server process died immediately!"
+            echo "📄 Server logs:"
+            cat server.log
+            exit 1
+          fi
+          echo "✅ Server process is still running"
         env:
           PORT: 3000
           SUPABASE_URL: "https://dummy.supabase.co"
@@ -250,14 +278,21 @@ jobs:
           ENV_NAME: "production"
       - name: Wait for server to start
         run: |
-          for i in {1..30}; do
+          echo "⏳ Waiting for server to be ready..."
+          for i in {1..40}; do
             if curl -f http://localhost:3000/api/health >/dev/null 2>&1; then
-              echo "Server is ready"
+              echo "✅ Server is ready after $((i * 2)) seconds"
               break
             fi
-            echo "Waiting for server... ($i/30)"
+            echo "Waiting for server... ($i/40)"
             sleep 2
           done
+          if [ $i -eq 40 ]; then
+            echo "❌ Server failed to start after 80 seconds"
+            echo "📄 Server logs:"
+            cat server.log
+            exit 1
+          fi
       - name: Check health endpoint
         run: |
           response=$(curl -s -o /dev/null -w "%{http_code}" \

@@ -19,20 +19,23 @@ test.describe("Feature Flag Page Protection - Enabled", () => {
       if (!(await generatorsLink.isVisible())) {
         test.skip();
       }
+      
+      const baseURL = new URL(page.url()).origin;
+      
       // Navigate to generators index - should load normally
       await page.goto("/generators");
       await expect(page.locator("h1, h2").first()).toBeVisible();
-      expect(page.url()).toBe("http://localhost:3000/generators");
+      expect(page.url()).toBe(`${baseURL}/generators`);
 
       // Navigate to generators iban page - should load normally
       await page.goto("/generators/iban");
       await expect(page.locator("h1, h2").first()).toBeVisible();
-      expect(page.url()).toBe("http://localhost:3000/generators/iban");
+      expect(page.url()).toBe(`${baseURL}/generators/iban`);
 
       // Navigate to generators dynamic page - should load normally
       await page.goto("/generators/phone");
       await expect(page.locator("h1, h2").first()).toBeVisible();
-      expect(page.url()).toBe("http://localhost:3000/generators/phone");
+      expect(page.url()).toBe(`${baseURL}/generators/phone`);
     });
   });
 });
