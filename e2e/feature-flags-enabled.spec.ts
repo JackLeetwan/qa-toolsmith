@@ -19,9 +19,9 @@ test.describe("Feature Flag Page Protection - Enabled", () => {
       if (!(await generatorsLink.isVisible())) {
         test.skip();
       }
-      
+
       const baseURL = new URL(page.url()).origin;
-      
+
       // Navigate to generators index - should load normally
       await page.goto("/generators");
       await expect(page.locator("h1, h2").first()).toBeVisible();
