@@ -14,15 +14,31 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
     define: {
-      // Ensure ENV_NAME is available in test mode
+      // Inject environment variables at build time
+      // These are available during build from Cloudflare Pages environment
       "import.meta.env.ENV_NAME": JSON.stringify(
         // eslint-disable-next-line no-undef
         process.env.ENV_NAME || null,
       ),
-      // Make ENV_NAME available for client-side components
       "import.meta.env.PUBLIC_ENV_NAME": JSON.stringify(
         // eslint-disable-next-line no-undef
         process.env.ENV_NAME || null,
+      ),
+      "import.meta.env.SUPABASE_URL": JSON.stringify(
+        // eslint-disable-next-line no-undef
+        process.env.SUPABASE_URL || null,
+      ),
+      "import.meta.env.SUPABASE_KEY": JSON.stringify(
+        // eslint-disable-next-line no-undef
+        process.env.SUPABASE_KEY || null,
+      ),
+      "import.meta.env.SUPABASE_SERVICE_KEY": JSON.stringify(
+        // eslint-disable-next-line no-undef
+        process.env.SUPABASE_SERVICE_KEY || null,
+      ),
+      "import.meta.env.OPENROUTER_API_KEY": JSON.stringify(
+        // eslint-disable-next-line no-undef
+        process.env.OPENROUTER_API_KEY || null,
       ),
     },
   },
