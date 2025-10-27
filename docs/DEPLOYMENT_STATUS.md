@@ -2,8 +2,8 @@
 
 ## 📋 Podsumowanie sytuacji
 
-**Data:** 2025-10-27 (Ostatnia aktualizacja: 2025-10-27 11:51 UTC)  
-**Status:** 🚀 DEPLOYED - zmiany wypchnięte, oczekuje na weryfikację na Cloudflare Pages
+**Data:** 2025-10-27 (Ostatnia aktualizacja: 2025-10-27 11:54 UTC)  
+**Status:** 🔧 FIX IN PROGRESS - naprawiono problem MessageChannel, oczekuje na redeploy
 
 ---
 
@@ -211,7 +211,24 @@ Oczekiwany wynik: `{"status":"ok"}`
 
 ---
 
-**Ostatnia aktualizacja:** 2025-10-27 11:51 UTC
+**Ostatnia aktualizacja:** 2025-10-27 11:54 UTC
+
+## 🔄 Najnowsze zmiany (2025-10-27 11:54 UTC)
+
+### Problem z MessageChannel - NAPRAWIONY ✅
+
+**Problem:** Błąd deployment na Cloudflare Pages:
+```
+Error: Failed to publish your Function. Got error: Uncaught ReferenceError: MessageChannel is not defined
+```
+
+**Przyczyna:** React 19 używa `MessageChannel` dla SSR, ale Cloudflare Workers nie ma tego API w standardowym runtime.
+
+**Rozwiązanie:** Dodano `compatibility_flags = ["nodejs_compat"]` do `wrangler.toml`
+
+- ✅ Commit: `6bed4b4` - "fix: add nodejs_compat flag to fix MessageChannel ReferenceError"
+- ✅ Zmiany wypchnięte do GitHub
+- 🔄 **OCZEKUJE**: Cloudflare Pages rebuild i weryfikacja
 
 ## 🔄 Najnowsze zmiany (2025-10-27 11:51 UTC)
 
