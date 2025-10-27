@@ -61,13 +61,6 @@ jobs:
             echo "✅ SUPABASE_KEY is set"
           fi
           
-          if [ -z "${{ secrets.SUPABASE_SERVICE_KEY }}" ]; then
-            echo "❌ SUPABASE_SERVICE_KEY is not set"
-            MISSING_VARS+=("SUPABASE_SERVICE_KEY")
-          else
-            echo "✅ SUPABASE_SERVICE_KEY is set"
-          fi
-          
           if [ ${#MISSING_VARS[@]} -ne 0 ]; then
             echo "❌ Missing required environment variables: ${MISSING_VARS[*]}"
             echo "Please configure these in GitHub Secrets"
@@ -80,7 +73,6 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
           ENV_NAME: production
       - name: Archive build artifacts
         uses: actions/upload-artifact@v4
