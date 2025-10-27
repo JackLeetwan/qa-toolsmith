@@ -1,78 +1,60 @@
-import React, { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import React, { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, Mail, Lock, AlertCircle } from "lucide-react";
-
-// Validation schema
-const registerSchema = z
-  .object({
-    email: z
-      .string()
-      .min(1, "Email jest wymagany")
-      .max(254, "Email jest za długi")
-      .email("Nieprawidłowy format email")
-      .transform((val) => val.trim().toLowerCase()),
-    password: z
-      .string()
-      .min(8, "Hasło musi mieć co najmniej 8 znaków")
-      .max(72, "Hasło jest za długie")
-      .regex(
-        /^(?=.*[A-Za-z])(?=.*\d)/,
-        "Hasło musi zawierać co najmniej jedną literę i jedną cyfrę",
-      ),
-    confirmPassword: z.string().min(1, "Potwierdzenie hasła jest wymagane"),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Hasła nie są identyczne",
-    path: ["confirmPassword"],
-  });
-
-type RegisterFormData = z.infer<typeof registerSchema>;
+import { toast } from "sonner";
+import { useRegisterForm } from "./hooks/useRegisterForm";
 
 interface RegisterFormProps {
-  onSubmit?: (data: Omit<RegisterFormData, "confirmPassword">) => Promise<void>;
+  onSubmit?: (data: { email: string; password: string }) => Promise<void>;
   isLoading?: boolean;
   error?: string;
+  onRedirect?: (url: string) => void;
 }
 
 export default function RegisterForm({
   onSubmit,
   isLoading = false,
   error,
+  onRedirect,
 }: RegisterFormProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [navigateTo, setNavigateTo] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (navigateTo) {
+      if (onRedirect) {
+        onRedirect(navigateTo);
+      } else {
+        window.location.href = navigateTo;
+      }
+    }
+  }, [navigateTo, onRedirect]);
+
+  const handleSuccess = useCallback(() => {
+    toast.success("Konto utworzone pomyślnie!");
+
+    setTimeout(() => {
+      setNavigateTo("/");
+    }, 500);
+  }, []);
 
   const {
     register,
     handleSubmit,
-    formState: { errors },
-  } = useForm<RegisterFormData>({
-    resolver: zodResolver(registerSchema),
+    handleFormSubmit,
+    errors,
+    isSubmitting,
+    apiError,
+  } = useRegisterForm({
+    onSubmit,
+    onSuccess: handleSuccess,
   });
 
-  const handleFormSubmit = async (data: RegisterFormData) => {
-    if (!onSubmit) return;
-
-    setIsSubmitting(true);
-    try {
-      await onSubmit({
-        email: data.email,
-        password: data.password,
-      });
-    } catch {
-      // Error handling is done by parent component
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   const isFormLoading = isLoading || isSubmitting;
+  const displayError = error || apiError;
 
   return (
     <Card className="w-full">
@@ -85,7 +67,6 @@ export default function RegisterForm({
           className="space-y-4"
           noValidate
         >
-          {/* Email field */}
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <div className="relative">
@@ -107,7 +88,6 @@ export default function RegisterForm({
             )}
           </div>
 
-          {/* Password field */}
           <div className="space-y-2">
             <Label htmlFor="password">Hasło</Label>
             <div className="relative">
@@ -132,7 +112,6 @@ export default function RegisterForm({
             </p>
           </div>
 
-          {/* Confirm Password field */}
           <div className="space-y-2">
             <Label htmlFor="confirmPassword">Potwierdź hasło</Label>
             <div className="relative">
@@ -154,22 +133,19 @@ export default function RegisterForm({
             )}
           </div>
 
-          {/* Error message */}
-          {error && (
+          {displayError && (
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{error}</AlertDescription>
+              <AlertDescription>{displayError}</AlertDescription>
             </Alert>
           )}
 
-          {/* Submit button */}
           <Button type="submit" className="w-full" disabled={isFormLoading}>
             {isFormLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {isFormLoading ? "Tworzenie konta..." : "Utwórz konto"}
           </Button>
         </form>
 
-        {/* Links */}
         <div className="text-center">
           <p className="text-sm text-muted-foreground">
             Masz już konto?{" "}

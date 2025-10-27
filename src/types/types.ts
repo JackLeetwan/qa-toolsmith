@@ -521,6 +521,16 @@ export interface LoginResponse {
   access_token: string; // Supabase JWT
   profile: ProfileDTO;
 }
+export interface SignupRequest {
+  email: string;
+  password: string;
+}
+export interface SignupResponse {
+  user: {
+    id: string;
+    email: string;
+  };
+}
 export interface LogoutResponse {
   success: true;
 }

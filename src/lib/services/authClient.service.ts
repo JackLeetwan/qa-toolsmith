@@ -1,6 +1,6 @@
 import { logger } from "@/lib/utils/logger";
 import type { LoginFormData } from "@/components/auth/hooks/useLoginForm";
-import type { LoginResponse } from "@/types/types";
+import type { LoginResponse, SignupResponse } from "@/types/types";
 
 /**
  * Client-side authentication service for making API calls to auth endpoints.
@@ -47,6 +47,49 @@ export const AuthClientService = {
     } catch (error) {
       logger.error("❌ Login network error:", error);
       throw new Error("Wystąpił błąd podczas logowania");
+    }
+  },
+
+  /**
+   * Signup with email and password via API endpoint.
+   * @param data - Signup credentials
+   * @returns Promise with signup response containing user ID and email
+   * @throws Error with user-friendly message on failure
+   */
+  async signup(data: {
+    email: string;
+    password: string;
+  }): Promise<SignupResponse> {
+    logger.debug("📡 Sending signup request to /api/auth/signup");
+
+    try {
+      const response = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+
+      logger.debug("📥 Signup response:", {
+        status: response.status,
+        ok: response.ok,
+        result,
+      });
+
+      if (!response.ok) {
+        logger.error("❌ Signup failed:", result);
+        const errorMessage =
+          result.message || "Wystąpił błąd podczas rejestracji";
+        return Promise.reject(new Error(errorMessage));
+      }
+
+      return result as SignupResponse;
+    } catch (error) {
+      logger.error("❌ Signup network error:", error);
+      throw new Error("Wystąpił błąd podczas rejestracji");
     }
   },
 
