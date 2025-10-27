@@ -17,7 +17,8 @@ test.describe("User Registration", () => {
     page,
   }) => {
     const timestamp = Date.now();
-    const testEmail = `test-registration-${timestamp}@example.com`;
+    // Using mailinator.com instead of example.com (Supabase blocks @mailinator.com as invalid)
+    const testEmail = `test-registration-${timestamp}@mailinator.com`;
     const testPassword = "SecurePass123";
 
     // Navigate to homepage
@@ -86,7 +87,7 @@ test.describe("User Registration", () => {
     page,
   }) => {
     const timestamp = Date.now();
-    const testEmail = `test-validation-${timestamp}@example.com`;
+    const testEmail = `test-validation-${timestamp}@mailinator.com`;
 
     await page.goto("/auth/register");
 
@@ -117,7 +118,7 @@ test.describe("User Registration", () => {
     page,
   }) => {
     const timestamp = Date.now();
-    const testEmail = `test-password-validation-${timestamp}@example.com`;
+    const testEmail = `test-password-validation-${timestamp}@mailinator.com`;
 
     await page.goto("/auth/register");
 
@@ -148,7 +149,7 @@ test.describe("User Registration", () => {
     page,
   }) => {
     const timestamp = Date.now();
-    const testEmail = `test-password-validation2-${timestamp}@example.com`;
+    const testEmail = `test-password-validation2-${timestamp}@mailinator.com`;
 
     await page.goto("/auth/register");
 
@@ -179,7 +180,7 @@ test.describe("User Registration", () => {
     page,
   }) => {
     const timestamp = Date.now();
-    const testEmail = `test-password-mismatch-${timestamp}@example.com`;
+    const testEmail = `test-password-mismatch-${timestamp}@mailinator.com`;
 
     await page.goto("/auth/register");
 
@@ -209,7 +210,7 @@ test.describe("User Registration", () => {
   }) => {
     // Use a known existing email (you may need to create this user beforehand)
     // For this test to work, you need a user with this email
-    const existingEmail = process.env.E2E_USERNAME || "existing@example.com";
+    const existingEmail = process.env.E2E_USERNAME || "existing@mailinator.com";
     const testPassword = "SecurePass123";
 
     await page.goto("/auth/register");

@@ -32,8 +32,8 @@ console.log(`  - Full URL: ${supabaseUrl}\n`);
 // Create Supabase client
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-// Test signup
-const testEmail = `test-diagnostic-${Date.now()}@example.com`;
+// Test signup with mailinator.com (accepted by Supabase)
+const testEmail = `test-diagnostic-${Date.now()}@mailinator.com`;
 const testPassword = 'SecurePass123';
 
 console.log('🧪 Testing Signup:');
@@ -60,8 +60,13 @@ try {
     
     // Provide diagnostic suggestions
     console.error('\n💡 Possible Solutions:');
+    if (error.code === 'email_address_invalid' || error.message?.includes('invalid')) {
+      console.error('   → Supabase is blocking this email domain as invalid');
+      console.error('   → @example.com is commonly blocked by Supabase Auth');
+      console.error('   → Use @mailinator.com, @guerrillamail.com, or real domain instead');
+    }
     if (error.message?.includes('Email not allowed')) {
-      console.error('   → Supabase may be blocking @example.com emails');
+      console.error('   → Supabase may be blocking this email domain');
       console.error('   → Try using a different email domain or real email service');
     }
     if (error.message?.includes('confirm') || error.code === 'email_confirmation_required') {
