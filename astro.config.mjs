@@ -35,9 +35,13 @@ export default defineConfig({
           }
         : undefined,
     },
-    // Make ENV_NAME available to client-side code
+    // Make environment variables available in runtime
+    // Note: For Astro SSR with Node adapter, process.env is NOT automatically available in runtime
+    // We need to explicitly define them here for them to be accessible via import.meta.env
     define: {
       "import.meta.env.ENV_NAME": JSON.stringify(process.env.ENV_NAME),
+      "import.meta.env.SUPABASE_URL": JSON.stringify(process.env.SUPABASE_URL),
+      "import.meta.env.SUPABASE_KEY": JSON.stringify(process.env.SUPABASE_KEY),
     },
   },
   adapter: useCloudflareAdapter ? cloudflare() : node({ mode: "standalone" }),
