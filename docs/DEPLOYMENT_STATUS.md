@@ -2,8 +2,87 @@
 
 ## 📋 Podsumowanie sytuacji
 
-**Data:** 2025-10-27 (Ostatnia aktualizacja: 2025-10-27 11:54 UTC)  
-**Status:** 🔧 FIX IN PROGRESS - naprawiono problem MessageChannel, oczekuje na redeploy
+**Data:** 2025-10-27 (Ostatnia aktualizacja: 2025-10-27 12:00 UTC)  
+**Status:** 🔧 FIX IN PROGRESS - eksperymentalna konfiguracja React adapter, oczekuje na weryfikację
+
+---
+
+## 🎯 PODSUMOWANIE DLA KOLEJNEGO AGENTA
+
+**Data sesji:** 2025-10-27 (11:39 - 12:00 UTC)
+
+### Główny problem
+Aplikacja nie może zostać wdrożona na Cloudflare Pages z powodu błędu:
+```
+Error: Uncaught ReferenceError: MessageChannel is not defined
+```
+
+**Przyczyna:** React 19 używa `MessageChannel` dla SSR, które nie jest dostępne w standardowym runtime Cloudflare Workers.
+
+### Co zostało zrobione
+
+#### 1. ✅ Utworzono `wrangler.toml`
+```toml
+name = "qa-toolsmith"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = "dist"
+```
+- **Commit:** `ad52824`, `6bed4b4`
+- **Status:** Plik został dodany, ale `nodejs_compat` nie rozwiązuje problemu MessageChannel
+
+#### 2. ✅ Zmieniono konfigurację Astro React adapter
+```javascript
+integrations: [
+  react({
+    experimentalReactChildren: true,
+  }),
+  sitemap(),
+]
+```
+- **Commit:** `004f6d4`
+- **Status:** Ostatnia próba - używa alternatywnej metody SSR bez MessageChannel
+
+### Obecny stan
+- ✅ Build lokalny się udaje
+- ❌ Deployment na Cloudflare Pages nadal zwraca błąd MessageChannel
+- ⏳ Ostatni build deployowany (commit `004f6d4`)
+
+### Ważne pliki
+- `wrangler.toml` - konfiguracja Cloudflare Pages
+- `astro.config.mjs` - konfiguracja Astro z experimentalReactChildren
+- `src/pages/api/env-check.ts` - endpoint diagnostyczny
+
+### Następne kroki (jeśli experimentalReactChildren nie zadziała)
+1. **Rozważ downgrade React** z 19.x na 18.x (React 18 nie używa MessageChannel)
+2. **Sprawdź alternatywne podejścia:**
+   - Pre-render wszystkich stron (bez SSR)
+   - Użycie innych adapterów (Node.js zamiast Cloudflare)
+3. **Weryfikuj czy Cloudflare Pages support React 19:**
+   - Może wymagać aktualizacji flaga kompatybilności
+   - Może wymagać użycia Worker environment zamiast Pages Functions
+
+### Testowanie po naprawie
+```bash
+curl https://qa-toolsmith.pages.dev/api/env-check
+```
+
+**Oczekiwany wynik:**
+```json
+{
+  "supabase_url": true,
+  "supabase_key": true,
+  "supabase_service_key": true,
+  "openrouter_api_key": false,
+  "env_name": true,
+  "all_set": true
+}
+```
+
+### Współczynnik sukcesu
+- Próba 1 (wrangler.toml): ❌
+- Próba 2 (nodejs_compat): ❌
+- Próba 3 (experimentalReactChildren): ⏳ W TRAKCIE
 
 ---
 
