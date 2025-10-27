@@ -250,7 +250,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Build for health check (Node adapter)
-        run: astro build
+        run: npx astro build
         env:
           SUPABASE_URL: "https://dummy.supabase.co"
           SUPABASE_KEY: "dummy-key"
