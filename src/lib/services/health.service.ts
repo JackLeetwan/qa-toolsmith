@@ -34,6 +34,11 @@ export function checkEnvironment(): {
     supabase_service_key: supabaseServiceKey,
     openrouter_api_key: openrouterApiKey,
     env_name: envName,
-    all_set: supabaseUrl && supabaseKey && supabaseServiceKey && openrouterApiKey && envName,
+    all_set:
+      supabaseUrl &&
+      supabaseKey &&
+      supabaseServiceKey &&
+      openrouterApiKey &&
+      envName,
   };
 }

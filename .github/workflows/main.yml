@@ -1,8 +1,9 @@
----
-name: CI
+name: CI/CD Pipeline
 
 on:
   push:
+    branches: [main, master]
+  pull_request:
     branches: [main, master]
 
 jobs:
@@ -41,20 +42,55 @@ jobs:
           cache: "npm"
       - name: Install dependencies
         run: npm ci
+      - name: Validate environment variables
+        run: |
+          echo "🔍 Checking required environment variables..."
+          MISSING_VARS=()
+          
+          if [ -z "${{ secrets.SUPABASE_URL }}" ]; then
+            echo "❌ SUPABASE_URL is not set"
+            MISSING_VARS+=("SUPABASE_URL")
+          else
+            echo "✅ SUPABASE_URL is set"
+          fi
+          
+          if [ -z "${{ secrets.SUPABASE_KEY }}" ]; then
+            echo "❌ SUPABASE_KEY is not set"
+            MISSING_VARS+=("SUPABASE_KEY")
+          else
+            echo "✅ SUPABASE_KEY is set"
+          fi
+          
+          if [ -z "${{ secrets.SUPABASE_SERVICE_KEY }}" ]; then
+            echo "❌ SUPABASE_SERVICE_KEY is not set"
+            MISSING_VARS+=("SUPABASE_SERVICE_KEY")
+          else
+            echo "✅ SUPABASE_SERVICE_KEY is set"
+          fi
+          
+          if [ ${#MISSING_VARS[@]} -ne 0 ]; then
+            echo "❌ Missing required environment variables: ${MISSING_VARS[*]}"
+            echo "Please configure these in GitHub Secrets"
+            exit 1
+          fi
+          
+          echo "✅ All required environment variables are set"
       - name: Build
         run: npm run build
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          ENV_NAME: production
       - name: Archive build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ci-build-output
+          name: build-output
           path: dist/
-          retention-days: 7
+          retention-days: ${{ github.event_name == 'push' && '30' || '7' }}
 
   test:
-    name: Test
+    name: Unit Tests
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -70,41 +106,16 @@ jobs:
           cache: "npm"
       - name: Install dependencies
         run: npm ci
-      - name: Run tests with coverage
+      - name: Run unit tests with coverage
         run: npm run test:unit:coverage
-      - name: Upload test coverage
+      - name: Upload unit test coverage
         uses: actions/upload-artifact@v4
         with:
-          name: ci-unit-coverage
+          name: unit-coverage
           path: coverage/
-          retention-days: 30
+          retention-days: ${{ github.event_name == 'push' && '30' || '7' }}
 
-  coverage-summary:
-    name: Coverage Summary
-    runs-on: ubuntu-latest
-    needs: test
-    permissions:
-      contents: read
-      checks: write
-    steps:
-      - uses: actions/checkout@v5
-      - name: Download coverage artifacts
-        uses: actions/download-artifact@v5
-        with:
-          name: ci-unit-coverage
-          path: coverage/
-      - name: Generate coverage summary
-        run: |
-          echo "## 📊 Coverage Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Unit Test Coverage" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Coverage report generated successfully!" >> $GITHUB_STEP_SUMMARY
-          echo "- **Format**: LCOV" >> $GITHUB_STEP_SUMMARY
-          echo "- **Retention**: 30 days" >> $GITHUB_STEP_SUMMARY
-          echo "- **Artifact**: ci-unit-coverage" >> $GITHUB_STEP_SUMMARY
-
-  e2e:
+  e2e-tests:
     name: E2E Tests
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -126,7 +137,7 @@ jobs:
       - name: Download build artifacts
         uses: actions/download-artifact@v5
         with:
-          name: ci-build-output
+          name: build-output
           path: dist/
       - name: Install Playwright browsers
         run: npx playwright install chromium
@@ -140,6 +151,7 @@ jobs:
           PORT: 3000
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          ENV_NAME: production
       - name: Wait for server to start
         run: |
           for i in {1..30}; do
@@ -159,20 +171,23 @@ jobs:
           echo "🔍 Environment variables check:"
           echo "SUPABASE_URL: ${SUPABASE_URL:+✅ Set}"
           echo "SUPABASE_KEY: ${SUPABASE_KEY:+✅ Set}"
+          echo "ENV_NAME: ${ENV_NAME:+✅ Set}"
           echo "E2E_USERNAME: ${E2E_USERNAME:+✅ Set}"
           echo "E2E_PASSWORD: ${E2E_PASSWORD:+✅ Set}"
           echo "E2E_USERNAME_ID: ${E2E_USERNAME_ID:+✅ Set}"
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          ENV_NAME: production
           E2E_USERNAME: ${{ secrets.E2E_USERNAME }}
           E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
           E2E_USERNAME_ID: ${{ secrets.E2E_USERNAME_ID }}
-      - name: Run E2E tests with preview server
+      - name: Run E2E tests
         run: npm run test:e2e
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          ENV_NAME: production
           E2E_USERNAME: ${{ secrets.E2E_USERNAME }}
           E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
           E2E_USERNAME_ID: ${{ secrets.E2E_USERNAME_ID }}
@@ -180,21 +195,21 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ci-e2e-html-report
+          name: e2e-html-report
           path: playwright-report/
-          retention-days: 30
+          retention-days: ${{ github.event_name == 'push' && '30' || '7' }}
       - name: Upload Test Results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ci-e2e-test-results
+          name: e2e-test-results
           path: test-results/
-          retention-days: 30
+          retention-days: ${{ github.event_name == 'push' && '30' || '7' }}
       - name: Publish test results
         if: always()
         uses: dorny/test-reporter@v2
         with:
-          name: E2E Tests (CI)
+          name: E2E Tests
           path: test-results/junit.xml
           reporter: java-junit
       - name: Stop server
@@ -209,9 +224,10 @@ jobs:
   health-check:
     name: Health Check
     runs-on: ubuntu-latest
-    needs: [e2e, coverage-summary]
+    needs: [e2e-tests]
     permissions:
       contents: read
+    if: github.event_name == 'push'
     steps:
       - uses: actions/checkout@v5
       - name: Enable Corepack
@@ -226,7 +242,7 @@ jobs:
       - name: Download build artifacts
         uses: actions/download-artifact@v5
         with:
-          name: ci-build-output
+          name: build-output
           path: dist/
       - name: Start server
         run: |
@@ -239,6 +255,7 @@ jobs:
           SUPABASE_KEY: "dummy-key"
           SUPABASE_SERVICE_KEY: "dummy-service-key"
           OPENROUTER_API_KEY: "dummy-key"
+          ENV_NAME: "production"
       - name: Wait for server to start
         run: |
           for i in {1..30}; do
@@ -268,3 +285,102 @@ jobs:
             kill $SERVER_PID || true
           fi
           pkill -f "astro preview" || true
+
+  status-comment:
+    name: Status Comment
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    needs: [lint, test, e2e-tests]
+    if: github.event_name == 'pull_request' && always()
+    steps:
+      - name: Check job results
+        id: check-results
+        run: |
+          if [[ "${{ needs.lint.result }}" == "success" &&
+                "${{ needs.test.result }}" == "success" &&
+                "${{ needs.e2e-tests.result }}" == "success" ]]; then
+            echo "status=success" >> $GITHUB_OUTPUT
+            echo "message=✅ All checks passed! This PR is ready for review." \
+              >> $GITHUB_OUTPUT
+            echo "color=28a745" >> $GITHUB_OUTPUT
+          else
+            echo "status=failure" >> $GITHUB_OUTPUT
+            echo "message=❌ Some checks failed. Please review failed jobs:" \
+              >> $GITHUB_OUTPUT
+            echo "color=dc3545" >> $GITHUB_OUTPUT
+
+            if [[ "${{ needs.lint.result }}" != "success" ]]; then
+              echo "message=${message} - Lint: ${{ needs.lint.result }}" \
+                >> $GITHUB_OUTPUT
+            fi
+            if [[ "${{ needs.test.result }}" != "success" ]]; then
+              echo "message=${message} - Unit: ${{ needs.test.result }}" \
+                >> $GITHUB_OUTPUT
+            fi
+            if [[ "${{ needs.e2e-tests.result }}" != "success" ]]; then
+              echo "message=${message} - E2E: ${{ needs.e2e-tests.result }}" \
+                >> $GITHUB_OUTPUT
+            fi
+          fi
+      - name: Create or update PR comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const botComment = comments.find(comment =>
+              comment.user.type === 'Bot' &&
+              comment.body.includes('## 🔍 Pull Request Status')
+            );
+
+            const statusIcon = '${{ steps.check-results.outputs.status }}' ===
+              'success' ? '✅' : '❌';
+            const statusColor = '${{ steps.check-results.outputs.status }}' ===
+              'success' ? 'success' : 'failure';
+            const message = `${{ steps.check-results.outputs.message }}`;
+
+            const commentBody = `## 🔍 Pull Request Status
+
+            ${statusIcon} **Status**: ${message}
+
+            ### 📊 Test Results
+
+            | Job | Status | Details |
+            |-----|--------|---------|
+            | **Lint** | ${{ needs.lint.result == 'success' && '✅ Passed' ||
+              '❌ Failed' }} | Code quality |
+            | **Unit Tests** | ${{ needs.test.result == 'success' &&
+              '✅ Passed' || '❌ Failed' }} | Test coverage |
+            | **E2E Tests** | ${{ needs.e2e-tests.result == 'success' &&
+              '✅ Passed' || '❌ Failed' }} | Integration tests |
+
+            ### 📁 Artifacts & Reports
+
+            - **Unit Test Coverage**: Available in workflow artifacts
+            - **E2E Test Report**: HTML report with traces and screenshots
+            - **Test Results**: JUnit XML format for CI integration
+
+            ---
+            *This comment is automatically updated by GitHub Actions*`;
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: commentBody
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: commentBody
+              });
+            }
+

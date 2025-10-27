@@ -22,12 +22,15 @@ interface ImportMetaEnv {
   readonly SUPABASE_SERVICE_KEY: string;
   readonly OPENROUTER_API_KEY?: string;
   readonly ENV_NAME?: string;
-  readonly PUBLIC_ENV_NAME?: string;
   readonly VITEST?: string;
 }
 
-interface ImportMeta {
-  readonly env: ImportMetaEnv;
+// Declare the ImportMeta interface to extend the global type system
+// This extends the built-in ImportMeta type from Astro/Vite
+declare global {
+  interface ImportMeta {
+    readonly env: ImportMetaEnv;
+  }
 }
 
 export {};

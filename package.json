@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "astro dev",
     "dev:e2e": "astro dev --mode test",
-    "build": "astro build",
+    "build": "ASTRO_TARGET=cloudflare astro build",
     "preview": "astro preview",
     "astro": "astro",
     "lint": "eslint .",

@@ -36,6 +36,7 @@ OPENROUTER_API_KEY = sk-or-v1-your-key
 - `SUPABASE_SERVICE_KEY` is the **service_role** key (starts with `eyJhbG...` and has role `service_role`)
 - Keys can be found in Supabase Dashboard → Settings → API
 - Never commit these keys to git
+- `ENV_NAME` is configured as a public environment variable in `astro.config.mjs` and is used for both server-side and client-side feature flags
 
 ## Step 3: Build Settings
 
@@ -128,6 +129,17 @@ Visit `https://your-project.pages.dev` in your browser. You should see the landi
 2. Check Supabase project is running
 3. Ensure migrations are applied: `supabase db push`
 4. Check browser console for specific errors
+
+### Feature Flags Not Working / Navigation Hidden
+
+**Problem:** Navigation links (Generators, etc.) are hidden or feature flags not working
+
+**Solution:**
+1. Verify `ENV_NAME` is set to `production` in Cloudflare Pages environment variables
+2. Check the environment check endpoint: `https://your-project.pages.dev/api/env-check`
+3. Ensure `ENV_NAME` shows `true` in the response
+4. The `ENV_NAME` variable is configured to be accessible from both server-side and client-side code via `astro.config.mjs`
+5. Redeploy after verifying the variable is set correctly
 
 ## Custom Domain Setup
 

@@ -72,10 +72,9 @@ For detailed technical stack and deployment configuration, see [docs/tech-stack.
 - `SUPABASE_KEY` - Supabase anonymous key (note: not SUPABASE_ANON_KEY)
 - `SUPABASE_SERVICE_KEY` - Supabase service role key (server-side only)
 - `OPENROUTER_API_KEY` - AI integration key (optional)
-- `ENV_NAME` - Environment name for server-side rendering (local, integration, or production)
-- `PUBLIC_ENV_NAME` - Environment name for client-side code (local, integration, or production). **Required in production.**
+- `ENV_NAME` - Environment name (local, integration, or production). **Required in production for feature flags.**
 
-**Note:** Both `ENV_NAME` and `PUBLIC_ENV_NAME` must be set to the same value in production deployments. See [docs/FEATURE_FLAGS_FIX.md](docs/FEATURE_FLAGS_FIX.md) for details.
+**Note:** `ENV_NAME` is used for both server-side and client-side code to control feature flags. It's configured as a public environment variable in `astro.config.mjs` for client-side access.
 
 ### Environment Files
 - `.env` - Local development

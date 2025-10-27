@@ -47,13 +47,13 @@ export async function middlewareHandler(
     });
   } catch (error) {
     logger.error("❌ Failed to create Supabase client:", error);
-    
+
     // For public paths, continue without Supabase
     if (isPublicPath) {
       logger.warn("⚠️ Continuing without Supabase for public path:", pathname);
       return next();
     }
-    
+
     // For protected paths, return error
     return new Response(
       JSON.stringify({

@@ -3,7 +3,7 @@ import { getFeatureFlagsForEnv } from "@/features";
 
 /**
  * Hook for checking feature flag status in client-side React components.
- * Uses the PUBLIC_ENV_NAME to determine the current environment and check feature status.
+ * Uses the ENV_NAME to determine the current environment and check feature status.
  *
  * @param featurePath - The feature path to check (e.g., "collections.generators")
  * @returns boolean indicating if the feature is enabled

@@ -4,29 +4,30 @@ This directory contains the CI/CD workflows for QA Toolsmith MVP.
 
 ## Workflows Overview
 
-### 1. CI Workflow (`ci.yml`)
-**Trigger**: Push to `main` or `master` branches  
-**Purpose**: Full deployment readiness check  
+### Unified CI/CD Pipeline (`main.yml`)
+**Trigger**: 
+- Push to `main` or `master` branches
+- Pull requests to `main` or `master` branches
+
+**Purpose**: Single workflow for both PR checks and deployment readiness
+
 **Jobs**:
 - `lint`: Code quality and formatting checks
-- `build`: Application build with artifacts
-- `test`: Unit tests with coverage (1,201 tests)
-- `coverage-summary`: Coverage reporting and summary
-- `e2e`: End-to-end tests (33 tests) with full diagnostics
-- `health-check`: Post-deployment smoke test
-
-**Artifacts Retention**: 30 days (production readiness)
-
-### 2. Pull Request Workflow (`pull-request.yml`)
-**Trigger**: Pull requests to `main` or `master` branches  
-**Purpose**: Code review readiness check  
-**Jobs**:
-- `lint`: Code quality and formatting checks
-- `unit-tests`: Unit tests with coverage
+- `build`: Application build with environment variable validation
+- `test`: Unit tests with coverage
 - `e2e-tests`: End-to-end tests with diagnostics
-- `status-comment`: Automated PR status comment
+- `health-check`: Post-deployment smoke test (push only)
+- `status-comment`: Automated PR status comment (PR only)
 
-**Artifacts Retention**: 7 days (review process)
+**Conditional Behavior**:
+- **On Push**: Full pipeline with 30-day artifact retention and health checks
+- **On Pull Request**: Lightweight checks with 7-day retention and status comments
+
+**Benefits**:
+- ✅ Single source of truth for CI/CD logic
+- ✅ No duplication between workflows
+- ✅ Easier maintenance and updates
+- ✅ Consistent behavior across environments
 
 ## Configuration
 

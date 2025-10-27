@@ -29,30 +29,26 @@ export const createSupabaseServerInstance = (context: {
     const missingVars = [];
     if (!supabaseUrl) missingVars.push("SUPABASE_URL");
     if (!supabaseKey) missingVars.push("SUPABASE_KEY");
-    
+
     throw new Error(
       `Missing Supabase environment variables: ${missingVars.join(", ")}. ` +
-      "Please ensure these are set in Cloudflare Pages environment variables."
+        "Please ensure these are set in Cloudflare Pages environment variables.",
     );
   }
 
-  const supabase = createServerClient<Database>(
-    supabaseUrl,
-    supabaseKey,
-    {
-      cookieOptions,
-      cookies: {
-        getAll() {
-          return parseCookieHeader(context.headers.get("Cookie") ?? "");
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            context.cookies.set(name, value, options),
-          );
-        },
+  const supabase = createServerClient<Database>(supabaseUrl, supabaseKey, {
+    cookieOptions,
+    cookies: {
+      getAll() {
+        return parseCookieHeader(context.headers.get("Cookie") ?? "");
+      },
+      setAll(cookiesToSet) {
+        cookiesToSet.forEach(({ name, value, options }) =>
+          context.cookies.set(name, value, options),
+        );
       },
     },
-  );
+  });
 
   return supabase;
 };
@@ -63,11 +59,9 @@ export const createSupabaseServerInstance = (context: {
 const supabaseUrl = import.meta.env.SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.SUPABASE_KEY;
 
-export const supabaseClient = (supabaseUrl && supabaseAnonKey)
-  ? createServerClient<Database>(
-      supabaseUrl,
-      supabaseAnonKey,
-      {
+export const supabaseClient =
+  supabaseUrl && supabaseAnonKey
+    ? createServerClient<Database>(supabaseUrl, supabaseAnonKey, {
         cookieOptions,
         cookies: {
           getAll() {
@@ -77,6 +71,5 @@ export const supabaseClient = (supabaseUrl && supabaseAnonKey)
             // No-op for legacy client
           },
         },
-      },
-    )
-  : null;
+      })
+    : null;

@@ -7,7 +7,7 @@ export const prerender = false;
  * GET /api/env-check
  * Checks if all required environment variables are set
  * Does not expose actual values for security
- * 
+ *
  * Response 200:
  * {
  *   supabase_url: true/false,
@@ -45,4 +45,3 @@ export const GET: APIRoute = async () => {
     );
   }
 };
-

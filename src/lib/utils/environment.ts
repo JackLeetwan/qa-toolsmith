@@ -6,7 +6,7 @@ import type { EnvName } from "../../features/types";
  * For server-side code, use import.meta.env.ENV_NAME directly.
  */
 export function getClientEnvName(): EnvName | null {
-  const envName = import.meta.env.PUBLIC_ENV_NAME;
+  const envName = import.meta.env.ENV_NAME;
 
   if (!envName || !["local", "integration", "production"].includes(envName)) {
     return null;

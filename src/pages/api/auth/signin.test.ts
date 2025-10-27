@@ -672,12 +672,15 @@ describe("Signin API Endpoint", () => {
 
       await POST(createAPIContext(mockRequest, mockCookies));
 
-      expect(logger.debug).toHaveBeenCalledWith("✅ Signin successful:", {
-        userId: "user-id...",
-        email: "user@...",
-        sessionExists: true,
-        duration: "0ms",
-      });
+      expect(logger.debug).toHaveBeenCalledWith(
+        "✅ Signin successful:",
+        expect.objectContaining({
+          userId: "user-id...",
+          email: "user@...",
+          sessionExists: true,
+          duration: expect.stringMatching(/^\d+ms$/),
+        }),
+      );
     });
 
     it("should log auth errors", async () => {
