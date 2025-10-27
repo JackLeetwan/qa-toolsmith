@@ -13,6 +13,7 @@ interface RegisterFormProps {
   isLoading?: boolean;
   error?: string;
   onRedirect?: (url: string) => void;
+  onEmailConfirmationRequired?: (email: string, message: string) => void;
 }
 
 export default function RegisterForm({
@@ -20,6 +21,7 @@ export default function RegisterForm({
   isLoading = false,
   error,
   onRedirect,
+  onEmailConfirmationRequired,
 }: RegisterFormProps) {
   const [navigateTo, setNavigateTo] = useState<string | null>(null);
 
@@ -33,13 +35,19 @@ export default function RegisterForm({
     }
   }, [navigateTo, onRedirect]);
 
-  const handleSuccess = useCallback(() => {
-    toast.success("Konto utworzone pomyślnie!");
-
-    setTimeout(() => {
-      setNavigateTo("/");
-    }, 500);
-  }, []);
+  const handleSuccess = useCallback((emailConfirmationRequired?: boolean, message?: string) => {
+    if (emailConfirmationRequired) {
+      toast.success(message || "Konto utworzone! Sprawdź swoją skrzynkę email, aby potwierdzić adres i się zalogować.");
+      if (onEmailConfirmationRequired) {
+        onEmailConfirmationRequired("", message || "Konto utworzone! Sprawdź swoją skrzynkę email, aby potwierdzić adres i się zalogować.");
+      }
+    } else {
+      toast.success("Konto utworzone pomyślnie!");
+      setTimeout(() => {
+        setNavigateTo("/");
+      }, 500);
+    }
+  }, [onEmailConfirmationRequired]);
 
   const {
     register,

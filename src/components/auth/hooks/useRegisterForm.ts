@@ -35,7 +35,7 @@ export type RegisterFormData = z.infer<typeof registerSchema>;
 
 interface UseRegisterFormOptions {
   onSubmit?: (data: Omit<RegisterFormData, "confirmPassword">) => Promise<void>;
-  onSuccess?: () => void;
+  onSuccess?: (emailConfirmationRequired?: boolean, message?: string) => void;
   onError?: (error: string) => void;
 }
 
@@ -102,11 +102,11 @@ export function useRegisterForm(options: UseRegisterFormOptions = {}) {
     setApiError("");
 
     try {
-      await AuthClientService.signup(submitData);
+      const result = await AuthClientService.signup(submitData);
 
       // Success - let the component handle UI feedback and navigation
       logger.debug("✅ Registration successful, redirecting...");
-      onSuccess?.();
+      onSuccess?.(result.emailConfirmationRequired, result.message);
     } catch (error) {
       const errorMessage =
         error instanceof Error
