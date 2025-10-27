@@ -1,5 +1,9 @@
 import "@testing-library/jest-dom";
 import { vi, afterEach, beforeAll } from "vitest";
+import dotenv from "dotenv";
+
+// Load environment variables from .env.test file at test startup
+dotenv.config({ path: ".env.test" });
 
 // ============================================================================
 // GLOBAL TEST SETUP - TEST ISOLATION & MOCK MANAGEMENT
