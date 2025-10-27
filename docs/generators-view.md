@@ -12,12 +12,12 @@ The Generators view provides a centralized hub for test data generation and vali
 
 ### Tech Stack
 
-- **Frontend**: Astro 5 + React 19 + TypeScript 5 + Tailwind 4
-- **UI Components**: Shadcn/ui (Card, Tabs, Select, Input, Alert, Toast, Collapsible)
-- **Icons**: Lucide React
-- **State Management**: React hooks (useState, useReducer) + TanStack Query
+- **Frontend**: Astro 5 (v5.13.7) + React 19 (v19.1.1) + TypeScript 5 + Tailwind 4 (v4.1.13)
+- **UI Components**: Shadcn/ui (Card, Tabs, Select, Input, Alert, Toast, Collapsible) built on Radix UI
+- **Icons**: Lucide React (v0.487.0)
+- **State Management**: React hooks (useState, useReducer, useOptimistic) + React 19 features
 - **Persistence**: localStorage for history and preferences
-- **Validation**: Zod schemas + client-side validation
+- **Validation**: Zod (v3.22.4) schemas + client-side validation
 
 ### Routing Structure
 
