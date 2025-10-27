@@ -1,0 +1,138 @@
+---
+description: Backend API, database, and Supabase guidelines.
+globs: ["src/pages/api/**", "src/lib/services/**", "supabase/migrations/**", "src/db/**"]
+alwaysApply: false
+---
+
+# Backend & API Standards
+
+## Supabase Integration Rules
+
+**KRYTYCZNE:**
+- **ZAWSZE** używaj `context.locals.supabase` w Astro routes
+- **NIGDY** nie importuj klienta Supabase bezpośrednio w API endpoints lub Astro pages
+- Używaj typów z `src/db/database.types.ts`, nie z `@supabase/supabase-js`
+- Row Level Security (RLS) jest wymagane dla wszystkich tabel
+- Wszystkie operacje na bazie danych powinny respektować polityki RLS
+
+## Server-Side Access Pattern
+
+```typescript
+// ✅ DO: W API endpoint
+export const POST: APIRoute = async ({ request, cookies }) => {
+  const supabase = createSupabaseServerInstance({
+    cookies,
+    headers: request.headers,
+  });
+  // ...
+};
+
+// ❌ NIE RÓB: Import bezpośredni
+import { supabaseClient } from '../../db/supabase.client.ts';
+```
+
+## API Endpoints Conventions
+
+- **HTTP Methods:** Używaj `POST`, `GET` w wielkich literach
+- **Prerender:** `export const prerender = false` dla wszystkich API routes
+- **Walidacja:** Używaj schematów **Zod** do walidacji wszystkich danych wejściowych
+- **Error Responses:** Zwracaj strukturyzowane błędy: `{ error: { code, message, details } }`
+- **Response Format:** Używaj `snake_case` w odpowiedziach API dla zgodności z backendem
+- **Environment:** Używaj `import.meta.env` zamiast `process.env` (kompatybilne z Cloudflare Workers)
+
+## Cookie Management
+
+**VERY IMPORTANT:**
+- Używaj `@supabase/ssr` package (NIE auth-helpers)
+- Używaj TYLKO `getAll()` i `setAll()` dla zarządzania cookies
+- **NIGDY** nie używaj pojedynczych metod `get`, `set`, lub `remove`
+- Proper cookie options: `httpOnly: true`, `secure: true`, `sameSite: 'lax'`
+
+## Authentication Flow
+
+### Core Requirements
+
+1. Use `@supabase/ssr` package (NOT auth-helpers)
+2. Use ONLY `getAll` and `setAll` for cookie management
+3. NEVER use individual `get`, `set`, or `remove` cookie methods
+4. Implement proper session management with middleware based on JWT (Supabase Auth)
+5. Always get user session first before any other operations
+
+### Middleware Implementation
+
+```typescript
+export const onRequest = defineMiddleware(async ({ locals, cookies, url, request, redirect }, next) => {
+  // Skip auth check for public paths
+  if (PUBLIC_PATHS.includes(url.pathname)) {
+    return next();
+  }
+
+  const supabase = createSupabaseServerInstance({
+    cookies,
+    headers: request.headers,
+  });
+
+  // IMPORTANT: Always get user session first
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (user) {
+    locals.user = { email: user.email, id: user.id };
+  } else if (!PUBLIC_PATHS.includes(url.pathname)) {
+    return redirect('/auth/login');
+  }
+
+  return next();
+});
+```
+
+### Common Pitfalls
+
+1. ❌ NIE używaj pojedynczych metod cookie (get/set/remove)
+2. ❌ NIE importuj z @supabase/auth-helpers-nextjs
+3. ❌ NIE pomijaj auth.getUser() w middleware
+4. ❌ NIE modyfikuj logiki cookie handling
+5. ✅ Zawsze obsługuj zmiany stanu autentykacji prawidłowo
+
+## Database Migrations
+
+### Creating Migrations
+
+**File naming convention:** `YYYYMMDDHHmmss_short_description.sql` (UTC time)
+
+Example: `20240906123045_create_profiles.sql`
+
+### SQL Guidelines
+
+- Pisuj SQL w **lowercase**
+- Dodaj header comment z metadata o migracji
+- Dodaj szczegółowe komentarze dla każdego kroku
+- Dodaj obfite komentarze dla destructive SQL (truncate, drop, alter column)
+- **ZAWSZE** włącz Row Level Security (RLS) przy tworzeniu nowej tabeli
+
+### RLS Policies
+
+- Zapewnij, że polityki pokrywają wszystkie relevant access scenarios (select, insert, update, delete)
+- Jeżeli tabela jest public, polityka może zwrócić `true`
+- Polityki powinny być granularne: jedna dla `select`, jedna dla `insert` itd.
+- Dla każdej supabase role (`anon` i `authenticated`) osobna polityka
+- **NIE ŁĄCZ** polityk, nawet jeśli functionality jest taka sama dla obu ról
+- Dodaj komentarze wyjaśniające rację i expected behavior każdej polityki
+
+## Security Best Practices
+
+- Ustaw proper cookie options (httpOnly, secure, sameSite)
+- Nie eksponuj Supabase integration & keys w client-side components
+- Waliduj wszystkie user input server-side
+- Używaj proper error handling i logging
+- Zasada najmniejszych uprawnień - grant only necessary permissions
+
+## Environment Variables
+
+- Używaj `import.meta.env` zamiast `process.env` (Cloudflare Workers)
+- Aktualizuj `src/env.d.ts` przy dodawaniu nowych zmiennych
+- Aktualizuj `.env.example` zgodnie ze zmianami
+
+**Required Variables:**
+- `SUPABASE_URL` - Supabase project URL
+- `SUPABASE_KEY` - Supabase anonymous key
+- `SUPABASE_SERVICE_KEY` - Supabase service role key (server-side only)

@@ -10,10 +10,11 @@ QA Toolsmith to otwartoźródłowa aplikacja internetowa dla testerów oprogramo
 
 ## Tech Stack
 
-- **Framework:** Astro 5 (SSR)
+- **Framework:** Astro 5 (SSR) z adapterem `@astrojs/cloudflare` dla Cloudflare Pages
 - **UI:** React 19 z TypeScript 5
 - **Stylowanie:** Tailwind 4 i shadcn/ui
 - **Backend:** Supabase (PostgreSQL, Auth)
+- **Hosting:** Cloudflare Pages (SSR z Workers)
 - **Testowanie:** Vitest (testy jednostkowe), Playwright (testy E2E)
 
 ## Project Structure
@@ -38,4 +39,31 @@ Zawsze przestrzegaj poniższej struktury katalogów:
 4.  **Obsługa Błędów i Czysty Kod:**
     - Priorytetyzuj obsługę błędów. Używaj "guard clauses" i wczesnych `return`, aby obsługiwać błędy na początku funkcji.
     - Unikaj zagnieżdżonych instrukcji `if` oraz zbędnych bloków `else`.
+    - Wykorzystuj linter feedback do poprawy kodu przy wprowadzaniu zmian.
 5.  **Testowanie:** Dodawaj testy jednostkowe Vitest dla nowej logiki w `src/lib/`. Dodawaj testy E2E Playwright dla nowych przepływów użytkownika.
+6.  **Backend i Supabase:** 
+    - Używaj typów z `src/db/database.types.ts`, nie z `@supabase/supabase-js`
+    - Row Level Security (RLS) jest wymagane dla wszystkich tabel
+    - Wszystkie operacje na bazie danych powinny respektować polityki RLS
+7.  **Stylowanie:**
+    - Używaj Tailwind CSS z klasami utility-first
+    - Implementuj responsywność z breakpointami (sm:, md:, lg:)
+    - Wykorzystuj varianty dark mode (dark:)
+8.  **Dostępność (a11y):**
+    - Minimalne wymagania: focus visible, labels dla pól formularzy, cele dotykowe ≥40px
+    - Używaj landmarków ARIA dla głównych regionów strony
+    - Testuj nawigację klawiaturową
+9.  **API Endpoints:**
+    - Używaj metod HTTP: POST, GET w wielkich literach
+    - Ustaw `export const prerender = false` dla wszystkich API routes
+    - Zwracaj strukturyzowane błędy: `{ error: { code, message, details } }`
+    - Używaj snake_case w odpowiedziach API dla zgodności z backendem
+10. **Environment Variables:**
+    - Używaj `import.meta.env` zamiast `process.env` (kompatybilne z Cloudflare Workers)
+    - Aktualizuj `src/env.d.ts` przy dodawaniu nowych zmiennych
+    - Aktualizuj `.env.example` zgodnie ze zmianami
+
+📚 **Szczegółowe wytyczne:**
+- **Frontend:** Zobacz `frontend-coding.mdc` dla szczegółów Astro, React, Tailwind, shadcn/ui
+- **Backend:** Zobacz `backend-api.mdc` dla Supabase, API, migracji, RLS
+- **Planowanie:** Zobacz `planning.mdc` dla PRD, user stories, MVP scope

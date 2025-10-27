@@ -1,0 +1,113 @@
+---
+description: Frontend coding standards for Astro, React, Tailwind, and shadcn/ui.
+globs: ["src/components/**", "src/pages/**", "src/layouts/**", "src/lib/hooks/**"]
+alwaysApply: false
+---
+
+# Frontend Coding Standards
+
+QA Toolsmith uses Astro 5 with React 19 for interactive components.
+
+## Astro vs React Rule
+
+**Podstawowa zasada:** Używaj Astro dla statyki, React dla interaktywności.
+
+✅ **DO:**
+- Astro components (`.astro`) dla layoutów, stron statycznych
+- React components (`.tsx`) TYLKO gdy potrzebna interaktywność klienta
+- View Transitions API dla smooth page transitions
+- Image optimization z Astro Image integration
+- Hybrid rendering z SSR gdzie potrzebne
+
+❌ **NIE RÓB:**
+- React dla prostych podstron
+- Astro dla kompleksowych formularzy z wieloma stanami
+- "use client" directive (to Next.js, nie Astro)
+- Nie używaj `use client` ani innych dyrektyw Next.js
+
+## Project Structure
+
+- `src/pages/`: Astro pages (`.astro`) i API endpoints (`.ts`)
+- `src/components/`: React components (`.tsx`) z logiką klienta
+- `src/components/ui/`: Komponenty shadcn/ui
+- `src/layouts/`: Astro layouts
+
+## Astro Guidelines
+
+- **Server Endpoints:** Używaj `POST`, `GET` w wielkich literach dla handlerów
+- **Prerender:** Ustaw `export const prerender = false` dla wszystkich API routes
+- **Walidacja:** Używaj Zod do walidacji danych wejściowych w API routes
+- **Services:** Wydziel logikę do serwisów w `src/lib/services`
+- **Middleware:** Implementuj middleware dla modyfikacji request/response
+- **Cookies:** Używaj `Astro.cookies` dla zarządzania cookies serwer-side
+- **Environment:** Używaj `import.meta.env` dla zmiennych środowiskowych
+- **Middleware:** Never skip the auth.getUser() call in authentication middleware
+
+## React Guidelines
+
+- **Functional Components:** Używaj komponentów funkcyjnych z hooks zamiast klasowych
+- **Custom Hooks:** Wydziel logikę do custom hooks w `src/components/hooks`
+- **Performance:** 
+  - Używaj `React.memo()` dla kosztownych komponentów renderujących się często
+  - Używaj `React.lazy()` i `Suspense` dla code-splitting
+  - Używaj `useCallback` dla event handlers przekazywanych do dzieci
+  - Używaj `useMemo` dla kosztownych obliczeń
+- **Accessibility:**
+  - Używaj `useId()` dla generowania unikalnych ID dla atrybutów accessibility
+- **Optimistic Updates:**
+  - Używaj `useOptimistic` dla optimistic UI updates w formularzach
+  - Używaj `useTransition` dla nie-urgentnych aktualizacji stanu
+
+## Tailwind CSS
+
+- **Layer Directive:** Używaj `@layer` do organizowania stylów (components, utilities, base)
+- **Arbitrary Values:** Używaj square brackets (np. `w-[123px]`) dla precise one-off designs
+- **Dark Mode:** Implementuj dark mode z variantem `dark:`
+- **Responsive:** Używaj responsive variants (`sm:`, `md:`, `lg:`) dla adaptive designs
+- **State Variants:** Wykorzystuj state variants (`hover:`, `focus-visible:`, `active:`)
+- **Config:** Implementuj Tailwind config file dla customizacji theme, plugins, variants
+- **Theme Function:** Wykorzystuj funkcję `theme()` w CSS dla dostępu do Tailwind theme values
+
+## Accessibility (a11y)
+
+**Minimalne wymagania:**
+- Focus visible na wszystkich interaktywnych elementach
+- Labels dla wszystkich pól formularzy
+- Cele dotykowe ≥40px
+- Wykorzystuj landmarky ARIA (main, navigation, search)
+- Testuj nawigację klawiaturową
+
+**ARIA Best Practices:**
+- Używaj `aria-expanded` i `aria-controls` dla expandable content (accordions, dropdowns)
+- Używaj `aria-live` regions z odpowiednimi politeness settings dla dynamic content
+- Używaj `aria-hidden` do ukrywania decorative content od screen readers
+- Używaj `aria-label` lub `aria-labelledby` dla elementów bez visible labels
+- Używaj `aria-describedby` do asocjowania descriptive text z form inputs
+- Używaj `aria-current` dla wskazania current item w nav/set
+- Nie używaj redundantnego ARIA, które duplikuje semantykę native HTML
+
+## shadcn/ui Components
+
+**Użycie komponentów:**
+Importuj komponenty zgodnie z aliasem `@/`:
+```tsx
+import { Button } from "@/components/ui/button"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+```
+
+**Instalowanie komponentów:**
+Używaj shadcn CLI:
+```bash
+npx shadcn@latest add [component-name]
+```
+
+**Ważne:** `npx shadcn-ui@latest` zostało wycofane. Używaj `npx shadcn@latest`.
+
+Popularne komponenty: Accordion, Alert, AlertDialog, AspectRatio, Avatar, Calendar, Checkbox, Collapsible, Command, ContextMenu, DataTable, DatePicker, Dropdown Menu, Form, Hover Card, Menubar, Navigation Menu, Popover, Progress, Radio Group, ScrollArea, Select, Separator, Sheet, Skeleton, Slider, Switch, Table, Textarea, Sonner (previously Toast), Toggle, Tooltip.
+
+**Stylowanie:**
+Projekt wykorzystuje wariant stylu „new-york” z kolorem bazowym "neutral" i zmiennymi CSS do tworzenia motywów, zgodnie z konfiguracją w `components.json`.
+
+**Lokalizacja:**
+Komponenty są dostępne w folderze `src/components/ui`, zgodnie z aliasami z pliku `components.json`.

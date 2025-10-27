@@ -1,0 +1,156 @@
+---
+description: PRD, user stories, and planning guidelines for feature development.
+globs: ["**/*"]
+alwaysApply: false
+---
+
+# Planning & Requirements Reference
+
+## Product Overview
+
+QA Toolsmith to otwartoźródłowa aplikacja webowa dla testerów oprogramowania, która standaryzuje ich codzienne zadania, takie jak raportowanie błędów, testy eksploracyjne i generowanie danych testowych.
+
+## Tech Stack Summary
+
+- **Framework:** Astro 5 (SSR) z adapterem `@astrojs/cloudflare` dla Cloudflare Pages
+- **UI:** React 19 z TypeScript 5
+- **Stylowanie:** Tailwind 4 i shadcn/ui
+- **Backend:** Supabase (PostgreSQL, Auth)
+- **Hosting:** Cloudflare Pages (SSR z Workers)
+- **Testowanie:** Vitest (testy jednostkowe), Playwright (testy E2E)
+
+## MVP Scope (v0.0.1)
+
+### ✅ Completed Features
+
+#### 1. Authentication & Roles
+- Email/password sign-in/out
+- Admin & User roles (first Admin seeded)
+- Login rate limiting and temporary lockout
+
+#### 2. Data Generators & Validators
+- **IBAN Generator & Validator**: Full implementation for Germany (DE) and Austria (AT)
+  - Deterministic generation with optional seed
+  - Luhn algorithm validation
+  - Comprehensive test suite (1000+ test cases)
+
+#### 3. Testing & CI/CD
+- **Unit tests**: 1167 tests across 34 test files
+- **E2E tests**: 10 Playwright tests
+- **CI/CD**: GitHub Actions pipeline
+
+### 🚧 In Development
+
+#### 4. Defect Report Templates
+- UI & API bug presets with required fields
+- Global templates managed by Admin; Users can fork & customize
+- Markdown export & "Copy to clipboard" button
+
+#### 5. Exploration Charter
+- Charters with Goal, Hypotheses, Notes (tags: bug / idea / question / risk)
+- Start/Stop timer, keyboard shortcuts (Alt+N, Alt+T, Alt+S)
+- Autosave (localStorage every 5 s, DB on close)
+- Markdown export & session history
+
+#### 6. Knowledge Base
+- CRUD for links with canonicalization & deduplication
+- Multiple notes per link, tag support
+- Full-text search (Postgres FTS) & tag filtering
+- JSON export of entries
+
+### 📋 Planned
+
+#### 7. Additional Data Generators
+- Phone numbers (DE/AT/PL)
+- Addresses (DE/AT/PL)
+- License plates (DE/AT/PL)
+- Email addresses
+- Company names
+- Payment cards (Visa, Mastercard with Luhn checksum)
+- GUIDs/UUIDs
+- Random strings with custom patterns
+
+#### 8. AI Assistant
+- "Improve / Expand" actions for descriptions, steps, notes
+- Diff preview with accept/reject
+- Per-user daily limit, dry-run & manual fallback
+- Integration with Openrouter.ai
+
+## Project Structure
+
+- `src/pages/`: Astro pages (`.astro`) i API endpoints (`.ts`)
+- `src/components/`: React components (`.tsx`) z interaktywnością
+- `src/components/ui/`: Komponenty shadcn/ui
+- `src/layouts/`: Główne układy stron Astro
+- `src/lib/`: Logika biznesowa (services/, utils/, hooks/)
+- `src/db/`: Klient Supabase i typy bazy danych
+- `src/middleware/`: Middleware Astro do autentykacji
+- `src/__tests__/`: Testy jednostkowe Vitest
+- `e2e/`: Testy End-to-End Playwright
+
+## Key User Stories (MVP)
+
+**Authentication & Roles:**
+- US-001: Rejestracja konta (email/password, auto-login)
+- US-002: Logowanie i sesja (rate limiting, password reset, read-only access)
+- US-003: Zarządzanie rolami (admin/user, global templates)
+
+**Templates:**
+- US-004: Presety raportów defektów (UI/API bug, Markdown export)
+- US-005: Fork i edycja szablonu (user-scoped templates)
+
+**Exploration:**
+- US-006: Exploration Charter (goal, hypotheses, notes, timer, shortcuts Alt+N/T/S)
+- US-007: Knowledge Base (CRUD, canonicalization, deduplication, FTS search)
+
+**Generators:**
+- US-008: Walidator IBAN DE/AT (mod-97 algorithm)
+- US-009: Generator IBAN DE/AT z deterministic seed
+- US-010: Other local data generators (phone, address, plates, etc.)
+
+**Additional Features:**
+- US-011: Wyszukiwanie i filtrowanie KB (FTS, tags)
+- US-012: AI Assistant (Improve/Expand, daily limit, diff preview)
+- US-013: Error handling (offline, duplicates, session expiry)
+- US-014: Export (charters to Markdown, KB to JSON)
+
+**📚 Pełne szczegóły:** See `.ai/prd.md` for complete user stories with acceptance criteria.
+
+## Architecture Reference
+
+**Database Tables:**
+- `profiles`, `templates`, `charters`, `charter_notes`
+- `kb_entries`, `kb_notes`, `ai_invocations`, `ai_daily_usage`
+- `usage_events`, `drafts` (optional)
+
+**Key Endpoints:**
+- `/api/health` - Health check
+- `/api/auth/login` - Authentication
+- `/api/templates` - Template management (global + forked)
+- `/api/charters` - Exploration sessions
+- `/api/kb` - Knowledge Base CRUD
+- `/api/generators/iban` - IBAN generation/validation
+
+**📚 Pełne szczegóły:** See `.ai/ARCHITECTURE.md` for complete API specs, database schema, UI architecture, and testing strategy.
+
+## Development Guidelines
+
+### Before Starting Work
+
+- ✅ Sprawdź czy request dotyczy MVP scope (US-001 do US-014)
+- ✅ Zweryfikuj czy feature jest już complete, in development, lub planned
+- ✅ Sprawdź architecturę i strukturę API w `.ai/ARCHITECTURE.md`
+- ✅ Upewnij się że wszystkie dependencies są zainstalowane
+
+### Feature Development Priority
+
+1. **MVP Features First**: Focus na completion US-007, US-008, US-009
+2. **Testing**: Dodaj unit tests dla nowej logiki, E2E dla user flows
+3. **Documentation**: Aktualizuj README i docs/ przy zmianach architektury
+
+### Deployment Considerations
+
+- Cloudflare Pages integration (Git-based deployments)
+- Environment variables configuration
+- SSR compatibility verification
+- Performance optimization (Worker limits)
