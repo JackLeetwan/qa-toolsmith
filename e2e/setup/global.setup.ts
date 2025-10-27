@@ -12,9 +12,15 @@
 async function globalSetup() {
   console.log("🚀 Starting E2E Global Setup...");
   console.log("🔍 Environment check:");
-  console.log(
-    `   - SUPABASE_URL: ${process.env.SUPABASE_URL ? "✅ Set" : "❌ Missing"}`,
-  );
+  
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const urlDisplay = supabaseUrl 
+    ? (supabaseUrl.includes('localhost') || supabaseUrl.includes('127.0.0.1') 
+        ? `⚠️ LOCALHOST (${supabaseUrl})`
+        : `✅ CLOUD (${supabaseUrl.split('.')[0]}.supabase.co)`)
+    : '❌ MISSING';
+  
+  console.log(`   - SUPABASE_URL: ${urlDisplay}`);
   console.log(
     `   - SUPABASE_KEY: ${process.env.SUPABASE_KEY ? "✅ Set" : "❌ Missing"}`,
   );
