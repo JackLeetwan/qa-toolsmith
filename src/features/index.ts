@@ -31,10 +31,11 @@ function loadFeatureFlags(): FeatureFlags {
     return flags;
   }
 
-  const ENV_NAME = import.meta.env.ENV_NAME as EnvName;
+  // Try ENV_NAME first, fallback to production for Cloudflare Pages
+  const ENV_NAME = (import.meta.env.ENV_NAME || "production") as EnvName;
 
-  if (!ENV_NAME || !["local", "integration", "production"].includes(ENV_NAME)) {
-    // Return safe defaults when ENV_NAME is null or invalid
+  if (!["local", "integration", "production"].includes(ENV_NAME)) {
+    // Return safe defaults when ENV_NAME is invalid
     flags = getSafeDefaultFlags();
     return flags;
   }
