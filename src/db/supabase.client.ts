@@ -58,21 +58,25 @@ export const createSupabaseServerInstance = (context: {
 };
 
 // Legacy client for backward compatibility
-const supabaseUrl = import.meta.env.SUPABASE_URL || "https://dummy.supabase.co";
-const supabaseAnonKey = import.meta.env.SUPABASE_KEY || "dummy-key";
+// Note: This is NOT used anywhere in the codebase but kept for backward compatibility
+// Returns null when env vars are missing to prevent crashes
+const supabaseUrl = import.meta.env.SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.SUPABASE_KEY;
 
-export const supabaseClient = createServerClient<Database>(
-  supabaseUrl,
-  supabaseAnonKey,
-  {
-    cookieOptions,
-    cookies: {
-      getAll() {
-        return [];
+export const supabaseClient = (supabaseUrl && supabaseAnonKey)
+  ? createServerClient<Database>(
+      supabaseUrl,
+      supabaseAnonKey,
+      {
+        cookieOptions,
+        cookies: {
+          getAll() {
+            return [];
+          },
+          setAll() {
+            // No-op for legacy client
+          },
+        },
       },
-      setAll() {
-        // No-op for legacy client
-      },
-    },
-  },
-);
+    )
+  : null;
