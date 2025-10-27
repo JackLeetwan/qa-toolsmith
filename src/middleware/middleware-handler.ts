@@ -14,10 +14,36 @@ export async function middlewareHandler(
   logger.info("🛡️ Middleware processing:", { pathname, method, timestamp });
 
   // Create supabase client
-  const supabase = createSupabaseServerInstance({
-    cookies: context.cookies,
-    headers: context.request.headers,
-  });
+  let supabase;
+  try {
+    supabase = createSupabaseServerInstance({
+      cookies: context.cookies,
+      headers: context.request.headers,
+    });
+  } catch (error) {
+    logger.error("❌ Failed to create Supabase client:", error);
+    
+    // For public paths, continue without Supabase
+    if (pathname === "/" || pathname.startsWith("/api/health") || pathname.startsWith("/api/env-check")) {
+      logger.warn("⚠️ Continuing without Supabase for public path:", pathname);
+      return next();
+    }
+    
+    // For protected paths, return error
+    return new Response(
+      JSON.stringify({
+        error: {
+          code: "CONFIGURATION_ERROR",
+          message: "Server configuration error. Please contact administrator.",
+          details: error instanceof Error ? error.message : String(error),
+        },
+      }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      },
+    );
+  }
 
   // Set supabase client in locals
   context.locals.supabase = supabase;

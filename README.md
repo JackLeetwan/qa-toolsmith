@@ -69,9 +69,10 @@ For detailed technical stack and deployment configuration, see [docs/tech-stack.
 
 ### Required Environment Variables
 - `SUPABASE_URL` - Supabase project URL
-- `SUPABASE_ANON_KEY` - Supabase anonymous key
-- `SUPABASE_SERVICE_ROLE_KEY` - Supabase service role key (server-side only)
+- `SUPABASE_KEY` - Supabase anonymous key (note: not SUPABASE_ANON_KEY)
+- `SUPABASE_SERVICE_KEY` - Supabase service role key (server-side only)
 - `OPENROUTER_API_KEY` - AI integration key (optional)
+- `ENV_NAME` - Environment name (local, integration, or production)
 
 ### Environment Files
 - `.env` - Local development

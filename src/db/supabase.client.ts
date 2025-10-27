@@ -22,9 +22,23 @@ export const createSupabaseServerInstance = (context: {
   headers: Headers;
   cookies: AstroCookies;
 }) => {
+  const supabaseUrl = import.meta.env.SUPABASE_URL;
+  const supabaseKey = import.meta.env.SUPABASE_KEY;
+
+  if (!supabaseUrl || !supabaseKey) {
+    const missingVars = [];
+    if (!supabaseUrl) missingVars.push("SUPABASE_URL");
+    if (!supabaseKey) missingVars.push("SUPABASE_KEY");
+    
+    throw new Error(
+      `Missing Supabase environment variables: ${missingVars.join(", ")}. ` +
+      "Please ensure these are set in Cloudflare Pages environment variables."
+    );
+  }
+
   const supabase = createServerClient<Database>(
-    import.meta.env.SUPABASE_URL,
-    import.meta.env.SUPABASE_KEY,
+    supabaseUrl,
+    supabaseKey,
     {
       cookieOptions,
       cookies: {

@@ -3,7 +3,8 @@ import Welcome from "../components/Welcome.astro";
 import PublicLayout from "../layouts/PublicLayout.astro";
 
 // Get user from Astro.locals (set by middleware)
-const { user } = Astro.locals;
+// Gracefully handle missing user data
+const user = Astro.locals.user;
 ---
 
 <PublicLayout
