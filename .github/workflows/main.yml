@@ -126,12 +126,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Build for E2E (Node adapter)
-        run: npx astro build
+        run: npm run build:node
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
           ENV_NAME: production
-          # Not setting ASTRO_TARGET to use Node adapter instead of Cloudflare
       - name: Install Playwright browsers
         run: npx playwright install chromium
       - name: Start preview server

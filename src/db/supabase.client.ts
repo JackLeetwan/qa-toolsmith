@@ -35,19 +35,34 @@ export const createSupabaseServerInstance = (context: {
   const supabaseKey =
     import.meta.env.SUPABASE_KEY || nodeProcess?.env?.SUPABASE_KEY;
 
-  // Debug logging in all modes to diagnose CI issues
+  // Comprehensive debug logging in all modes to diagnose environment issues
   // eslint-disable-next-line no-console
-  console.log("🔍 DEBUG SUPABASE CLIENT:", {
-    url: supabaseUrl || "❌ MISSING",
-    urlType: supabaseUrl
-      ? supabaseUrl.includes("localhost") || supabaseUrl.includes("127.0.0.1")
-        ? "⚠️ LOCALHOST"
-        : "✅ CLOUD"
-      : "N/A",
-    key: supabaseKey ? `${supabaseKey.substring(0, 20)}...` : "❌ MISSING",
-    nodeEnv: import.meta.env.MODE,
-    dev: import.meta.env.DEV,
-    source: import.meta.env.SUPABASE_URL ? "import.meta.env" : "process.env",
+  console.log("🔍 DEBUG SUPABASE CLIENT INIT:", {
+    timestamp: new Date().toISOString(),
+    environment: {
+      mode: import.meta.env.MODE,
+      prod: import.meta.env.PROD,
+      dev: import.meta.env.DEV,
+      envName: import.meta.env.ENV_NAME,
+    },
+    supabaseUrl: {
+      fromImportMeta: import.meta.env.SUPABASE_URL ? "✅ Set" : "❌ Missing",
+      fromProcessEnv: nodeProcess?.env?.SUPABASE_URL ? "✅ Set" : "❌ Missing",
+      final: supabaseUrl ? (supabaseUrl.includes("localhost") || supabaseUrl.includes("127.0.0.1") ? "⚠️ LOCALHOST" : "✅ CLOUD") : "❌ MISSING",
+      value: supabaseUrl || "❌ NOT SET",
+    },
+    supabaseKey: {
+      fromImportMeta: import.meta.env.SUPABASE_KEY ? "✅ Set" : "❌ Missing",
+      fromProcessEnv: nodeProcess?.env?.SUPABASE_KEY ? "✅ Set" : "❌ Missing",
+      final: supabaseKey ? `✅ Set (${supabaseKey.substring(0, 20)}...)` : "❌ MISSING",
+    },
+    processAvailable: {
+      exists: typeof process !== 'undefined' ? "✅ Yes" : "❌ No",
+      env: nodeProcess?.env ? "✅ Yes" : "❌ No",
+    },
+    globalThis: {
+      process: nodeProcess ? "✅ Available" : "❌ Not available",
+    }
   });
 
   if (!supabaseUrl || !supabaseKey) {

@@ -24,215 +24,143 @@ Error: connect ECONNREFUSED 127.0.0.1:54321
 
 In Astro SSR with Node adapter, there are two runtime environments:
 1. **Cloudflare Workers** (production) - uses `import.meta.env` automatically
-2. **Node.js Runtime** (CI E2E tests) - requires explicit handling
+2. **Node.js Runtime** (CI E2E tests) - requires explicit handling of `process.env`
 
-The problem is that `vite.define` in `astro.config.mjs` performs **build-time substitution**:
+The problem was that `vite.define` in `astro.config.mjs` performs **build-time substitution**:
 - When `process.env.SUPABASE_URL` is undefined at build time → gets embedded as literal `undefined` in the build
 - Runtime environment variables are NOT accessible through `import.meta.env` in Node adapter
+- Vite strips `process` references during bundling for browser compatibility
 
-### Attempted Solutions (Chronological)
+### Root Cause Identified
 
-#### 1. Initial Approach: Added SUPABASE vars to vite.define ❌
-```javascript
-define: {
-  "import.meta.env.SUPABASE_URL": JSON.stringify(process.env.SUPABASE_URL),
-  "import.meta.env.SUPABASE_KEY": JSON.stringify(process.env.SUPABASE_KEY),
-}
-```
-**Problem:** Hardcodes `undefined` at build time, runtime vars inaccessible.
+**The CI build was using Cloudflare adapter instead of Node adapter!**
 
-#### 2. Second Approach: Added process.env fallback ❌
-```javascript
-const supabaseUrl = import.meta.env.SUPABASE_URL || process.env.SUPABASE_URL;
-```
-**Problem:** Vite strips `process` references during bundling for browser compatibility.
-
-#### 3. Current Approach: globalThis.process fallback 🟡
-```javascript
-const nodeProcess = (globalThis as any).process || undefined;
-const supabaseUrl = import.meta.env.SUPABASE_URL || nodeProcess?.env?.SUPABASE_URL;
-```
-**Status:** Still failing - likely need to investigate further.
-
-## Current Implementation
-
-### Key Files Modified
-
-#### 1. `src/db/supabase.client.ts` (Lines 29-52)
-```typescript
-export const createSupabaseServerInstance = (context: {
-  headers: Headers;
-  cookies: AstroCookies;
-}) => {
-  // Try import.meta.env first (works in Cloudflare), fallback to process.env (works in Node adapter runtime)
-  // Get process from globalThis to work around Vite bundling
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const nodeProcess = (globalThis as any).process || undefined;
-  const supabaseUrl = import.meta.env.SUPABASE_URL || nodeProcess?.env?.SUPABASE_URL;
-  const supabaseKey = import.meta.env.SUPABASE_KEY || nodeProcess?.env?.SUPABASE_KEY;
-
-  // Debug logging in all modes to diagnose CI issues
-  // eslint-disable-next-line no-console
-  console.log("🔍 DEBUG SUPABASE CLIENT:", {
-    url: supabaseUrl || "❌ MISSING",
-    urlType: supabaseUrl
-      ? supabaseUrl.includes("localhost") || supabaseUrl.includes("127.0.0.1")
-        ? "⚠️ LOCALHOST"
-        : "✅ CLOUD"
-      : "N/A",
-    key: supabaseKey ? `${supabaseKey.substring(0, 20)}...` : "❌ MISSING",
-    nodeEnv: import.meta.env.MODE,
-    dev: import.meta.env.DEV,
-    source: import.meta.env.SUPABASE_URL ? "import.meta.env" : "process.env",
-  });
-
-  if (!supabaseUrl || !supabaseKey) {
-    const missingVars = [];
-    if (!supabaseUrl) missingVars.push("SUPABASE_URL");
-    if (!supabaseKey) missingVars.push("SUPABASE_KEY");
-
-    throw new Error(
-      `Missing Supabase environment variables: ${missingVars.join(", ")}. ` +
-        "Please ensure these are set in Cloudflare Pages environment variables.",
-    );
-  }
-
-  const supabase = createServerClient<Database>(supabaseUrl, supabaseKey, {
-    // ... configuration
-  });
-
-  return supabase;
-};
-```
-
-#### 2. `astro.config.mjs` (Lines 38-43)
-```javascript
-// Note: We only define ENV_NAME here as it's needed for client-side feature flags
-// SUPABASE_URL and SUPABASE_KEY are accessed via process.env fallback in runtime
-// (vite.define hardcodes values at build time, making runtime env vars unavailable)
-define: {
-  "import.meta.env.ENV_NAME": JSON.stringify(process.env.ENV_NAME),
-},
-```
-
-### CI Configuration
-
-#### `.github/workflows/main.yml` - E2E Job
-Environment variables are correctly set in the workflow:
+In `.github/workflows/main.yml` E2E job:
 ```yaml
 - name: Build for E2E (Node adapter)
-  run: npx astro build
-  env:
-    SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-    SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-    ENV_NAME: production
+  run: npx astro build  # ❌ This uses ASTRO_TARGET=cloudflare from package.json
+```
 
-- name: Start preview server
-  env:
-    SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-    SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-    ENV_NAME: production
+But `package.json` defines:
+```json
+"build": "ASTRO_TARGET=cloudflare astro build"
+```
 
-- name: Run E2E tests
-  run: npm run test:e2e
+So when CI ran `astro build` without environment variables, it was still building with Cloudflare adapter.
+
+## Solution Implemented
+
+### 1. Created separate build script for Node adapter
+**File: `package.json`**
+```json
+"build": "ASTRO_TARGET=cloudflare astro build",
+"build:node": "astro build",
+"preview": "node scripts/preview.js",
+```
+
+### 2. Updated CI workflow to use Node build script
+**File: `.github/workflows/main.yml` (line 129)**
+```yaml
+- name: Build for E2E (Node adapter)
+  run: npm run build:node
   env:
     SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
     SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
     ENV_NAME: production
 ```
 
-## Debugging Notes
+### 3. Created preview script that loads dotenv
+**File: `scripts/preview.js`**
 
-### Missing Debug Output
+This script:
+1. Loads environment variables via `dotenv` at runtime
+2. Then imports the Astro entry point
+3. Ensures env vars are available in `process.env` before any code needs them
 
-The debug log at line 38-47 in `src/db/supabase.client.ts` is **NOT appearing** in CI logs. This suggests:
-1. The build might not include the latest code
-2. The code path might not be executing
-3. Console.log might be suppressed in the build
+```javascript
+import('dotenv').then(({ config }) => {
+  config();  // Load env vars from .env file
+  console.log('✅ Environment variables loaded via dotenv');
+  
+  // Now import server entry point
+  import('../dist/server/entry.mjs').then((module) => {
+    // Entry point auto-starts via serverEntrypointModule['start']
+  });
+});
+```
 
-### Key Questions to Investigate
+### 4. Enhanced Supabase client with diagnostic logging
+**File: `src/db/supabase.client.ts`**
 
-1. **Where is `127.0.0.1:54321` coming from?**
-   - Is it hardcoded somewhere in Supabase config?
-   - Is it a default fallback when env vars are undefined?
-   - Check `supabase/config.toml` for localhost references
+Added comprehensive debug output showing:
+- Where env vars come from (import.meta.env vs process.env)
+- Whether they're localhost or cloud URLs
+- Whether process is available in globalThis
+- Timestamp and environment mode
 
-2. **Why is debug logging not appearing?**
-   - Check if the build includes latest code
-   - Verify console.log works in Node adapter runtime
-   - Check if there's logging suppression
-
-3. **Is `globalThis.process` actually accessible in runtime?**
-   - Node.js adapter might need a different approach
-   - Consider using Astro's runtime context API
-
-## Potential Solutions to Try
-
-### Solution 1: Use Astro's Runtime Environment API
-Astro 5 provides `context.locals.runtime.env` for Cloudflare, but Node adapter might need a different approach.
-
-### Solution 2: Pass Variables via Astro API Context
-Instead of global variables, pass env vars explicitly through Astro's context object.
-
-### Solution 3: Use dotenv at Runtime
-Load environment variables explicitly using dotenv when running Node adapter:
 ```typescript
-import dotenv from 'dotenv';
-dotenv.config();
-const supabaseUrl = process.env.SUPABASE_URL;
+console.log("🔍 DEBUG SUPABASE CLIENT INIT:", {
+  timestamp: new Date().toISOString(),
+  environment: { mode, prod, dev, envName },
+  supabaseUrl: {
+    fromImportMeta: "...",
+    fromProcessEnv: "...",
+    final: "..."
+  },
+  processAvailable: {...}
+});
 ```
 
-### Solution 4: Conditional Build for E2E
-Build with different approach for E2E tests that preserves `process.env` access.
+## Current Status
 
-### Solution 5: Check Supabase Client Initialization
-Investigate if `@supabase/supabase-js` is falling back to localhost when URL is invalid/undefined.
+### Changes Made
+✅ Fixed build script in `package.json`
+✅ Updated CI workflow to use correct build
+✅ Created Node runtime wrapper with dotenv loading
+✅ Added enhanced diagnostic logging
 
-## Testing Locally
+### Testing Status
+✅ `npm run build:node` builds successfully with Node adapter
+✅ `npm run preview` starts server and loads env vars via dotenv
+✅ Server listens on http://localhost:3000
 
-To replicate the issue locally:
-```bash
-# Set environment variables
-export SUPABASE_URL="https://your-project.supabase.co"
-export SUPABASE_KEY="your-anon-key"
-export ENV_NAME="production"
+## How It Works Now
 
-# Build with Node adapter (not Cloudflare)
-npx astro build
-npm run preview
+1. **In CI:**
+   - CI builds with `npm run build:node` → uses Node adapter
+   - CI sets SUPABASE_URL and SUPABASE_KEY as environment variables
+   - CI runs `npm run preview` which calls `scripts/preview.js`
+   - `preview.js` loads dotenv + imports entry.mjs
+   - Supabase client reads env vars from `process.env`
 
-# Run E2E tests
-npm run test:e2e
-```
+2. **Locally:**
+   - `.env` file has SUPABASE_URL and SUPABASE_KEY
+   - `npm run build:node` builds with Node adapter
+   - `npm run preview` runs `scripts/preview.js`
+   - `preview.js` calls `dotenv.config()` which loads `.env`
+   - Supabase client has access to env vars
 
-## Related Files
+## Files Modified
 
-- `src/db/supabase.client.ts` - Supabase client initialization
-- `astro.config.mjs` - Astro/Vite configuration
-- `.github/workflows/main.yml` - CI/CD pipeline
-- `src/pages/api/auth/signup.ts` - Endpoint that uses Supabase
-- `supabase/config.toml` - Local Supabase configuration (port 54321)
-- `e2e/setup/global.setup.ts` - E2E test setup with env var validation
+- `package.json` - Added `build:node` and updated `preview` script
+- `.github/workflows/main.yml` - Changed build command to `npm run build:node`
+- `src/db/supabase.client.ts` - Enhanced diagnostic logging
+- `scripts/preview.js` - **NEW** - Preview script with dotenv loading
 
-## PR Details
+## Next Steps
 
-- **Branch:** `feat/auth-improvements`
-- **PR:** #5
-- **Commits:** 7 commits related to this issue
-- **Status:** CI still failing on E2E tests
-
-## Next Steps for Next Agent
-
-1. **Check if debug logs appear** - Search CI output for "🔍 DEBUG SUPABASE CLIENT"
-2. **Investigate where 127.0.0.1:54321 comes from** - Search codebase for hardcoded localhost
-3. **Try Solution 3** (dotenv at runtime) - Most likely to work in Node runtime
-4. **Review Astro Node adapter docs** - Look for official way to access env vars
-5. **Consider skipping problematic E2E tests** - If cloud Supabase access isn't critical for MVP
+1. Push these changes to the feat/auth-improvements branch
+2. CI should now:
+   - Build with Node adapter (not Cloudflare)
+   - Environment variables should be available via process.env
+   - E2E tests should connect to cloud Supabase (not localhost:54321)
+3. Monitor CI logs for "🔍 DEBUG SUPABASE CLIENT INIT" output to confirm env vars are being loaded
+4. Once E2E tests pass, merge to main
 
 ## Useful Resources
 
 - [Astro SSR Documentation](https://docs.astro.build/en/guides/server-side-rendering/)
 - [Astro Node Adapter](https://docs.astro.build/en/guides/integrations-guide/node/)
-- [Supabase JS Client](https://supabase.com/docs/reference/javascript/creating-a-client)
 - [Vite Environment Variables](https://vitejs.dev/guide/env-and-mode.html)
+- [dotenv Documentation](https://github.com/motdotla/dotenv)
 
