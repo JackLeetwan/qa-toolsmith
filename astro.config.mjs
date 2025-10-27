@@ -10,14 +10,14 @@ import cloudflare from "@astrojs/cloudflare";
 export default defineConfig({
   site: "https://qa-toolsmith.pages.dev", // Cloudflare Pages URL
   output: "server",
-  integrations: [react(), sitemap()],
+  integrations: [
+    react({
+      experimentalReactChildren: true,
+    }),
+    sitemap(),
+  ],
   vite: {
     plugins: [tailwindcss()],
   },
-  adapter: cloudflare({
-    platformProxy: {
-      enabled: true,
-      type: "pages",
-    },
-  }),
+  adapter: cloudflare(),
 });
