@@ -43,20 +43,24 @@ QA Toolsmith uses Astro 5 with React 19 for interactive components.
 - **Environment:** Używaj `import.meta.env` dla zmiennych środowiskowych
 - **Middleware:** Never skip the auth.getUser() call in authentication middleware
 
-## React Guidelines
+## React 19 Guidelines
 
 - **Functional Components:** Używaj komponentów funkcyjnych z hooks zamiast klasowych
-- **Custom Hooks:** Wydziel logikę do custom hooks w `src/components/hooks`
+- **Custom Hooks:** Wydziel logikę do custom hooks w `src/lib/hooks` (nie `src/components/hooks`)
+- **React Compiler:** Projekt używa React Compiler - unikaj ręcznej optymalizacji bez uzasadnienia
 - **Performance:** 
-  - Używaj `React.memo()` dla kosztownych komponentów renderujących się często
+  - Używaj `React.memo()` tylko gdy konieczne (React Compiler robi to automatycznie)
   - Używaj `React.lazy()` i `Suspense` dla code-splitting
-  - Używaj `useCallback` dla event handlers przekazywanych do dzieci
-  - Używaj `useMemo` dla kosztownych obliczeń
+  - Używaj `useCallback` tylko gdy potrzebujesz stabilności reference (nie dla zwykłych event handlers)
+  - Używaj `useMemo` tylko dla kosztownych obliczeń
 - **Accessibility:**
   - Używaj `useId()` dla generowania unikalnych ID dla atrybutów accessibility
 - **Optimistic Updates:**
-  - Używaj `useOptimistic` dla optimistic UI updates w formularzach
+  - Używaj `useOptimistic` dla optimistic UI updates w formularzach (React 19)
   - Używaj `useTransition` dla nie-urgentnych aktualizacji stanu
+- **Forms:**
+  - Używaj `useFormStatus()` i `useFormState()` dla formularzy (React 19)
+  - Używaj `async` actions w formularzach
 
 ## Tailwind CSS
 
