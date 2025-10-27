@@ -165,9 +165,9 @@ Server listening on http://localhost:3000
 - [x] Preview server starts and loads env vars
 - [x] Debug logging shows correct sources
 - [x] Locally replicates CI setup
+- [x] E2E tests now run (57 passed, only 3 registration failures)
 - [ ] CI builds successfully with Node adapter (await)
-- [ ] E2E tests connect to cloud Supabase (await)
-- [ ] Registration/signin tests pass (await)
+- [ ] E2E tests fully pass in CI (await)
 - [ ] All E2E tests pass (await)
 
 ## Resources
