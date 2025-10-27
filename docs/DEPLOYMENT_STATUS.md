@@ -52,6 +52,29 @@ Deployment zakończony sukcesem o 11:09:56 UTC (commit `912b792`)
 
 ---
 
+## ⚠️ NOWY PROBLEM: Feature Flags nie działają na produkcji
+
+**Data odkrycia:** 2025-10-27 12:15 UTC
+
+### Symptom
+Na produkcji (https://qa-toolsmith.pages.dev) **nie są widoczne** zakładki nawigacji (np. "Generators"), mimo że w konfiguracji produkcji (`src/features/config.production.ts`) są ustawione na `true`.
+
+### Przyczyna
+Niespójność w użyciu zmiennych środowiskowych:
+- **Server-side** używa `ENV_NAME` (ustawiony w Cloudflare ✅)
+- **Client-side** używa `PUBLIC_ENV_NAME` (**NIE ustawiony w Cloudflare** ❌)
+
+Rezultat: Client-side dostaje `undefined` i wraca do safe defaults (wszystko `false`).
+
+### Rozwiązanie
+**Dodać do Cloudflare Dashboard:**
+- **Name:** `PUBLIC_ENV_NAME`
+- **Value:** `production`
+
+**Dokumentacja:** Zobacz `docs/FEATURE_FLAGS_FIX.md` dla pełnych instrukcji.
+
+---
+
 ## ✅ Weryfikacja deploymentu
 
 ### Testy do wykonania:
