@@ -2,9 +2,13 @@ import type { AstroCookies } from "astro";
 import { createServerClient, type CookieOptionsWithName } from "@supabase/ssr";
 import type { Database } from "./database.types";
 
+// Determine if we're in production based on environment
+const isProduction =
+  import.meta.env.PROD || import.meta.env.ENV_NAME === "production";
+
 export const cookieOptions: CookieOptionsWithName = {
   path: "/",
-  secure: true,
+  secure: isProduction, // Only use secure cookies in production (HTTPS)
   httpOnly: true,
   sameSite: "lax",
 };
@@ -24,6 +28,16 @@ export const createSupabaseServerInstance = (context: {
 }) => {
   const supabaseUrl = import.meta.env.SUPABASE_URL;
   const supabaseKey = import.meta.env.SUPABASE_KEY;
+
+  // Debug logging in dev mode
+  if (import.meta.env.DEV) {
+    // eslint-disable-next-line no-console
+    console.log("🔍 DEBUG SUPABASE CLIENT:", {
+      url: supabaseUrl || "❌ MISSING",
+      key: supabaseKey ? `${supabaseKey.substring(0, 20)}...` : "❌ MISSING",
+      nodeEnv: import.meta.env.MODE,
+    });
+  }
 
   if (!supabaseUrl || !supabaseKey) {
     const missingVars = [];

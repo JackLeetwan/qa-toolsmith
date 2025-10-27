@@ -18,9 +18,17 @@ const registerSchema = z
       .string()
       .min(8, "Hasło musi mieć co najmniej 8 znaków")
       .max(72, "Hasło jest za długie")
-      .regex(
-        /^(?=.*[A-Za-z])(?=.*\d)/,
-        "Hasło musi zawierać co najmniej jedną literę i jedną cyfrę",
+      .refine(
+        (val) => /[A-Za-z]/.test(val),
+        {
+          message: "Hasło musi zawierać co najmniej jedną literę",
+        }
+      )
+      .refine(
+        (val) => /\d/.test(val),
+        {
+          message: "Hasło musi zawierać co najmniej jedną cyfrę",
+        }
       ),
     confirmPassword: z.string().min(1, "Potwierdzenie hasła jest wymagane"),
   })
