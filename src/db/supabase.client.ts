@@ -26,8 +26,14 @@ export const createSupabaseServerInstance = (context: {
   headers: Headers;
   cookies: AstroCookies;
 }) => {
-  const supabaseUrl = import.meta.env.SUPABASE_URL;
-  const supabaseKey = import.meta.env.SUPABASE_KEY;
+  // Try import.meta.env first (works in Cloudflare), fallback to process.env (works in Node adapter runtime)
+  // @ts-expect-error - process is available in Node runtime but not in type definitions
+  const supabaseUrl =
+    import.meta.env.SUPABASE_URL ||
+    (typeof process !== "undefined" ? process.env.SUPABASE_URL : undefined);
+  const supabaseKey =
+    import.meta.env.SUPABASE_KEY ||
+    (typeof process !== "undefined" ? process.env.SUPABASE_KEY : undefined);
 
   // Debug logging in all modes to diagnose CI issues
   // eslint-disable-next-line no-console
@@ -41,6 +47,7 @@ export const createSupabaseServerInstance = (context: {
     key: supabaseKey ? `${supabaseKey.substring(0, 20)}...` : "❌ MISSING",
     nodeEnv: import.meta.env.MODE,
     dev: import.meta.env.DEV,
+    source: import.meta.env.SUPABASE_URL ? "import.meta.env" : "process.env",
   });
 
   if (!supabaseUrl || !supabaseKey) {
