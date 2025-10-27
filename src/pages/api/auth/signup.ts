@@ -46,7 +46,16 @@ export const POST: APIRoute = async ({ request, cookies }) => {
         message: error.message,
         status: error.status,
         code: error.code,
+        name: error.name,
         email: email.split("@")[0] + "@...",
+      });
+
+      // ENHANCED: Log to console for CI debugging
+      console.error("🚨 SUPABASE SIGNUP ERROR:", {
+        code: error.code,
+        message: error.message,
+        status: error.status,
+        name: error.name,
       });
 
       // Always return generic error message to avoid revealing if email exists
