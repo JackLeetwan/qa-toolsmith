@@ -2,8 +2,8 @@
 
 ## 📋 Podsumowanie sytuacji
 
-**Data:** 2025-10-27 (Ostatnia aktualizacja: 2025-10-27 10:45 UTC)  
-**Status:** 🔧 W TRAKCIE - dodano wrangler.toml, oczekuje na deploy
+**Data:** 2025-10-27 (Ostatnia aktualizacja: 2025-10-27 11:51 UTC)  
+**Status:** 🚀 DEPLOYED - zmiany wypchnięte, oczekuje na weryfikację na Cloudflare Pages
 
 ---
 
@@ -211,7 +211,16 @@ Oczekiwany wynik: `{"status":"ok"}`
 
 ---
 
-**Ostatnia aktualizacja:** 2025-10-27 10:45 UTC
+**Ostatnia aktualizacja:** 2025-10-27 11:51 UTC
+
+## 🔄 Najnowsze zmiany (2025-10-27 11:51 UTC)
+
+### Wykonane kroki ✅
+
+1. ✅ Stworzono `wrangler.toml` z konfiguracją dla Cloudflare Pages
+2. ✅ Build lokalny przetestowany - **sukces** (exit code: 0)
+3. ✅ Zmiany wypchnięte do repozytorium (commit `ad52824`)
+4. 🔄 **OCZEKUJE**: Automatyczny rebuild w Cloudflare Pages (około 2-3 minuty)
 
 ## 🔄 Najnowsze zmiany (2025-10-27 10:45 UTC)
 
@@ -231,7 +240,35 @@ pages_build_output_dir = "dist"
 - Build logs pokazywały: `"No wrangler.toml file found. Continuing."` - teraz ta wiadomość powinna zniknąć
 
 **Następne kroki:**
-1. Push zmian do repozytorium
-2. Poczekać na automatyczny rebuild w Cloudflare Pages
-3. Sprawdzić `/api/env-check` po redeploy
+1. ✅ Push zmian do repozytorium - WYKONANE
+2. 🔄 Poczekać na automatyczny rebuild w Cloudflare Pages (około 2-3 minuty)
+3. ⏳ Sprawdzić `/api/env-check` po redeploy
+
+### Jak sprawdzić po redeploy:
+
+**1. Sprawdź status w Cloudflare Dashboard:**
+- Otwórz: https://dash.cloudflare.com
+- Wejdź w Workers & Pages → qa-toolsmith
+- Sprawdź zakładkę Deployments - powinno być nowe wdrożenie
+
+**2. Sprawdź build logs:**
+- W nowym deploy sprawdź czy widzisz: `"Found wrangler.toml in configuration"`
+- Powinno **NIE** być komunikatu: `"No wrangler.toml file found. Continuing."`
+
+**3. Przetestuj endpoint diagnostyczny:**
+```bash
+curl https://qa-toolsmith.pages.dev/api/env-check
+```
+
+**Oczekiwany wynik (jeśli działa):**
+```json
+{
+  "supabase_url": true,
+  "supabase_key": true,
+  "supabase_service_key": true,
+  "openrouter_api_key": false,
+  "env_name": true,
+  "all_set": true
+}
+```
 
