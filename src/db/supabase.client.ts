@@ -33,7 +33,11 @@ export const createSupabaseServerInstance = (context: {
   // eslint-disable-next-line no-console
   console.log("🔍 DEBUG SUPABASE CLIENT:", {
     url: supabaseUrl || "❌ MISSING",
-    urlType: supabaseUrl ? (supabaseUrl.includes("localhost") || supabaseUrl.includes("127.0.0.1") ? "⚠️ LOCALHOST" : "✅ CLOUD") : "N/A",
+    urlType: supabaseUrl
+      ? supabaseUrl.includes("localhost") || supabaseUrl.includes("127.0.0.1")
+        ? "⚠️ LOCALHOST"
+        : "✅ CLOUD"
+      : "N/A",
     key: supabaseKey ? `${supabaseKey.substring(0, 20)}...` : "❌ MISSING",
     nodeEnv: import.meta.env.MODE,
     dev: import.meta.env.DEV,
