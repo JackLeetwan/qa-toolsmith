@@ -27,13 +27,13 @@ export const createSupabaseServerInstance = (context: {
   cookies: AstroCookies;
 }) => {
   // Try import.meta.env first (works in Cloudflare), fallback to process.env (works in Node adapter runtime)
-  // @ts-expect-error - process is available in Node runtime but not in type definitions
+  // Get process from globalThis to work around Vite bundling
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const nodeProcess = (globalThis as any).process || undefined;
   const supabaseUrl =
-    import.meta.env.SUPABASE_URL ||
-    (typeof process !== "undefined" ? process.env.SUPABASE_URL : undefined);
+    import.meta.env.SUPABASE_URL || nodeProcess?.env?.SUPABASE_URL;
   const supabaseKey =
-    import.meta.env.SUPABASE_KEY ||
-    (typeof process !== "undefined" ? process.env.SUPABASE_KEY : undefined);
+    import.meta.env.SUPABASE_KEY || nodeProcess?.env?.SUPABASE_KEY;
 
   // Debug logging in all modes to diagnose CI issues
   // eslint-disable-next-line no-console
