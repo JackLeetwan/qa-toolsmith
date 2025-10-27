@@ -76,7 +76,9 @@ test.describe("User Registration", () => {
 
     // Should display validation error (look for the error message specifically)
     await expect(
-      page.locator('p[role="alert"]').filter({ hasText: /Nieprawidłowy format email/i }),
+      page
+        .locator('p[role="alert"]')
+        .filter({ hasText: /Nieprawidłowy format email/i }),
     ).toBeVisible({ timeout: 3000 });
   });
 
@@ -102,7 +104,11 @@ test.describe("User Registration", () => {
     await submitButton.click();
 
     // Should display validation error (look for the error message specifically)
-    await expect(page.locator('p[role="alert"]').filter({ hasText: /co najmniej 8 znaków/i })).toBeVisible({
+    await expect(
+      page
+        .locator('p[role="alert"]')
+        .filter({ hasText: /co najmniej 8 znaków/i }),
+    ).toBeVisible({
       timeout: 3000,
     });
   });
@@ -129,7 +135,11 @@ test.describe("User Registration", () => {
     await submitButton.click();
 
     // Should display validation error (look for the error message specifically)
-    await expect(page.locator('p[role="alert"]').filter({ hasText: /co najmniej jedną literę/i })).toBeVisible({
+    await expect(
+      page
+        .locator('p[role="alert"]')
+        .filter({ hasText: /co najmniej jedną literę/i }),
+    ).toBeVisible({
       timeout: 3000,
     });
   });
@@ -156,7 +166,11 @@ test.describe("User Registration", () => {
     await submitButton.click();
 
     // Should display validation error (look for the error message specifically)
-    await expect(page.locator('p[role="alert"]').filter({ hasText: /co najmniej jedną cyfrę/i })).toBeVisible({
+    await expect(
+      page
+        .locator('p[role="alert"]')
+        .filter({ hasText: /co najmniej jedną cyfrę/i }),
+    ).toBeVisible({
       timeout: 3000,
     });
   });
@@ -183,7 +197,9 @@ test.describe("User Registration", () => {
     await submitButton.click();
 
     // Should display validation error (look for the error message specifically)
-    await expect(page.locator('p[role="alert"]').filter({ hasText: /nie są identyczne/i })).toBeVisible({
+    await expect(
+      page.locator('p[role="alert"]').filter({ hasText: /nie są identyczne/i }),
+    ).toBeVisible({
       timeout: 3000,
     });
   });
