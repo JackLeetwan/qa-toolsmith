@@ -114,7 +114,6 @@ jobs:
     permissions:
       checks: write
       contents: read
-    needs: build
     steps:
       - uses: actions/checkout@v5
       - name: Enable Corepack
@@ -126,11 +125,13 @@ jobs:
           cache: "npm"
       - name: Install dependencies
         run: npm ci
-      - name: Download build artifacts
-        uses: actions/download-artifact@v5
-        with:
-          name: build-output
-          path: dist/
+      - name: Build for E2E (Node adapter)
+        run: astro build
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          ENV_NAME: production
+          # Not setting ASTRO_TARGET to use Node adapter instead of Cloudflare
       - name: Install Playwright browsers
         run: npx playwright install chromium
       - name: Start preview server
@@ -248,11 +249,15 @@ jobs:
           cache: "npm"
       - name: Install dependencies
         run: npm ci
-      - name: Download build artifacts
-        uses: actions/download-artifact@v5
-        with:
-          name: build-output
-          path: dist/
+      - name: Build for health check (Node adapter)
+        run: astro build
+        env:
+          SUPABASE_URL: "https://dummy.supabase.co"
+          SUPABASE_KEY: "dummy-key"
+          SUPABASE_SERVICE_KEY: "dummy-service-key"
+          OPENROUTER_API_KEY: "dummy-key"
+          ENV_NAME: "production"
+          # Not setting ASTRO_TARGET to use Node adapter instead of Cloudflare
       - name: Start server
         run: |
           echo "🚀 Starting preview server for health check..."
