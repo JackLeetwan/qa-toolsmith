@@ -5,11 +5,21 @@ import react from "@astrojs/react";
 import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
 import cloudflare from "@astrojs/cloudflare";
+import node from "@astrojs/node";
+
+// Determine which adapter to use based on environment
+/* eslint-disable no-undef */
+const useCloudflareAdapter =
+  process.env.CF_PAGES === "1" || process.env.ASTRO_TARGET === "cloudflare";
 
 // https://astro.build/config
 export default defineConfig({
   site: "https://qa-toolsmith.pages.dev", // Cloudflare Pages URL
   output: "server",
+  server: {
+    port: 3000,
+    host: true,
+  },
   integrations: [
     react({
       experimentalReactChildren: true,
@@ -19,10 +29,17 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
     resolve: {
-      alias: {
-        "react-dom/server": "react-dom/server.edge",
-      },
+      alias: useCloudflareAdapter
+        ? {
+            "react-dom/server": "react-dom/server.edge",
+          }
+        : undefined,
+    },
+    // Make ENV_NAME available to client-side code
+    define: {
+      "import.meta.env.ENV_NAME": JSON.stringify(process.env.ENV_NAME),
     },
   },
-  adapter: cloudflare(),
+  adapter: useCloudflareAdapter ? cloudflare() : node({ mode: "standalone" }),
 });
+/* eslint-enable no-undef */
