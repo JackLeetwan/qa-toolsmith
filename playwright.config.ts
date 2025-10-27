@@ -54,12 +54,16 @@ export default defineConfig({
       name: "safe-defaults",
       use: {
         ...devices["Desktop Chrome"],
-        baseURL: "http://localhost:3001",
+        // In CI, use port 3000 since only one server is running
+        // In local development, use port 3001 for different project configuration
+        baseURL: process.env.CI ? "http://localhost:3000" : "http://localhost:3001",
       },
     },
   ],
 
-  webServer: [
+  webServer: process.env.CI
+    ? undefined  // In CI, server is already started by workflow
+    : [
     {
       command: "node scripts/dev-e2e.js local",
       url: "http://localhost:3000",

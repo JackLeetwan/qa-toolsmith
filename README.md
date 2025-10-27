@@ -8,12 +8,13 @@
 1. [Project Description](#project-description)
 2. [Tech Stack](#tech-stack)
 3. [Deployment & Hosting](#deployment--hosting)
-4. [Getting Started Locally](#getting-started-locally)
-5. [Available Scripts](#available-scripts)
-6. [Project Scope](#project-scope)
-7. [API Documentation](#api-documentation)
-8. [Project Status](#project-status)
-9. [License](#license)
+4. [CI/CD Configuration](#cicd-configuration)
+5. [Getting Started Locally](#getting-started-locally)
+6. [Available Scripts](#available-scripts)
+7. [Project Scope](#project-scope)
+8. [API Documentation](#api-documentation)
+9. [Project Status](#project-status)
+10. [License](#license)
 
 ## Project Description
 
@@ -48,7 +49,9 @@ QA Toolsmith is an open-source, lightweight web application that standardizes an
   - Playwright (E2E testing)
   - React Testing Library (component testing)
 
-## Deployment & Hosting
+## 🚀 Deployment
+
+### Cloudflare Pages
 
 QA Toolsmith is deployed on **Cloudflare Pages**, chosen after comprehensive analysis of hosting platforms for optimal balance of cost, performance, and developer experience.
 
@@ -64,6 +67,59 @@ The application requires SSR due to server-side API endpoints (authentication, d
 For detailed technical architecture and API specifications, see [.ai/ARCHITECTURE.md](.ai/ARCHITECTURE.md).
 
 For detailed technical stack and deployment configuration, see [docs/tech-stack.md](docs/tech-stack.md).
+
+## CI/CD Configuration
+
+### GitHub Actions Secrets Setup
+
+For E2E tests and automatic deployments to work in CI/CD, configure the following GitHub Secrets:
+
+**Required for E2E Tests:**
+- `SUPABASE_URL` - Your Supabase project URL (e.g., `https://xxxxx.supabase.co`)
+  - **⚠️ IMPORTANT**: Use your **cloud Supabase URL**, NOT localhost
+  - ❌ Do NOT use: `http://localhost:54321`
+  - ✅ Use: `https://your-project.supabase.co`
+- `SUPABASE_KEY` - Your Supabase anon public key
+- `E2E_USERNAME` - Test user email for authentication tests
+- `E2E_PASSWORD` - Test user password for authentication tests
+- `E2E_USERNAME_ID` - Test user UUID from Supabase Auth
+
+**Optional (for future features):**
+- `SUPABASE_SERVICE_KEY` - Service role key for admin operations
+- `OPENROUTER_API_KEY` - AI assistant integration key
+
+### How to Configure GitHub Secrets
+
+1. Go to your repository → **Settings** → **Secrets and variables** → **Actions**
+2. Click **"New repository secret"** for each required secret
+3. Enter the secret name (exactly as listed above) and value
+4. Click "Add secret"
+
+### Getting Supabase Credentials
+
+1. Navigate to [Supabase Dashboard](https://supabase.com/dashboard)
+2. Select your project (create one if needed)
+3. Go to **Settings** → **API**
+4. Copy the credentials:
+   - `Project URL` → use for `SUPABASE_URL`
+   - `anon public` key → use for `SUPABASE_KEY`
+   - `service_role` key → use for `SUPABASE_SERVICE_KEY` (only if needed)
+
+### Troubleshooting CI/CD
+
+**E2E tests fail with "connect ECONNREFUSED 127.0.0.1:54321":**
+- This means your `SUPABASE_URL` secret points to localhost
+- Update the secret to your actual cloud Supabase project URL
+- Verify in GitHub: Settings → Secrets and variables → Actions
+
+**E2E tests fail with "SUPABASE_KEY: ❌ MISSING":**
+- The `SUPABASE_KEY` secret is not configured
+- Add it in GitHub Secrets (see "How to Configure GitHub Secrets" above)
+
+**Server logs show "⚠️ WARNING: SUPABASE_URL points to localhost":**
+- Your Supabase URL is incorrectly set to localhost in the GitHub Secret
+- This will cause all authentication requests to fail in CI
+- Update the secret to use your cloud Supabase project URL
 
 ## Environment Configuration
 
