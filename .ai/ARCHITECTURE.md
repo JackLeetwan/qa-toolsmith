@@ -449,8 +449,8 @@ This document consolidates the comprehensive architecture specifications for QA 
 #### Integracja i biblioteki
 
 - `@supabase/supabase-js` – klient (browser i server).
-- `@supabase/auth-helpers-astro` – zarządzanie sesją, ciasteczkami i SSR guards (wariant A).
-- Zmienne środowiskowe: `SUPABASE_URL`, `SUPABASE_ANON_KEY` (klient), `SUPABASE_SERVICE_ROLE_KEY` (tylko serwer – **nie** do bundla FE).
+- `@supabase/ssr` – zarządzanie sesją, ciasteczkami i SSR guards dla Astro.
+- Zmienne środowiskowe: `SUPABASE_URL`, `SUPABASE_KEY` (anon key), `SUPABASE_SERVICE_KEY` (service role key – tylko serwer).
 
 #### Przepływy
 
@@ -704,10 +704,16 @@ Architektura UI opiera się na **modułowym podejściu** z wyraźnie wydzielonym
 
 ### State Management
 
-- **TanStack Query** – cache zapytań API, mutacje, synchronizacja
+- **React 19** – nowe hooks:
+  - `use()` – hook do asynchronicznego pobierania danych kompatybilny z Suspense
+  - `useOptimistic()` – optimistic UI updates dla mutacji danych
+  - `useReducer` – dla złożonych stanów (IBAN Generator)
+  - `useState` – dla prostych stanów lokalnych
+- **TanStack Query** – cache zapytań API, mutacje, synchronizacja (do ewaluacji użycia)
 - **Keyset pagination** – `?limit&after=cursor` dla stabilnej paginacji
 - **URL-synced filters** – parametry filtrów i wyszukiwania w URL
 - **localStorage** – autosave dla Charters (5s), historia generatorów (10 wpisów)
+- **Suspense** – dla ładowania danych asynchronicznych z fallback UI
 
 ### Error Handling
 
@@ -814,7 +820,8 @@ Mobile-first CTA:
 #### Hooks
 
 - **useAuth**: User profile, role, logout
-- **useTemplates/useCharters/useKB**: TanStack Query hooks
+- **use()**: React 19 hook for async data fetching with Suspense compatibility
+- **useOptimistic()**: React 19 hook for optimistic UI updates during mutations
 - **usePagination**: Keyset pagination state
 - **useDebounce**: Debounced search input
 - **useLocalStorage**: Autosave, generator history
@@ -870,19 +877,29 @@ Mobile-first CTA:
 
 ### Frontend
 
-- **Astro 5**: Fast, efficient pages and applications with minimal JavaScript
-- **React 19**: Interactivity where needed
-- **TypeScript 5**: Static typing for better IDE support
-- **Tailwind 4**: Convenient styling
-- **Shadcn/ui**: Library of accessible React components
+- **Astro 5** (v5.13.7): Fast, efficient pages and applications with minimal JavaScript and SSR support
+  - API endpoints with `context` parameter for request handling
+  - Middleware via `onRequest` export
+  - Cloudflare Workers integration via `context.locals.runtime`
+- **React 19** (v19.1.1): Interactivity where needed with React Compiler support
+  - New hooks: `use()` for async data fetching, `useOptimistic()` for optimistic UI
+  - Enhanced Suspense for loading states
+  - React Compiler enabled for automatic optimizations
+- **TypeScript 5**: Static typing for better IDE support and error prevention
+- **Tailwind 4** (v4.1.13): Utility-first CSS framework
+  - CSS-first configuration with `@import "tailwindcss"` and `@theme` directive
+  - Native Vite integration via `@tailwindcss/vite` plugin
+  - CSS variables for theme tokens (e.g., `--color-primary`, `--spacing-4`)
+- **Shadcn/ui**: Library of accessible React components built on Radix UI
 
 ### Backend
 
 - **Supabase**: Complete backend solution providing:
-  - PostgreSQL database
-  - Multi-language SDKs as Backend-as-a-Service
+  - PostgreSQL database with Row Level Security (RLS)
+  - `@supabase/supabase-js` (v2.75.0) - Multi-language SDKs as Backend-as-a-Service
+  - `@supabase/ssr` (v0.7.0) - SSR support for Astro with proper cookie management
   - Open-source, can be hosted locally or on own server
-  - Built-in user authentication
+  - Built-in JWT authentication with session management
 
 ### AI
 
@@ -910,16 +927,18 @@ Mobile-first CTA:
 ### CI/CD and Hosting
 
 - **GitHub Actions**: Automated CI/CD pipeline (lint → build → unit tests → E2E tests → health check)
-- **Cloudflare Pages**: Production hosting with SSR support via `@astrojs/cloudflare` adapter
+- **Cloudflare Pages**: Production hosting with SSR support via `@astrojs/cloudflare` adapter (v12.6.10)
 
 ### Testing
 
-- **Vitest**: Unit testing framework, fast and Vite-compatible
+- **Vitest** (v3.2.4): Unit testing framework, fast and Vite-compatible
   - 1,167 unit tests (34 test files)
   - Tests IBAN validator/generator, services, helpers, utility functions
-- **Playwright**: E2E testing framework with multi-browser support
+  - React Testing Library for component testing
+- **Playwright** (v1.56.1): E2E testing framework with multi-browser support
   - 10 E2E tests covering generators, navigation, authentication
-  - Full diagnostics: traces, screenshots, videos (on failure)
+  - Full diagnostics: traces, screenshots, videos (on failure only)
+  - Chromium-only configuration for consistency
 
 ---
 

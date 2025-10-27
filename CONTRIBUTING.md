@@ -2,6 +2,78 @@
 
 Thank you for your interest in contributing to QA Toolsmith! This guide outlines how to set up your local environment and ensure your contributions follow our code quality standards.
 
+## Branching Strategy
+
+This project uses **GitHub Flow**, a lightweight, branch-based workflow. All changes should be made through feature branches with pull requests.
+
+### Creating a Feature Branch
+
+1. **Start from an up-to-date master branch:**
+   ```bash
+   git checkout master
+   git pull origin master
+   ```
+
+2. **Create a new feature branch:**
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+
+### Branch Naming Convention
+
+Use descriptive, kebab-case branch names prefixed with a type:
+
+- `feature/` - New features (e.g., `feature/iban-generator`)
+- `fix/` - Bug fixes (e.g., `fix/login-validation`)
+- `docs/` - Documentation updates (e.g., `docs/api-documentation`)
+- `refactor/` - Code refactoring (e.g., `refactor/auth-service`)
+- `test/` - Test improvements (e.g., `test/e2e-coverage`)
+
+### Making Changes
+
+1. Make your changes and commit them (pre-commit hooks will run automatically):
+   ```bash
+   git add .
+   git commit -m "feat: add IBAN generator for Germany"
+   ```
+
+2. **Use conventional commits** for better changelog generation:
+   - `feat:` - New feature
+   - `fix:` - Bug fix
+   - `docs:` - Documentation changes
+   - `refactor:` - Code refactoring
+   - `test:` - Test additions or changes
+   - `chore:` - Maintenance tasks
+
+### Creating a Pull Request
+
+1. **Push your branch to the remote:**
+   ```bash
+   git push origin feature/your-feature-name
+   ```
+
+2. **Create a Pull Request** on GitHub:
+   - Go to the repository on GitHub
+   - Click "New Pull Request"
+   - Select your feature branch
+   - Fill in the PR description
+
+3. **Wait for CI checks to pass:**
+   - Lint, build, unit tests, and E2E tests run automatically
+   - All checks must pass before merging
+
+4. **Get code review approval** (if applicable)
+
+5. **Merge the PR** when approved
+
+### Important Rules
+
+- ❌ **Never push directly to `master` branch**
+- ✅ **Always create a feature branch for changes**
+- ✅ **Ensure all CI checks pass before merging**
+- ✅ **Keep feature branches up-to-date with master**
+- ✅ **Delete branch after merging**
+
 ## Pre-commit Hooks
 
 This project uses **Husky** and **lint-staged** to automatically validate code before each commit. These hooks prevent common mistakes from entering the repository.

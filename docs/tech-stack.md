@@ -7,45 +7,58 @@ QA Toolsmith is built with modern web technologies focused on performance, devel
 ## Technology Stack
 
 ### Frontend
-- **Astro 5** - Static Site Generator with SSR support
-- **React 19** - Component library for interactive UI elements
-- **TypeScript 5** - Type-safe JavaScript
-- **Tailwind CSS 4** - Utility-first CSS framework
-- **Shadcn/ui** - Accessible UI components
+- **Astro 5** (v5.13.7) - Static Site Generator with SSR support via `@astrojs/cloudflare` adapter
+  - API endpoints using `context` parameter for request handling
+  - Middleware support with `onRequest` export
+  - Cloudflare Workers integration via `context.locals.runtime`
+- **React 19** (v19.1.1) - Component library for interactive UI elements
+  - React Compiler support enabled
+  - New hooks: `use()` for async data fetching, `useOptimistic()` for optimistic UI updates
+  - Enhanced Suspense for better loading states
+- **TypeScript 5** - Type-safe JavaScript with strict mode enabled
+- **Tailwind CSS 4** (v4.1.13) - Utility-first CSS framework
+  - CSS-first configuration using `@import "tailwindcss"` and `@theme` directive
+  - Native Vite integration via `@tailwindcss/vite` plugin (no PostCSS required)
+  - Direct CSS variables for theme tokens (e.g., `--color-primary`, `--spacing-4`)
+- **Shadcn/ui** - Accessible UI components built on Radix UI
 
 ### Backend & Database
-- **Supabase** - Backend-as-a-Service
-  - PostgreSQL database
-  - Built-in authentication
-  - Real-time subscriptions
-  - Row Level Security (RLS)
+- **Supabase** - Backend-as-a-Service with SSR support via `@supabase/ssr` (v0.7.0)
+  - PostgreSQL database with Row Level Security (RLS)
+  - Built-in JWT authentication
+  - Real-time subscriptions (future feature)
+  - SQL migrations with Supabase CLI
 
 ### AI Integration
 - **Openrouter.ai** - Multi-provider AI API (supports OpenAI, Anthropic, Google, etc.)
+- Environment-based configuration with per-user daily limits
+- Structured JSON responses with schema validation
 
 ### Testing
-- **Vitest** - Unit testing framework
-- **Playwright** - End-to-End testing
-- **React Testing Library** - Component testing utilities
+- **Vitest** (v3.2.4) - Fast unit testing framework with Vite-native performance
+- **Playwright** (v1.56.1) - Multi-browser E2E testing with Chromium support
+- **React Testing Library** (v16.3.0) - Component testing utilities
+- **@testing-library/user-event** (v14.6.1) - Realistic user interaction simulation
 
 ### Development Tools
-- **ESLint** - Code linting
-- **Prettier** - Code formatting
-- **Husky** - Git hooks
-- **lint-staged** - Pre-commit linting
+- **ESLint** (v9.38.0) - Code linting with TypeScript, Astro, and React support
+- **Prettier** - Code formatting with Astro plugin
+- **Husky** (v9.1.7) - Git hooks for quality gates
+- **lint-staged** (v15.5.0) - Pre-commit linting and formatting
 
 ## Deployment & Hosting
 
-QA Toolsmith is deployed on **Cloudflare Pages** using the official `@astrojs/cloudflare` adapter. This provides optimal integration with Cloudflare Workers for server-side rendering support.
+QA Toolsmith is deployed on **Cloudflare Pages** using the official `@astrojs/cloudflare` adapter (v12.6.10). This provides optimal integration with Cloudflare Workers for server-side rendering support.
 
 **Key Configuration:**
-- **Adapter**: `@astrojs/cloudflare` for Cloudflare Workers integration
-- **Build Command**: `npm run build`
-- **Build Output**: `dist/` directory
-- **Environment Variables**: Supabase credentials and application secrets
-- **Preview Deployments**: Automatic for all pull requests
+- **Adapter**: `@astrojs/cloudflare` v12.6.10 for Cloudflare Workers integration with Astro 5
+- **Build Command**: `npm run build` with `ASTRO_TARGET=cloudflare`
+- **Build Output**: `dist/` directory with Cloudflare Workers-compatible bundles
+- **Environment Variables**: Supabase credentials (`SUPABASE_URL`, `SUPABASE_KEY`, `SUPABASE_SERVICE_KEY`) and application secrets
+- **Preview Deployments**: Automatic for all pull requests with preview URLs
+- **SSR**: Enabled via `output: "server"` in `astro.config.mjs`
 
-The application requires SSR due to server-side API endpoints, making Cloudflare Pages the ideal choice for its excellent SSR support and generous free tier.
+The application requires SSR due to server-side API endpoints (authentication, data generators, health checks), making Cloudflare Pages the ideal choice for its excellent SSR support and generous free tier.
 
 ## Development Workflow
 

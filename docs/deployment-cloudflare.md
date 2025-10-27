@@ -170,8 +170,20 @@ All environment variables are accessed as follows:
 
 1. ✅ **Compliant**: The project uses `import.meta.env` instead of `process.env` (Cloudflare Workers compatible)
 2. ✅ **Working**: Environment variables from Cloudflare Pages dashboard are automatically available
-3. ⚠️ **Not using Astro 5 Runtime API**: The newer `context.locals.runtime.env` API is available but not required - current implementation works perfectly
+3. ✅ **Astro 5 Runtime API**: The project uses `import.meta.env` for compatibility. The newer `context.locals.runtime.env` API is available in Astro 5 for accessing Cloudflare Workers runtime, but `import.meta.env` is the standard approach and works perfectly
 4. ✅ **Fixed**: Previously `process.env.VITEST` was used in logger.ts, now uses `import.meta.env.VITEST`
+
+### Accessing Cloudflare Workers Runtime
+
+In Astro 5, you can access Cloudflare-specific features via `context.locals.runtime`:
+
+```javascript
+export function GET(context) {
+  const runtime = context.locals.runtime;
+  // Access Cloudflare bindings, env vars, etc.
+  return new Response('Some response');
+}
+```
 
 For more details on implementation, see `src/db/supabase.client.ts` and `src/lib/services/health.service.ts`.
 
