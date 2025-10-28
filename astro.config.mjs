@@ -8,7 +8,6 @@ import cloudflare from "@astrojs/cloudflare";
 import node from "@astrojs/node";
 
 // Determine which adapter to use based on environment
-/* eslint-disable no-undef */
 const useCloudflareAdapter =
   process.env.CF_PAGES === "1" || process.env.ASTRO_TARGET === "cloudflare";
 
@@ -35,11 +34,12 @@ export default defineConfig({
           }
         : undefined,
     },
-    // Make ENV_NAME available to client-side code
+    // Note: We only define ENV_NAME here as it's needed for client-side feature flags
+    // SUPABASE_URL and SUPABASE_KEY are accessed via process.env fallback in runtime
+    // (vite.define hardcodes values at build time, making runtime env vars unavailable)
     define: {
       "import.meta.env.ENV_NAME": JSON.stringify(process.env.ENV_NAME),
     },
   },
   adapter: useCloudflareAdapter ? cloudflare() : node({ mode: "standalone" }),
 });
-/* eslint-enable no-undef */

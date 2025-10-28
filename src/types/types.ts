@@ -530,6 +530,8 @@ export interface SignupResponse {
     id: string;
     email: string;
   };
+  emailConfirmationRequired?: boolean;
+  message?: string;
 }
 export interface LogoutResponse {
   success: true;

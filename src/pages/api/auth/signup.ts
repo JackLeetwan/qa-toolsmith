@@ -46,7 +46,17 @@ export const POST: APIRoute = async ({ request, cookies }) => {
         message: error.message,
         status: error.status,
         code: error.code,
+        name: error.name,
         email: email.split("@")[0] + "@...",
+      });
+
+      // ENHANCED: Log to console for CI debugging
+      // eslint-disable-next-line no-console
+      console.error("🚨 SUPABASE SIGNUP ERROR:", {
+        code: error.code,
+        message: error.message,
+        status: error.status,
+        name: error.name,
       });
 
       // Always return generic error message to avoid revealing if email exists
@@ -62,14 +72,37 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       );
     }
 
-    // Auto-login after successful signup (US-001)
+    // Try auto-login after successful signup (US-001)
     const { data: signInData, error: signInError } =
       await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
+    // If auto-login fails due to unconfirmed email, return success with confirmation required
     if (signInError) {
+      if (
+        signInError.message?.includes("Email not confirmed") ||
+        signInError.status === 400
+      ) {
+        return new Response(
+          JSON.stringify({
+            user: {
+              id: "", // No user ID since not logged in
+              email: email,
+            },
+            emailConfirmationRequired: true,
+            message:
+              "Konto utworzone. Sprawdź swoją skrzynkę email i potwierdź adres, aby się zalogować.",
+          }),
+          {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          },
+        );
+      }
+
+      // For other login errors, return generic error
       return new Response(
         JSON.stringify({
           error: "UNKNOWN_ERROR",
@@ -82,6 +115,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       );
     }
 
+    // Auto-login successful
     return new Response(
       JSON.stringify({
         user: {

@@ -126,18 +126,44 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Build for E2E (Node adapter)
-        run: npx astro build
+        run: npm run build:node
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
           ENV_NAME: production
-          # Not setting ASTRO_TARGET to use Node adapter instead of Cloudflare
       - name: Install Playwright browsers
         run: npx playwright install chromium
+      - name: Test Supabase Signup (Diagnostic)
+        run: node scripts/test-signup.js
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
       - name: Start preview server
         run: |
           echo "🚀 Starting preview server..."
-          npm run preview > server.log 2>&1 &
+          
+          # Validate that secrets are configured
+          if [ -z "$SUPABASE_URL" ]; then
+            echo "❌ ERROR: SUPABASE_URL secret is not configured in GitHub!"
+            echo "Please go to Settings → Secrets and variables → Actions"
+            echo "and add SUPABASE_URL with your cloud Supabase project URL"
+            exit 1
+          fi
+          
+          if [ -z "$SUPABASE_KEY" ]; then
+            echo "❌ ERROR: SUPABASE_KEY secret is not configured in GitHub!"
+            echo "Please go to Settings → Secrets and variables → Actions"
+            echo "and add SUPABASE_KEY with your Supabase anon key"
+            exit 1
+          fi
+          
+          echo "🔍 Verifying environment variables are set:"
+          echo "  - SUPABASE_URL: ${SUPABASE_URL:+✅ Set (cloud URL)}"
+          echo "  - SUPABASE_KEY: ${SUPABASE_KEY:+✅ Set}"
+          echo "  - ENV_NAME: ${ENV_NAME:+✅ Set}"
+          
+          # Pass environment variables directly to npm command to ensure they reach Node process
+          SUPABASE_URL="$SUPABASE_URL" SUPABASE_KEY="$SUPABASE_KEY" ENV_NAME="$ENV_NAME" PORT="$PORT" npm run preview > server.log 2>&1 &
           SERVER_PID=$!
           echo "SERVER_PID=$SERVER_PID" >> $GITHUB_ENV
           echo "Server started with PID: $SERVER_PID"
@@ -213,6 +239,20 @@ jobs:
           name: e2e-test-results
           path: test-results/
           retention-days: ${{ github.event_name == 'push' && '30' || '7' }}
+      - name: Upload Server Logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: server-logs
+          path: server.log
+          retention-days: ${{ github.event_name == 'push' && '30' || '7' }}
+      - name: Print Server Logs
+        if: always()
+        run: |
+          echo "📄 Server logs from preview server:"
+          echo "=================================="
+          cat server.log || echo "No server.log found"
+          echo "=================================="
       - name: Publish test results
         if: always()
         uses: dorny/test-reporter@v2

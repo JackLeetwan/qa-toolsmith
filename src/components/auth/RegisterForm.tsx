@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,6 +13,7 @@ interface RegisterFormProps {
   isLoading?: boolean;
   error?: string;
   onRedirect?: (url: string) => void;
+  onEmailConfirmationRequired?: (email: string, message: string) => void;
 }
 
 export default function RegisterForm({
@@ -20,8 +21,10 @@ export default function RegisterForm({
   isLoading = false,
   error,
   onRedirect,
+  onEmailConfirmationRequired,
 }: RegisterFormProps) {
   const [navigateTo, setNavigateTo] = useState<string | null>(null);
+  const redirectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (navigateTo) {
@@ -33,13 +36,38 @@ export default function RegisterForm({
     }
   }, [navigateTo, onRedirect]);
 
-  const handleSuccess = useCallback(() => {
-    toast.success("Konto utworzone pomyślnie!");
-
-    setTimeout(() => {
-      setNavigateTo("/");
-    }, 500);
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (redirectTimeoutRef.current) {
+        clearTimeout(redirectTimeoutRef.current);
+      }
+    };
   }, []);
+
+  const handleSuccess = useCallback(
+    (emailConfirmationRequired?: boolean, message?: string) => {
+      if (emailConfirmationRequired) {
+        toast.success(
+          message ||
+            "Konto utworzone! Sprawdź swoją skrzynkę email, aby potwierdzić adres i się zalogować.",
+        );
+        if (onEmailConfirmationRequired) {
+          onEmailConfirmationRequired(
+            "",
+            message ||
+              "Konto utworzone! Sprawdź swoją skrzynkę email, aby potwierdzić adres i się zalogować.",
+          );
+        }
+      } else {
+        toast.success("Konto utworzone pomyślnie!");
+        redirectTimeoutRef.current = setTimeout(() => {
+          setNavigateTo("/");
+        }, 500);
+      }
+    },
+    [onEmailConfirmationRequired],
+  );
 
   const {
     register,

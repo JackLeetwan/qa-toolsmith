@@ -59,7 +59,9 @@ export const AuthClientService = {
   async signup(data: {
     email: string;
     password: string;
-  }): Promise<SignupResponse> {
+  }): Promise<
+    SignupResponse & { emailConfirmationRequired?: boolean; message?: string }
+  > {
     logger.debug("📡 Sending signup request to /api/auth/signup");
 
     try {

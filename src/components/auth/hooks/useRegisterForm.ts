@@ -18,18 +18,12 @@ const registerSchema = z
       .string()
       .min(8, "Hasło musi mieć co najmniej 8 znaków")
       .max(72, "Hasło jest za długie")
-      .refine(
-        (val) => /[A-Za-z]/.test(val),
-        {
-          message: "Hasło musi zawierać co najmniej jedną literę",
-        }
-      )
-      .refine(
-        (val) => /\d/.test(val),
-        {
-          message: "Hasło musi zawierać co najmniej jedną cyfrę",
-        }
-      ),
+      .refine((val) => /[A-Za-z]/.test(val), {
+        message: "Hasło musi zawierać co najmniej jedną literę",
+      })
+      .refine((val) => /\d/.test(val), {
+        message: "Hasło musi zawierać co najmniej jedną cyfrę",
+      }),
     confirmPassword: z.string().min(1, "Potwierdzenie hasła jest wymagane"),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -41,7 +35,7 @@ export type RegisterFormData = z.infer<typeof registerSchema>;
 
 interface UseRegisterFormOptions {
   onSubmit?: (data: Omit<RegisterFormData, "confirmPassword">) => Promise<void>;
-  onSuccess?: () => void;
+  onSuccess?: (emailConfirmationRequired?: boolean, message?: string) => void;
   onError?: (error: string) => void;
 }
 
@@ -60,8 +54,10 @@ export function useRegisterForm(options: UseRegisterFormOptions = {}) {
     register,
     handleSubmit,
     formState: { errors },
+    trigger,
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
+    mode: "onSubmit",
   });
 
   const handleFormSubmit = async (data: RegisterFormData) => {
@@ -108,11 +104,11 @@ export function useRegisterForm(options: UseRegisterFormOptions = {}) {
     setApiError("");
 
     try {
-      await AuthClientService.signup(submitData);
+      const result = await AuthClientService.signup(submitData);
 
       // Success - let the component handle UI feedback and navigation
       logger.debug("✅ Registration successful, redirecting...");
-      onSuccess?.();
+      onSuccess?.(result.emailConfirmationRequired, result.message);
     } catch (error) {
       const errorMessage =
         error instanceof Error
@@ -134,5 +130,6 @@ export function useRegisterForm(options: UseRegisterFormOptions = {}) {
     isSubmitting,
     apiError,
     setApiError,
+    trigger,
   };
 }

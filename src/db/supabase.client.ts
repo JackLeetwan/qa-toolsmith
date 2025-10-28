@@ -26,18 +26,50 @@ export const createSupabaseServerInstance = (context: {
   headers: Headers;
   cookies: AstroCookies;
 }) => {
-  const supabaseUrl = import.meta.env.SUPABASE_URL;
-  const supabaseKey = import.meta.env.SUPABASE_KEY;
+  // Try import.meta.env first (works in Cloudflare), fallback to process.env (works in Node adapter runtime)
+  // Get process from globalThis to work around Vite bundling
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const nodeProcess = (globalThis as any).process || undefined;
+  const supabaseUrl =
+    import.meta.env.SUPABASE_URL || nodeProcess?.env?.SUPABASE_URL;
+  const supabaseKey =
+    import.meta.env.SUPABASE_KEY || nodeProcess?.env?.SUPABASE_KEY;
 
-  // Debug logging in dev mode
-  if (import.meta.env.DEV) {
-    // eslint-disable-next-line no-console
-    console.log("🔍 DEBUG SUPABASE CLIENT:", {
-      url: supabaseUrl || "❌ MISSING",
-      key: supabaseKey ? `${supabaseKey.substring(0, 20)}...` : "❌ MISSING",
-      nodeEnv: import.meta.env.MODE,
-    });
-  }
+  // Comprehensive debug logging in all modes to diagnose environment issues
+  // eslint-disable-next-line no-console
+  console.log("🔍 DEBUG SUPABASE CLIENT INIT:", {
+    timestamp: new Date().toISOString(),
+    environment: {
+      mode: import.meta.env.MODE,
+      prod: import.meta.env.PROD,
+      dev: import.meta.env.DEV,
+      envName: import.meta.env.ENV_NAME,
+    },
+    supabaseUrl: {
+      fromImportMeta: import.meta.env.SUPABASE_URL ? "✅ Set" : "❌ Missing",
+      fromProcessEnv: nodeProcess?.env?.SUPABASE_URL ? "✅ Set" : "❌ Missing",
+      final: supabaseUrl
+        ? supabaseUrl.includes("localhost") || supabaseUrl.includes("127.0.0.1")
+          ? "⚠️ LOCALHOST"
+          : "✅ CLOUD"
+        : "❌ MISSING",
+      value: supabaseUrl || "❌ NOT SET",
+    },
+    supabaseKey: {
+      fromImportMeta: import.meta.env.SUPABASE_KEY ? "✅ Set" : "❌ Missing",
+      fromProcessEnv: nodeProcess?.env?.SUPABASE_KEY ? "✅ Set" : "❌ Missing",
+      final: supabaseKey
+        ? `✅ Set (${supabaseKey.substring(0, 20)}...)`
+        : "❌ MISSING",
+    },
+    processAvailable: {
+      exists: typeof process !== "undefined" ? "✅ Yes" : "❌ No",
+      env: nodeProcess?.env ? "✅ Yes" : "❌ No",
+    },
+    globalThis: {
+      process: nodeProcess ? "✅ Available" : "❌ Not available",
+    },
+  });
 
   if (!supabaseUrl || !supabaseKey) {
     const missingVars = [];
