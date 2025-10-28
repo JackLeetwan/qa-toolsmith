@@ -1,6 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "../../db/database.types";
 import type { ProfileDTO } from "../../types/types";
+import { SUPABASE_URL, SUPABASE_SERVICE_KEY } from "astro:env/server";
 
 function getSupabaseDb(): ReturnType<typeof createClient<Database>> {
   // Allow bypassing credential check in test environment
@@ -11,8 +12,8 @@ function getSupabaseDb(): ReturnType<typeof createClient<Database>> {
     );
   }
 
-  const supabaseUrl = import.meta.env.SUPABASE_URL;
-  const supabaseServiceKey = import.meta.env.SUPABASE_SERVICE_KEY;
+  const supabaseUrl = SUPABASE_URL;
+  const supabaseServiceKey = SUPABASE_SERVICE_KEY;
 
   if (!supabaseUrl || !supabaseServiceKey) {
     throw new Error(

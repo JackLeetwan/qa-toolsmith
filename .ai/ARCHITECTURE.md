@@ -881,6 +881,7 @@ Mobile-first CTA:
   - API endpoints with `context` parameter for request handling
   - Middleware via `onRequest` export
   - Cloudflare Workers integration via `context.locals.runtime`
+  - **Type-safe environment variables** via `astro:env` (server/client separation)
 - **React 19** (v19.1.1): Interactivity where needed with React Compiler support
   - New hooks: `use()` for async data fetching, `useOptimistic()` for optimistic UI
   - Enhanced Suspense for loading states
@@ -900,6 +901,18 @@ Mobile-first CTA:
   - `@supabase/ssr` (v0.7.0) - SSR support for Astro with proper cookie management
   - Open-source, can be hosted locally or on own server
   - Built-in JWT authentication with session management
+
+### Environment Configuration
+
+The application uses **Astro 5's typed environment variable system** (`astro:env`) for secure and type-safe configuration:
+
+- **Server-side access**: `import { SUPABASE_URL, SUPABASE_KEY, OPENROUTER_API_KEY } from 'astro:env/server'`
+- **Client-side access**: `import { ENV_NAME } from 'astro:env/client'` (only public variables)
+- **Variable schema**: Defined in `astro.config.mjs` with type safety and access level validation
+- **Priority system**: Cloudflare bindings → `astro:env` → Node.js fallback
+- **References**:
+  - [Astro: Variable types](https://docs.astro.build/en/guides/environment-variables/#variable-types)
+  - [Astro × Cloudflare: Env & Secrets](https://docs.astro.build/en/guides/integrations-guide/cloudflare/#environment-variables-and-secrets)
 
 ### AI
 

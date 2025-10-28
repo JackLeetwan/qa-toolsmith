@@ -1,5 +1,5 @@
 // @ts-check
-import { defineConfig } from "astro/config";
+import { defineConfig, envField } from "astro/config";
 
 import react from "@astrojs/react";
 import sitemap from "@astrojs/sitemap";
@@ -25,6 +25,50 @@ export default defineConfig({
     }),
     sitemap(),
   ],
+  env: {
+    schema: {
+      // Supabase configuration (server-side only)
+      SUPABASE_URL: envField.string({
+        context: "server",
+        access: "public",
+        optional: false,
+      }),
+      SUPABASE_KEY: envField.string({
+        context: "server",
+        access: "secret",
+        optional: false,
+      }),
+      SUPABASE_SERVICE_KEY: envField.string({
+        context: "server",
+        access: "secret",
+        optional: true,
+      }),
+
+      // Feature flags environment (client-accessible)
+      ENV_NAME: envField.enum({
+        context: "client",
+        access: "public",
+        values: ["local", "integration", "production"],
+        optional: false,
+        default: "local",
+      }),
+
+      // AI integration (server-side only, optional)
+      OPENROUTER_API_KEY: envField.string({
+        context: "server",
+        access: "secret",
+        optional: true,
+      }),
+
+      // Auth configuration (server-side only)
+      AUTH_RESET_REDIRECT_URL: envField.string({
+        context: "server",
+        access: "public",
+        optional: true,
+      }),
+    },
+    validateSecrets: true,
+  },
   vite: {
     plugins: [tailwindcss()],
     resolve: {
@@ -33,12 +77,6 @@ export default defineConfig({
             "react-dom/server": "react-dom/server.edge",
           }
         : undefined,
-    },
-    // Note: We only define ENV_NAME here as it's needed for client-side feature flags
-    // SUPABASE_URL and SUPABASE_KEY are accessed via process.env fallback in runtime
-    // (vite.define hardcodes values at build time, making runtime env vars unavailable)
-    define: {
-      "import.meta.env.ENV_NAME": JSON.stringify(process.env.ENV_NAME),
     },
   },
   adapter: useCloudflareAdapter ? cloudflare() : node({ mode: "standalone" }),

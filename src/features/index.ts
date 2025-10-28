@@ -1,4 +1,5 @@
-import type { EnvName, FeatureFlags, FeaturePath } from "./types";
+import { ENV_NAME } from "astro:env/client";
+import type { FeatureFlags, FeaturePath } from "./types";
 import { flags as localFlags } from "./config.local";
 import { flags as integrationFlags } from "./config.integration";
 import { flags as productionFlags } from "./config.production";
@@ -31,16 +32,16 @@ function loadFeatureFlags(): FeatureFlags {
     return flags;
   }
 
-  // Try ENV_NAME first, fallback to production for Cloudflare Pages
-  const ENV_NAME = (import.meta.env.ENV_NAME || "production") as EnvName;
+  // Use ENV_NAME from astro:env/client, fallback to production
+  const currentEnvName = ENV_NAME || "production";
 
-  if (!["local", "integration", "production"].includes(ENV_NAME)) {
+  if (!["local", "integration", "production"].includes(currentEnvName)) {
     // Return safe defaults when ENV_NAME is invalid
     flags = getSafeDefaultFlags();
     return flags;
   }
 
-  switch (ENV_NAME) {
+  switch (currentEnvName) {
     case "local":
       flags = localFlags;
       break;

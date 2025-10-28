@@ -8,6 +8,9 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      // Mock astro:env modules for Vitest
+      "astro:env/server": path.resolve(__dirname, "./src/test/env-mock.ts"),
+      "astro:env/client": path.resolve(__dirname, "./src/test/env-mock.ts"),
     },
   },
   test: {

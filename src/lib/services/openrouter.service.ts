@@ -14,6 +14,11 @@ import type {
   AIField,
   OpenRouterResponse,
 } from "../../types/types";
+import {
+  SUPABASE_URL,
+  SUPABASE_SERVICE_KEY,
+  OPENROUTER_API_KEY,
+} from "astro:env/server";
 
 /**
  * OpenRouter Service Error
@@ -1028,9 +1033,9 @@ export class OpenRouterService {
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "../../db/database.types";
 
-// Create Supabase client for database integration
-const supabaseUrl = import.meta.env.SUPABASE_URL;
-const supabaseServiceKey = import.meta.env.SUPABASE_SERVICE_KEY;
+// Create Supabase client for database integration using astro:env/server
+const supabaseUrl = SUPABASE_URL;
+const supabaseServiceKey = SUPABASE_SERVICE_KEY;
 
 let supabaseClient: unknown = null;
 if (supabaseUrl && supabaseServiceKey) {
@@ -1043,8 +1048,11 @@ if (supabaseUrl && supabaseServiceKey) {
 }
 
 // Export singleton instance
+// Note: OpenRouter config vars (baseUrl, defaultModel, etc.) use import.meta.env fallbacks
+// since they're not yet in astro.config.mjs env.schema. All key vars (apiKey, supabase) use astro:env/server
 export const openRouterService = new OpenRouterService({
-  apiKey: import.meta.env.OPENROUTER_API_KEY || "",
+  apiKey: OPENROUTER_API_KEY || "",
+  // Fallback to import.meta.env for config vars not yet in schema
   baseUrl:
     import.meta.env.OPENROUTER_BASE_URL || "https://openrouter.ai/api/v1",
   defaultModel:

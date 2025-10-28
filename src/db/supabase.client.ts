@@ -1,10 +1,10 @@
 import type { AstroCookies } from "astro";
 import { createServerClient, type CookieOptionsWithName } from "@supabase/ssr";
 import type { Database } from "./database.types";
+import { SUPABASE_URL, SUPABASE_KEY } from "astro:env/server";
 
 // Determine if we're in production based on environment
-const isProduction =
-  import.meta.env.PROD || import.meta.env.ENV_NAME === "production";
+const isProduction = import.meta.env.PROD;
 
 export const cookieOptions: CookieOptionsWithName = {
   path: "/",
@@ -28,59 +28,42 @@ export const createSupabaseServerInstance = (context: {
   // Cloudflare Pages Functions runtime bindings (available via locals.runtime.env)
   runtimeEnv?: Record<string, string> | undefined;
 }) => {
-  // Try import.meta.env first (works in Cloudflare), fallback to process.env (works in Node adapter runtime)
-  // Get process from globalThis to work around Vite bundling
+  // Priority order for environment variables:
+  // 1. Cloudflare runtime bindings (context.runtimeEnv)
+  // 2. astro:env/server (typowane, bezpieczne)
+  // 3. Node process.env fallback (for local preview/E2E)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const nodeProcess = (globalThis as any).process || undefined;
-  // Prefer Cloudflare runtime bindings first
   const bindingsUrl = context.runtimeEnv?.SUPABASE_URL;
   const bindingsKey = context.runtimeEnv?.SUPABASE_KEY;
 
+  // Priority order: 1) Cloudflare bindings → 2) astro:env/server → 3) process.env fallback
   const supabaseUrl =
-    bindingsUrl ||
-    import.meta.env.SUPABASE_URL ||
-    nodeProcess?.env?.SUPABASE_URL;
+    bindingsUrl || SUPABASE_URL || nodeProcess?.env?.SUPABASE_URL;
   const supabaseKey =
-    bindingsKey ||
-    import.meta.env.SUPABASE_KEY ||
-    nodeProcess?.env?.SUPABASE_KEY;
+    bindingsKey || SUPABASE_KEY || nodeProcess?.env?.SUPABASE_KEY;
 
-  // Comprehensive debug logging in all modes to diagnose environment issues
+  // Single, clear diagnostic log showing source priority and final values
   // eslint-disable-next-line no-console
-  console.log("🔍 DEBUG SUPABASE CLIENT INIT:", {
-    timestamp: new Date().toISOString(),
-    environment: {
-      mode: import.meta.env.MODE,
-      prod: import.meta.env.PROD,
-      dev: import.meta.env.DEV,
-      envName: import.meta.env.ENV_NAME,
+  console.log("🔍 Supabase client init:", {
+    envSource: {
+      url: bindingsUrl
+        ? "cloudflare-bindings"
+        : SUPABASE_URL
+          ? "astro:env/server"
+          : nodeProcess?.env?.SUPABASE_URL
+            ? "process.env"
+            : "❌ missing",
+      key: bindingsKey
+        ? "cloudflare-bindings"
+        : SUPABASE_KEY
+          ? "astro:env/server"
+          : nodeProcess?.env?.SUPABASE_KEY
+            ? "process.env"
+            : "❌ missing",
     },
-    supabaseUrl: {
-      fromBindings: bindingsUrl ? "✅ Set" : "❌ Missing",
-      fromImportMeta: import.meta.env.SUPABASE_URL ? "✅ Set" : "❌ Missing",
-      fromProcessEnv: nodeProcess?.env?.SUPABASE_URL ? "✅ Set" : "❌ Missing",
-      final: supabaseUrl
-        ? supabaseUrl.includes("localhost") || supabaseUrl.includes("127.0.0.1")
-          ? "⚠️ LOCALHOST"
-          : "✅ CLOUD"
-        : "❌ MISSING",
-      value: supabaseUrl || "❌ NOT SET",
-    },
-    supabaseKey: {
-      fromBindings: bindingsKey ? "✅ Set" : "❌ Missing",
-      fromImportMeta: import.meta.env.SUPABASE_KEY ? "✅ Set" : "❌ Missing",
-      fromProcessEnv: nodeProcess?.env?.SUPABASE_KEY ? "✅ Set" : "❌ Missing",
-      final: supabaseKey
-        ? `✅ Set (${supabaseKey.substring(0, 20)}...)`
-        : "❌ MISSING",
-    },
-    processAvailable: {
-      exists: typeof process !== "undefined" ? "✅ Yes" : "❌ No",
-      env: nodeProcess?.env ? "✅ Yes" : "❌ No",
-    },
-    globalThis: {
-      process: nodeProcess ? "✅ Available" : "❌ Not available",
-    },
+    hasUrl: !!supabaseUrl,
+    hasKey: !!supabaseKey,
   });
 
   if (!supabaseUrl || !supabaseKey) {
@@ -114,8 +97,9 @@ export const createSupabaseServerInstance = (context: {
 // Legacy client for backward compatibility
 // Note: This is NOT used anywhere in the codebase but kept for backward compatibility
 // Returns null when env vars are missing to prevent crashes
-const supabaseUrl = import.meta.env.SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.SUPABASE_KEY;
+// Uses astro:env/server for typified environment access
+const supabaseUrl = SUPABASE_URL;
+const supabaseAnonKey = SUPABASE_KEY;
 
 export const supabaseClient =
   supabaseUrl && supabaseAnonKey
