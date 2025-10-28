@@ -2,6 +2,7 @@ import type { APIRoute } from "astro";
 import { createSupabaseServerInstance } from "../../../db/supabase.client";
 import { z } from "zod";
 import { logger } from "../../../lib/utils/logger";
+import { AUTH_RESET_REDIRECT_URL } from "astro:env/server";
 
 const resetRequestSchema = z.object({
   email: z
@@ -28,10 +29,9 @@ export const POST: APIRoute = async ({ request, cookies, locals }) => {
       ).runtime?.env,
     });
 
-    const envRedirectUrl = import.meta.env?.AUTH_RESET_REDIRECT_URL;
     const redirectUrl =
-      envRedirectUrl && envRedirectUrl !== "undefined"
-        ? envRedirectUrl
+      AUTH_RESET_REDIRECT_URL && AUTH_RESET_REDIRECT_URL !== "undefined"
+        ? AUTH_RESET_REDIRECT_URL
         : undefined;
 
     try {

@@ -1,13 +1,14 @@
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "../../db/database.types";
+import { SUPABASE_URL, SUPABASE_SERVICE_KEY } from "astro:env/server";
 
 // Allow bypassing credential check in test environment
 const supabaseUrl = import.meta.env.VITEST
   ? "https://test.supabase.co"
-  : import.meta.env.SUPABASE_URL;
+  : SUPABASE_URL;
 const supabaseServiceKey = import.meta.env.VITEST
   ? "test-service-key"
-  : import.meta.env.SUPABASE_SERVICE_KEY;
+  : SUPABASE_SERVICE_KEY;
 
 if (!supabaseUrl || !supabaseServiceKey) {
   throw new Error(

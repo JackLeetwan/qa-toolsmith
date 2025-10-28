@@ -1,4 +1,10 @@
 import type { HealthDTO } from "../../types/types";
+import {
+  SUPABASE_URL,
+  SUPABASE_KEY,
+  SUPABASE_SERVICE_KEY,
+  OPENROUTER_API_KEY,
+} from "astro:env/server";
 
 /**
  * Checks application health status
@@ -22,10 +28,10 @@ export function checkEnvironment(): {
   env_name: boolean;
   all_set: boolean;
 } {
-  const supabaseUrl = !!import.meta.env.SUPABASE_URL;
-  const supabaseKey = !!import.meta.env.SUPABASE_KEY;
-  const supabaseServiceKey = !!import.meta.env.SUPABASE_SERVICE_KEY;
-  const openrouterApiKey = !!import.meta.env.OPENROUTER_API_KEY;
+  const supabaseUrl = !!SUPABASE_URL;
+  const supabaseKey = !!SUPABASE_KEY;
+  const supabaseServiceKey = !!SUPABASE_SERVICE_KEY;
+  const openrouterApiKey = !!OPENROUTER_API_KEY;
   const envName = !!import.meta.env.ENV_NAME;
 
   return {

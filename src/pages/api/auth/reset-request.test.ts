@@ -35,9 +35,15 @@ vi.mock("../../../lib/utils/logger", () => ({
   },
 }));
 
-// Mock environment variables
-vi.mock("import.meta.env", () => ({
-  AUTH_RESET_REDIRECT_URL: "https://test.example.com/auth/reset/confirm",
+// Mock astro:env/server with a variable we can control
+let mockAUTH_RESET_REDIRECT_URL: string | undefined = undefined;
+vi.mock("astro:env/server", () => ({
+  get AUTH_RESET_REDIRECT_URL() {
+    return mockAUTH_RESET_REDIRECT_URL;
+  },
+  SUPABASE_URL: "https://test.supabase.co",
+  SUPABASE_KEY: "test-key",
+  SUPABASE_SERVICE_KEY: "test-service-key",
 }));
 
 import { createSupabaseServerInstance } from "../../../db/supabase.client.ts";
@@ -91,6 +97,8 @@ describe("Reset Request API Endpoint", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    // Reset environment variable
+    mockAUTH_RESET_REDIRECT_URL = undefined;
 
     mockCookies = {
       get: vi.fn(),
@@ -171,7 +179,7 @@ describe("Reset Request API Endpoint", () => {
 
     it("should use default redirect URL when env let not set", async () => {
       // Mock environment without AUTH_RESET_REDIRECT_URL
-      vi.mocked(import.meta.env).AUTH_RESET_REDIRECT_URL = undefined;
+      mockAUTH_RESET_REDIRECT_URL = undefined;
 
       const requestBody = {
         email: "user@example.com",
@@ -193,8 +201,7 @@ describe("Reset Request API Endpoint", () => {
     });
 
     it("should use custom redirect URL from environment", async () => {
-      vi.mocked(import.meta.env).AUTH_RESET_REDIRECT_URL =
-        "https://custom.example.com/reset";
+      mockAUTH_RESET_REDIRECT_URL = "https://custom.example.com/reset";
 
       const requestBody = {
         email: "user@example.com",
@@ -216,7 +223,7 @@ describe("Reset Request API Endpoint", () => {
     });
 
     it("should handle different request origins", async () => {
-      vi.mocked(import.meta.env).AUTH_RESET_REDIRECT_URL = undefined;
+      mockAUTH_RESET_REDIRECT_URL = undefined;
 
       mockRequest = createMockRequest(
         "https://different.example.com/api/auth/reset-request",
@@ -576,7 +583,7 @@ describe("Reset Request API Endpoint", () => {
 
   describe("redirect URL handling", () => {
     it("should construct correct default redirect URL", async () => {
-      vi.mocked(import.meta.env).AUTH_RESET_REDIRECT_URL = undefined;
+      mockAUTH_RESET_REDIRECT_URL = undefined;
 
       const testUrls = [
         "https://example.com/api/auth/reset-request",
@@ -603,7 +610,7 @@ describe("Reset Request API Endpoint", () => {
     });
 
     it("should handle URLs with ports", async () => {
-      vi.mocked(import.meta.env).AUTH_RESET_REDIRECT_URL = undefined;
+      mockAUTH_RESET_REDIRECT_URL = undefined;
 
       mockRequest = createMockRequest(
         "https://example.com:8080/api/auth/reset-request",
@@ -624,7 +631,7 @@ describe("Reset Request API Endpoint", () => {
     });
 
     it("should handle URLs with query parameters", async () => {
-      vi.mocked(import.meta.env).AUTH_RESET_REDIRECT_URL = undefined;
+      mockAUTH_RESET_REDIRECT_URL = undefined;
 
       mockRequest = createMockRequest(
         "https://example.com/api/auth/reset-request?param=value",

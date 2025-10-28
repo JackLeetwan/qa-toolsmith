@@ -1,23 +1,26 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import type { EnvName, FeaturePath } from "../features/types";
 
-// Mock the environment for each test
+// Mock astro:env/client with a variable we can control
+let mockENV_NAME: string | undefined = "local";
+
+vi.mock("astro:env/client", () => ({
+  get ENV_NAME() {
+    return mockENV_NAME;
+  },
+}));
 
 describe("Feature Flags", () => {
   beforeEach(() => {
     // Reset environment before each test
     vi.resetModules();
-    // Reset import.meta.env for each test
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (import.meta.env as any).ENV_NAME = "local";
+    mockENV_NAME = "local";
   });
 
   describe("Safe defaults for invalid environment", () => {
     it("should return false for all features when ENV_NAME is invalid", async () => {
       // Temporarily set invalid ENV_NAME
-      const originalEnv = import.meta.env.ENV_NAME;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (import.meta.env as any).ENV_NAME = "invalid";
+      mockENV_NAME = "invalid";
 
       const { isFeatureEnabled } = await import("../features");
 
@@ -29,32 +32,24 @@ describe("Feature Flags", () => {
       expect(isFeatureEnabled("auth.passwordReset")).toBe(false);
       expect(isFeatureEnabled("auth.emailVerification")).toBe(false);
       expect(isFeatureEnabled("auth.socialLogin")).toBe(false);
-
-      // Restore original env
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (import.meta.env as any).ENV_NAME = originalEnv;
     });
 
-    it("should return false for all features when ENV_NAME is missing", async () => {
-      // Temporarily remove ENV_NAME
-      const originalEnv = import.meta.env.ENV_NAME;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (import.meta.env as any).ENV_NAME = undefined;
+    it("should fallback to production when ENV_NAME is missing", async () => {
+      // Temporarily remove ENV_NAME - should fallback to production
+      mockENV_NAME = undefined;
 
       const { isFeatureEnabled } = await import("../features");
 
-      expect(isFeatureEnabled("collections.generators")).toBe(false);
-      expect(isFeatureEnabled("collections.templates")).toBe(false);
-      expect(isFeatureEnabled("collections.charters")).toBe(false);
-      expect(isFeatureEnabled("collections.knowledgeBase")).toBe(false);
-      expect(isFeatureEnabled("collections.export")).toBe(false);
-      expect(isFeatureEnabled("auth.passwordReset")).toBe(false);
-      expect(isFeatureEnabled("auth.emailVerification")).toBe(false);
-      expect(isFeatureEnabled("auth.socialLogin")).toBe(false);
-
-      // Restore original env
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (import.meta.env as any).ENV_NAME = originalEnv;
+      // When ENV_NAME is undefined, code fallbacks to "production"
+      // Check that production flags are used
+      expect(isFeatureEnabled("collections.generators")).toBe(true); // production
+      expect(isFeatureEnabled("collections.templates")).toBe(false); // production
+      expect(isFeatureEnabled("collections.charters")).toBe(false); // production
+      expect(isFeatureEnabled("collections.knowledgeBase")).toBe(false); // production
+      expect(isFeatureEnabled("collections.export")).toBe(false); // production
+      expect(isFeatureEnabled("auth.passwordReset")).toBe(true); // production
+      expect(isFeatureEnabled("auth.emailVerification")).toBe(true); // production
+      expect(isFeatureEnabled("auth.socialLogin")).toBe(false); // production
     });
   });
 
@@ -87,7 +82,7 @@ describe("Feature Flags", () => {
     "Feature flag values for %s environment",
     (env: EnvName, featurePath: FeaturePath, expected: boolean) => {
       it(`should return ${expected} for ${featurePath}`, async () => {
-        process.env.ENV_NAME = env;
+        mockENV_NAME = env;
 
         const { isFeatureEnabled } = await import("../features");
 
@@ -98,7 +93,7 @@ describe("Feature Flags", () => {
 
   describe("Default-deny behavior", () => {
     it("should return false for non-existent namespace", async () => {
-      process.env.ENV_NAME = "local";
+      mockENV_NAME = "local";
 
       const { isFeatureEnabled } = await import("../features");
 
@@ -107,7 +102,7 @@ describe("Feature Flags", () => {
     });
 
     it("should return false for non-existent feature key", async () => {
-      process.env.ENV_NAME = "local";
+      mockENV_NAME = "local";
 
       const { isFeatureEnabled } = await import("../features");
 

@@ -128,11 +128,33 @@ Example: `20240906123045_create_profiles.sql`
 
 ## Environment Variables
 
-- Używaj `import.meta.env` zamiast `process.env` (Cloudflare Workers)
+### Astro 5 Typed Environment Variables
+
+QA Toolsmith uses **`astro:env`** (Astro 5's typed environment variable system) for secure and type-safe configuration:
+
+- **Server-side**: `import { SUPABASE_URL, SUPABASE_KEY, OPENROUTER_API_KEY } from 'astro:env/server'`
+- **Client-side**: `import { ENV_NAME } from 'astro:env/client'` (only public variables)
+- **Variable schema**: Defined in `astro.config.mjs` with type safety and access level validation
+- **Priority system**: Cloudflare bindings (`context.locals.runtime.env`) → `astro:env/server` → Node.js fallback (`process.env`)
+- **Security**: Secrets are **only available server-side** through `astro:env/server`; **never** expose secrets client-side
+
+### References
+
+- [Astro: Variable types](https://docs.astro.build/en/guides/environment-variables/#variable-types)
+- [Astro × Cloudflare: Env & Secrets](https://docs.astro.build/en/guides/integrations-guide/cloudflare/#environment-variables-and-secrets)
+
+### Required Variables
+
+- `SUPABASE_URL` - Supabase project URL (server/public)
+- `SUPABASE_KEY` - Supabase seed anonymous key (server/secret)
+- `SUPABASE_SERVICE_KEY` - Supabase service role key (server/secret)
+- `ENV_NAME` - Environment name for feature flags (local/integration/production) - client/public
+- `OPENROUTER_API_KEY` - AI integration key (optional, server/secret)
+- `AUTH_RESET_REDIRECT_URL` - Password reset redirect URL (server/public or client/public)
+
+### Migration Notes
+
+- **Old**: `import.meta.env.VARIABLE_NAME`
+- **New**: `import { VARIABLE_NAME } from 'astro:env/server'` or `'astro:env/client'`
 - Aktualizuj `src/env.d.ts` przy dodawaniu nowych zmiennych
 - Aktualizuj `.env.example` zgodnie ze zmianami
-
-**Required Variables:**
-- `SUPABASE_URL` - Supabase project URL
-- `SUPABASE_KEY` - Supabase anonymous key
-- `SUPABASE_SERVICE_KEY` - Supabase service role key (server-side only)

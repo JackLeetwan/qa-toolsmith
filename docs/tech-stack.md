@@ -54,7 +54,11 @@ QA Toolsmith is deployed on **Cloudflare Pages** using the official `@astrojs/cl
 - **Adapter**: `@astrojs/cloudflare` v12.6.10 for Cloudflare Workers integration with Astro 5
 - **Build Command**: `npm run build` with `ASTRO_TARGET=cloudflare`
 - **Build Output**: `dist/` directory with Cloudflare Workers-compatible bundles
-- **Environment Variables**: Supabase credentials (`SUPABASE_URL`, `SUPABASE_KEY`, `SUPABASE_SERVICE_KEY`) and application secrets
+- **Environment Variables**: Type-safe access via `astro:env/server` and `astro:env/client`
+  - Supabase credentials (`SUPABASE_URL`, `SUPABASE_KEY`, `SUPABASE_SERVICE_KEY`)
+  - Feature flags (`ENV_NAME`)
+  - AI integration (`OPENROUTER_API_KEY`)
+  - Cloudflare bindings available at `context.locals.runtime.env`
 - **Preview Deployments**: Automatic for all pull requests with preview URLs
 - **SSR**: Enabled via `output: "server"` in `astro.config.mjs`
 
