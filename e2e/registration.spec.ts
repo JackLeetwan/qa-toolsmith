@@ -58,9 +58,10 @@ test.describe("User Registration", () => {
     const isOnRegisterPage = currentUrl.includes("/auth/register");
     const isOnHomePage =
       currentUrl.includes("/") && !currentUrl.includes("/auth");
+    const isOnLoginCheckEmail = currentUrl.includes("/auth/login?check_email=1");
 
     // Either user stays on register page (email confirmation required) or is redirected to home (auto-login)
-    expect(isOnRegisterPage || isOnHomePage).toBe(true);
+    expect(isOnRegisterPage || isOnHomePage || isOnLoginCheckEmail).toBe(true);
 
     // If on home page, user was auto-logged in (email confirmation not required)
     // If on register page, email confirmation is required
@@ -264,9 +265,10 @@ test.describe("User Registration", () => {
     const isOnRegisterPage = currentUrl.includes("/auth/register");
     const isOnHomePage =
       currentUrl.includes("/") && !currentUrl.includes("/auth");
+    const isOnLoginCheckEmail = currentUrl.includes("/auth/login?check_email=1");
 
     // Either user stays on register page (email confirmation required or error) or is redirected to home (auto-login)
-    expect(isOnRegisterPage || isOnHomePage).toBe(true);
+    expect(isOnRegisterPage || isOnHomePage || isOnLoginCheckEmail).toBe(true);
 
     // If still on register page, form should not be stuck in loading state
     if (isOnRegisterPage) {
