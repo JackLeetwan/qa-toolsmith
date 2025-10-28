@@ -2,6 +2,89 @@
 
 This guide explains how to deploy QA Toolsmith to Cloudflare Pages in production.
 
+## CI/CD Pipeline
+
+QA Toolsmith uses GitHub Actions for automated testing and deployment to Cloudflare Pages.
+
+### Workflow Structure
+
+The CI/CD is split into two separate workflows for better security and performance:
+
+#### CI Pipeline (`.github/workflows/ci.yml`)
+- **Purpose**: Continuous Integration for PR validation
+- **Triggers**: Push to `main`/`master`, Pull Requests
+- **Jobs**: Lint → Build → Unit Tests → E2E Tests → Status Comment
+- **Artifacts**: 30-day retention (push) / 7-day retention (PR)
+
+#### Deployment Pipeline (`.github/workflows/deploy-cloudflare.yml`)
+- **Purpose**: Production deployment to Cloudflare Pages
+- **Triggers**: Push to `master` branch, Manual dispatch
+- **Jobs**: Build → Deploy via Wrangler
+- **Strategy**: Direct upload with graceful skip if secrets not configured
+
+### Recommended Flow
+
+```
+┌─────────────────┐
+│   Open PR       │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│   CI Pipeline   │──► Lint → Build → Test → E2E
+│    (ci.yml)     │     │
+└────────┬────────┘     │
+         │              ▼
+         │         Status Comment on PR
+         │
+         ▼
+  ┌─────────────────┐
+  │  Merge to       │
+  │    master       │
+  └────────┬────────┘
+           │
+           ▼
+    ┌──────────────────┐
+    │ Deploy Workflow  │──► Build → Deploy to Cloudflare
+    │ (deploy-         │     │
+    │  cloudflare.yml) │     │
+    └──────────────────┘     │
+                            ▼
+                   Cloudflare Pages Production
+```
+
+### Why Separate Workflows?
+
+1. **Separation of Concerns**: CI checks run independently from deployments
+2. **Security**: Deployment secrets only exposed during deployment jobs
+3. **Performance**: E2E tests not run before deployment (already tested in PR)
+4. **Flexibility**: Manual deployment via workflow dispatch
+5. **Cost**: Deployment jobs only run when needed
+
+### Required GitHub Secrets
+
+#### CI Pipeline
+- `SUPABASE_URL` - Supabase project URL
+- `SUPABASE_KEY` - Supabase anon key
+- `E2E_USERNAME` (optional) - Test user email
+- `E2E_PASSWORD` (optional) - Test user password
+- `E2E_USERNAME_ID` (optional) - Test user UUID
+
+#### Deployment Pipeline
+- `CLOUDFLARE_API_TOKEN` - Cloudflare API token with Pages permissions
+- `CLOUDFLARE_ACCOUNT_ID` - Cloudflare account ID
+- `CLOUDFLARE_PAGES_PROJECT_NAME` (optional) - Project name, defaults to 'qa-toolsmith'
+- `SUPABASE_SERVICE_KEY` - Supabase service role key
+- `OPENROUTER_API_KEY` (optional) - AI service API key
+
+### Getting Cloudflare Secrets
+
+1. **API Token**: Cloudflare Dashboard → My Profile → API Tokens → Create token with "Cloudflare Pages - Edit" template
+2. **Account ID**: Find in Cloudflare Dashboard URL: `https://dash.cloudflare.com/{ACCOUNT_ID}/`
+3. **Project Name**: Optional, defaults to `qa-toolsmith` (found in Cloudflare Pages dashboard)
+
+For detailed workflow documentation, see `.github/workflows/README.md`.
+
 ## Prerequisites
 
 - Cloudflare account

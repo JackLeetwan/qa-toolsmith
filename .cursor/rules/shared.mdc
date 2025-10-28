@@ -30,6 +30,7 @@ Zawsze przestrzegaj poniższej struktury katalogów:
 - `src/middleware/`: Middleware Astro do autentykacji i zarządzania sesją.
 - `src/__tests__/`: Testy jednostkowe Vitest.
 - `e2e/`: Testy End-to-End Playwright.
+- `.github/workflows/`: GitHub Actions workflows dla CI/CD.
 
 ## Kluczowe Zasady Kodowania i Architektury
 
@@ -67,3 +68,5 @@ Zawsze przestrzegaj poniższej struktury katalogów:
 - **Frontend:** Zobacz `frontend-coding.mdc` dla szczegółów Astro, React, Tailwind, shadcn/ui
 - **Backend:** Zobacz `backend-api.mdc` dla Supabase, API, migracji, RLS
 - **Planowanie:** Zobacz `planning.mdc` dla PRD, user stories, MVP scope
+- **CI/CD:** Zobacz `github-action.mdc` dla GitHub Actions workflows
+- **Deployment:** Zobacz `docs/deployment-cloudflare.md` dla szczegółów wdrożenia i CI/CD pipeline
