@@ -81,19 +81,19 @@ test.describe("User Registration", () => {
     await expect(emailInput).toBeVisible();
     await expect(submitButton).toBeVisible();
 
-    // Fill with invalid email and submit to trigger validation
-    await emailInput.fill("invalid-email");
+    // Fill form with invalid email and submit to trigger validation
+    await emailInput.type("invalid-email");
     await submitButton.click();
 
     // Wait for validation to complete
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(1000);
 
     // Should display validation error for invalid email format
     await expect(
       page
         .locator('p[role="alert"]')
         .filter({ hasText: /Nieprawidłowy format email/i }),
-    ).toBeVisible({ timeout: 3000 });
+    ).toBeVisible();
   });
 
   test("should display validation errors for short password", async ({
@@ -112,12 +112,10 @@ test.describe("User Registration", () => {
     await expect(emailInput).toBeVisible();
     await expect(submitButton).toBeVisible();
 
-    // Fill form with short password
-    await emailInput.fill(testEmail);
-    await passwordInput.fill("short"); // Too short
-    await confirmPasswordInput.fill("short");
-
-    // Submit to trigger validation
+    // Fill form with short password and submit to trigger validation
+    await emailInput.type(testEmail);
+    await passwordInput.type("short"); // Too short
+    await confirmPasswordInput.type("short");
     await submitButton.click();
 
     // Wait for validation to complete
@@ -149,12 +147,10 @@ test.describe("User Registration", () => {
     await expect(emailInput).toBeVisible();
     await expect(submitButton).toBeVisible();
 
-    // Fill form with password containing only numbers
-    await emailInput.fill(testEmail);
-    await passwordInput.fill("12345678");
-    await confirmPasswordInput.fill("12345678");
-
-    // Submit to trigger validation
+    // Fill form with password containing only numbers and submit to trigger validation
+    await emailInput.type(testEmail);
+    await passwordInput.type("12345678");
+    await confirmPasswordInput.type("12345678");
     await submitButton.click();
 
     // Wait for validation to complete
@@ -186,12 +182,10 @@ test.describe("User Registration", () => {
     await expect(emailInput).toBeVisible();
     await expect(submitButton).toBeVisible();
 
-    // Fill form with password containing only letters
-    await emailInput.fill(testEmail);
-    await passwordInput.fill("password");
-    await confirmPasswordInput.fill("password");
-
-    // Submit to trigger validation
+    // Fill form with password containing only letters and submit to trigger validation
+    await emailInput.type(testEmail);
+    await passwordInput.type("password");
+    await confirmPasswordInput.type("password");
     await submitButton.click();
 
     // Wait for validation to complete
@@ -223,12 +217,10 @@ test.describe("User Registration", () => {
     await expect(emailInput).toBeVisible();
     await expect(submitButton).toBeVisible();
 
-    // Fill form with mismatched passwords
-    await emailInput.fill(testEmail);
-    await passwordInput.fill("SecurePass123");
-    await confirmPasswordInput.fill("DifferentPass456");
-
-    // Submit to trigger validation
+    // Fill form with mismatched passwords and submit to trigger validation
+    await emailInput.type(testEmail);
+    await passwordInput.type("SecurePass123");
+    await confirmPasswordInput.type("DifferentPass456");
     await submitButton.click();
 
     // Wait for validation to complete

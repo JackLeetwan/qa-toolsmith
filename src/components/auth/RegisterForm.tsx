@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,6 +24,7 @@ export default function RegisterForm({
   onEmailConfirmationRequired,
 }: RegisterFormProps) {
   const [navigateTo, setNavigateTo] = useState<string | null>(null);
+  const redirectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (navigateTo) {
@@ -34,6 +35,15 @@ export default function RegisterForm({
       }
     }
   }, [navigateTo, onRedirect]);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (redirectTimeoutRef.current) {
+        clearTimeout(redirectTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleSuccess = useCallback(
     (emailConfirmationRequired?: boolean, message?: string) => {
@@ -51,7 +61,7 @@ export default function RegisterForm({
         }
       } else {
         toast.success("Konto utworzone pomyślnie!");
-        setTimeout(() => {
+        redirectTimeoutRef.current = setTimeout(() => {
           setNavigateTo("/");
         }, 500);
       }

@@ -57,7 +57,7 @@ export function useRegisterForm(options: UseRegisterFormOptions = {}) {
     trigger,
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
-    mode: "onChange",
+    mode: "onSubmit",
   });
 
   const handleFormSubmit = async (data: RegisterFormData) => {
