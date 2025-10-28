@@ -105,4 +105,3 @@ npm run preview      # Preview production build
 - **CI Workflow** (`.github/workflows/ci.yml`): Lint → Build → Unit Tests → E2E Tests
 - **Deployment Workflow** (`.github/workflows/deploy-cloudflare.yml`): Automatic on master branch merges to Cloudflare Pages
 - **See**: [Cloudflare Pages Deployment Guide](./deployment-cloudflare.md) for full CI/CD details
-- DigitalOcean App Platform jako hosting aplikacji Astro
