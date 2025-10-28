@@ -20,15 +20,19 @@ const showCheckEmailBanner = currentUrl.searchParams.get("check_email") === "1";
 ---
 
 <AuthLayout title="Logowanie" description="Zaloguj się do swojego konta">
-  {showCheckEmailBanner && (
-    <Alert>
-      <AlertDescription>
-        Konto utworzone! Sprawdź swoją skrzynkę email i potwierdź adres, aby
-        się zalogować.
-      </AlertDescription>
-    </Alert>
-  )}
+  {
+    showCheckEmailBanner && (
+      <Alert>
+        <AlertDescription>
+          Konto utworzone! Sprawdź swoją skrzynkę email i potwierdź adres, aby
+          się zalogować.
+        </AlertDescription>
+      </Alert>
+    )
+  }
 
-  {/* @ts-expect-error - client directive is handled by Astro, not a React prop */}
+  {
+    /* @ts-expect-error - client directive is handled by Astro, not a React prop */
+  }
   <LoginForm client:idle />
 </AuthLayout>
