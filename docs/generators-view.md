@@ -441,3 +441,21 @@ Planned generators (currently placeholders):
 - No cloud sync for history (localStorage only)
 - No export/import for history
 - Generic generators show "Coming Soon" placeholder
+
+---
+
+## See Also
+
+### Related Documentation
+
+- **[API Documentation](./api.md)** - Complete API reference for IBAN generator and validator endpoints
+- **[Architecture Overview](../.ai/ARCHITECTURE.md)** - High-level architecture and UI patterns
+- **[Tech Stack](./tech-stack.md)** - Technology overview and React/TypeScript configuration
+- **[README](../README.md)** - Project overview and getting started
+
+### Implementation
+
+- **IBAN Generator**: `src/components/generators/IBANGenerator.tsx` - Main component
+- **IBAN Validator**: `src/pages/api/validators/iban.ts` - Validation endpoint
+- **IBAN Utils**: `src/lib/utils/iban.ts` - Validation and generation utilities
+- **Tests**: `src/__tests__/lib/utils/iban.test.ts` - 158 IBAN test cases

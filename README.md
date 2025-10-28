@@ -306,14 +306,65 @@ For flaky IBAN generator tests, check:
 
 ## API Documentation
 
-The QA Toolsmith API provides several endpoints for interacting with the application programmatically. Detailed API specifications and endpoint documentation can be found in [.ai/ARCHITECTURE.md](.ai/ARCHITECTURE.md).
+The QA Toolsmith API provides several endpoints for interacting with the application programmatically.
 
+**📚 Complete API Reference:** See [docs/api.md](./docs/api.md) for detailed endpoint specifications, request/response formats, authentication, and examples.
+
+**Overview:**
 - **Health Check**: `GET /api/health` - Simple application health check endpoint
+- **Authentication**: `/api/auth/*` - Login, registration, password reset
+- **Data Generators**: `/api/generators/*` - IBAN, phone, address generators
+- **Validators**: `/api/validators/*` - IBAN, data validation
+
+For high-level architecture overview, see [.ai/ARCHITECTURE.md](.ai/ARCHITECTURE.md).
 
 ## Project Status
 
 - **MVP Complete** (v0.0.1)
 - Actively maintained feature set for testers' core workflows
+
+## Documentation Structure
+
+QA Toolsmith uses a structured documentation approach to serve different audiences:
+
+### `.ai/` - Architecture & Requirements
+**Purpose:** High-level architectural context and product requirements for AI tools and developers
+
+**Contents:**
+- `ARCHITECTURE.md` - High-level architecture overview (database, UI, API, tech stack)
+- `prd.md` - Product Requirements Document with user stories (US-001 to US-014)
+- `diagrams/` - Mermaid diagrams for UI flows and architecture
+
+**Note:** Does NOT contain implementation details or deployment guides
+
+### `.cursor/rules/` - AI Agent Instructions
+**Purpose:** Specific coding rules and guidelines for AI agents
+
+**Contents:**
+- `shared.mdc` - Core project rules (always apply)
+- `backend-api.mdc` - Supabase, API, RLS guidelines
+- `frontend-coding.mdc` - Astro, React, Tailwind, shadcn/ui guidelines
+- `github-action.mdc` - CI/CD rules
+- `planning.mdc` - PRD shortcuts and planning guidelines
+
+**Note:** These are rules for AI agents, not user documentation
+
+### `docs/` - User-Facing Documentation
+**Purpose:** Complete documentation for users and developers
+
+**Contents:**
+- `api.md` - Complete API reference with endpoints and examples
+- `deployment-cloudflare.md` - Deployment guide for Cloudflare Pages
+- `SETUP_GUIDE.md` - Setup instructions in Polish
+- `tech-stack.md` - Technology overview
+- `SECURITY.md` - Security policy
+- `generators-view.md` - Feature documentation for data generators
+
+**See also:**
+- [Tech Stack](./docs/tech-stack.md) for technology details
+- [API Documentation](./docs/api.md) for complete API reference
+- [Cloudflare Deployment Guide](./docs/deployment-cloudflare.md) for deployment
+- [Architecture Overview](./.ai/ARCHITECTURE.md) for high-level architecture
 
 ## License
 

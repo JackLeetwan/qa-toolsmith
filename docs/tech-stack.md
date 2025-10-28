@@ -105,3 +105,21 @@ npm run preview      # Preview production build
 - **CI Workflow** (`.github/workflows/ci.yml`): Lint → Build → Unit Tests → E2E Tests
 - **Deployment Workflow** (`.github/workflows/deploy-cloudflare.yml`): Automatic on master branch merges to Cloudflare Pages
 - **See**: [Cloudflare Pages Deployment Guide](./deployment-cloudflare.md) for full CI/CD details
+
+---
+
+## See Also
+
+### Related Documentation
+
+- **[Cloudflare Deployment](./deployment-cloudflare.md)** - Complete deployment guide and CI/CD setup
+- **[API Documentation](./api.md)** - API endpoints and authentication details
+- **[Architecture Overview](../.ai/ARCHITECTURE.md)** - High-level architecture and database design
+- **[Setup Guide](./SETUP_GUIDE.md)** - Polish setup instructions with environment configuration
+- **[README](../README.md)** - Project overview and getting started
+
+### Configuration
+
+- **Environment Variables**: See `.cursor/rules/backend-api.mdc` for complete environment variable documentation
+- **Astro Configuration**: `astro.config.mjs` - SSR setup with Cloudflare adapter
+- **Package Management**: `package.json` - Dependencies and scripts

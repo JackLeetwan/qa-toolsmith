@@ -40,7 +40,7 @@ QA Toolsmith uses Astro 5 with React 19 for interactive components.
 - **Services:** Wydziel logikę do serwisów w `src/lib/services`
 - **Middleware:** Implementuj middleware dla modyfikacji request/response
 - **Cookies:** Używaj `Astro.cookies` dla zarządzania cookies serwer-side
-- **Environment:** Używaj `import.meta.env` dla zmiennych środowiskowych
+- **Environment:** Używaj **Astro 5's typed environment system** (`astro:env`) - See `backend-api.mdc`
 - **Middleware:** Never skip the auth.getUser() call in authentication middleware
 
 ## React 19 Guidelines
