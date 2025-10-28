@@ -64,6 +64,28 @@ QA Toolsmith is deployed on **Cloudflare Pages** using the official `@astrojs/cl
 
 The application requires SSR due to server-side API endpoints (authentication, data generators, health checks), making Cloudflare Pages the ideal choice for its excellent SSR support and generous free tier.
 
+### Docker Deployment (Alternative)
+
+QA Toolsmith can also be deployed as a Docker container for flexibility across various hosting platforms (DigitalOcean, AWS, Azure, etc.).
+
+**Key Features:**
+- **Multi-stage build**: Optimized image size (~200MB)
+- **Non-root user**: Enhanced security with `nodejs:1001` user
+- **Health checks**: Built-in endpoint monitoring at `/api/health`
+- **Flexible configuration**: Runtime environment variables for all secrets
+- **GitHub Container Registry**: Ready for `ghcr.io` deployment
+
+**Quick Start:**
+```bash
+docker build -t jayleetwan/qa-toolsmith:latest .
+docker run -d -p 3000:3000 \
+  -e SUPABASE_URL=https://your-project.supabase.co \
+  -e SUPABASE_KEY=your-anon-key \
+  jayleetwan/qa-toolsmith:latest
+```
+
+For detailed Docker deployment instructions, see [Docker Deployment Guide](./docker.md).
+
 ## Development Workflow
 
 ### Local Development
@@ -83,4 +105,3 @@ npm run preview      # Preview production build
 - **CI Workflow** (`.github/workflows/ci.yml`): Lint → Build → Unit Tests → E2E Tests
 - **Deployment Workflow** (`.github/workflows/deploy-cloudflare.yml`): Automatic on master branch merges to Cloudflare Pages
 - **See**: [Cloudflare Pages Deployment Guide](./deployment-cloudflare.md) for full CI/CD details
-
