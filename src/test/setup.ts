@@ -6,14 +6,29 @@ import dotenv from "dotenv";
 dotenv.config({ path: ".env.test" });
 
 // ============================================================================
+// ENSURE PROCESS.ENV IS POPULATED FOR TESTS
+// ============================================================================
+
+// Set default test values for process.env if not already set
+if (!process.env.SUPABASE_URL) {
+  process.env.SUPABASE_URL = "https://test.supabase.co";
+}
+if (!process.env.SUPABASE_KEY) {
+  process.env.SUPABASE_KEY = "test-anonymous-key-placeholder";
+}
+if (!process.env.SUPABASE_SERVICE_KEY) {
+  process.env.SUPABASE_SERVICE_KEY = "test-service-key-placeholder";
+}
+
+// ============================================================================
 // GLOBAL TEST SETUP - TEST ISOLATION & MOCK MANAGEMENT
 // ============================================================================
 
 // Mock environment variables globally
 Object.defineProperty(import.meta, "env", {
   value: {
-    SUPABASE_URL: "https://test.supabase.co",
-    SUPABASE_SERVICE_KEY: "test-service-key",
+    SUPABASE_URL: process.env.SUPABASE_URL,
+    SUPABASE_SERVICE_KEY: process.env.SUPABASE_SERVICE_KEY,
   },
   writable: false,
   configurable: true,

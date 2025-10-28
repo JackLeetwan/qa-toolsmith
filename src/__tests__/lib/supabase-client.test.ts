@@ -7,6 +7,10 @@ describe("Supabase Client Initialization", () => {
   let mockHeaders: Headers;
 
   beforeEach(() => {
+    // Ensure environment variables are set for tests
+    process.env.SUPABASE_URL = "https://test.supabase.co";
+    process.env.SUPABASE_KEY = "test-anonymous-key-placeholder";
+
     // Mock Astro cookies
     mockCookies = {
       get: vi.fn(),
