@@ -19,7 +19,7 @@ const signinSchema = z.object({
     .max(72, "Hasło jest za długie"),
 });
 
-export const POST: APIRoute = async ({ request, cookies }) => {
+export const POST: APIRoute = async ({ request, cookies, locals }) => {
   const startTime = Date.now();
   logger.debug("🔐 Signin API called at:", new Date().toISOString());
 
@@ -39,6 +39,9 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     const supabase = createSupabaseServerInstance({
       cookies,
       headers: request.headers,
+      runtimeEnv: (
+        locals as unknown as { runtime?: { env?: Record<string, string> } }
+      ).runtime?.env,
     });
     logger.debug("🔧 Supabase instance created");
 

@@ -1,5 +1,5 @@
 import type { APIRoute } from "astro";
-import { createSupabaseServerInstance } from "../../../db/supabase.client.ts";
+import { createSupabaseServerInstance } from "../../../db/supabase.client";
 import { z } from "zod";
 import { logger } from "../../../lib/utils/logger";
 
@@ -15,7 +15,7 @@ const resetChangeSchema = z.object({
     ),
 });
 
-export const POST: APIRoute = async ({ request, cookies }) => {
+export const POST: APIRoute = async ({ request, cookies, locals }) => {
   try {
     const body = await request.json();
     const { new_password } = resetChangeSchema.parse(body);
@@ -23,6 +23,9 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     const supabase = createSupabaseServerInstance({
       cookies,
       headers: request.headers,
+      runtimeEnv: (
+        locals as unknown as { runtime?: { env?: Record<string, string> } }
+      ).runtime?.env,
     });
 
     const { error } = await supabase.auth.updateUser({

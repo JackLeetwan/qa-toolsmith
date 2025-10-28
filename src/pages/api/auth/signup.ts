@@ -25,7 +25,7 @@ const signupSchema = z.object({
     ),
 });
 
-export const POST: APIRoute = async ({ request, cookies }) => {
+export const POST: APIRoute = async ({ request, cookies, locals }) => {
   try {
     const body = await request.json();
     const { email, password } = signupSchema.parse(body);
@@ -33,6 +33,9 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     const supabase = createSupabaseServerInstance({
       cookies,
       headers: request.headers,
+      runtimeEnv: (
+        locals as unknown as { runtime?: { env?: Record<string, string> } }
+      ).runtime?.env,
     });
 
     const { error } = await supabase.auth.signUp({

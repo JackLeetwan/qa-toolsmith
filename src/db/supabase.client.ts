@@ -25,15 +25,25 @@ function parseCookieHeader(
 export const createSupabaseServerInstance = (context: {
   headers: Headers;
   cookies: AstroCookies;
+  // Cloudflare Pages Functions runtime bindings (available via locals.runtime.env)
+  runtimeEnv?: Record<string, string> | undefined;
 }) => {
   // Try import.meta.env first (works in Cloudflare), fallback to process.env (works in Node adapter runtime)
   // Get process from globalThis to work around Vite bundling
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const nodeProcess = (globalThis as any).process || undefined;
+  // Prefer Cloudflare runtime bindings first
+  const bindingsUrl = context.runtimeEnv?.SUPABASE_URL;
+  const bindingsKey = context.runtimeEnv?.SUPABASE_KEY;
+
   const supabaseUrl =
-    import.meta.env.SUPABASE_URL || nodeProcess?.env?.SUPABASE_URL;
+    bindingsUrl ||
+    import.meta.env.SUPABASE_URL ||
+    nodeProcess?.env?.SUPABASE_URL;
   const supabaseKey =
-    import.meta.env.SUPABASE_KEY || nodeProcess?.env?.SUPABASE_KEY;
+    bindingsKey ||
+    import.meta.env.SUPABASE_KEY ||
+    nodeProcess?.env?.SUPABASE_KEY;
 
   // Comprehensive debug logging in all modes to diagnose environment issues
   // eslint-disable-next-line no-console
@@ -46,6 +56,7 @@ export const createSupabaseServerInstance = (context: {
       envName: import.meta.env.ENV_NAME,
     },
     supabaseUrl: {
+      fromBindings: bindingsUrl ? "✅ Set" : "❌ Missing",
       fromImportMeta: import.meta.env.SUPABASE_URL ? "✅ Set" : "❌ Missing",
       fromProcessEnv: nodeProcess?.env?.SUPABASE_URL ? "✅ Set" : "❌ Missing",
       final: supabaseUrl
@@ -56,6 +67,7 @@ export const createSupabaseServerInstance = (context: {
       value: supabaseUrl || "❌ NOT SET",
     },
     supabaseKey: {
+      fromBindings: bindingsKey ? "✅ Set" : "❌ Missing",
       fromImportMeta: import.meta.env.SUPABASE_KEY ? "✅ Set" : "❌ Missing",
       fromProcessEnv: nodeProcess?.env?.SUPABASE_KEY ? "✅ Set" : "❌ Missing",
       final: supabaseKey
