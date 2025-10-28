@@ -67,7 +67,8 @@ export default defineConfig({
         optional: true,
       }),
     },
-    validateSecrets: true,
+    // Disable secret validation during Docker build (secrets provided at runtime)
+    validateSecrets: process.env.ASTRO_TARGET !== "node",
   },
   vite: {
     plugins: [tailwindcss()],
