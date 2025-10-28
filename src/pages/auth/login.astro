@@ -1,17 +1,38 @@
 ---
 import AuthLayout from "@/layouts/AuthLayout.astro";
 import LoginForm from "@/components/auth/LoginForm";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 // Redirect if already logged in
-const { user } = Astro.locals;
+// @ts-expect-error - Astro global provided by the framework
+const user = Astro.locals.user;
 
 if (user) {
+  // @ts-expect-error - Astro global provided by the framework
   const url = new URL(Astro.request.url);
   const nextUrl = url.searchParams.get("next") || "/";
   return Astro.redirect(nextUrl);
 }
+
+// @ts-expect-error - Astro global provided by the framework
+const currentUrl = new URL(Astro.request.url);
+const showCheckEmailBanner = currentUrl.searchParams.get("check_email") === "1";
 ---
 
 <AuthLayout title="Logowanie" description="Zaloguj się do swojego konta">
-  <LoginForm client:load />
+  {
+    showCheckEmailBanner && (
+      <Alert>
+        <AlertDescription>
+          Konto utworzone! Sprawdź swoją skrzynkę email i potwierdź adres, aby
+          się zalogować.
+        </AlertDescription>
+      </Alert>
+    )
+  }
+
+  {
+    /* @ts-expect-error - client directive is handled by Astro, not a React prop */
+  }
+  <LoginForm client:idle />
 </AuthLayout>

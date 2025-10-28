@@ -59,6 +59,10 @@ export default function RegisterForm({
               "Konto utworzone! Sprawdź swoją skrzynkę email, aby potwierdzić adres i się zalogować.",
           );
         }
+        // Redirect to login with banner prompting to check email
+        redirectTimeoutRef.current = setTimeout(() => {
+          setNavigateTo("/auth/login?check_email=1");
+        }, 500);
       } else {
         toast.success("Konto utworzone pomyślnie!");
         redirectTimeoutRef.current = setTimeout(() => {
