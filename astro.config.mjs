@@ -8,7 +8,6 @@ import cloudflare from "@astrojs/cloudflare";
 import node from "@astrojs/node";
 
 // Determine which adapter to use based on environment
-/* eslint-disable no-undef */
 const useCloudflareAdapter =
   process.env.CF_PAGES === "1" || process.env.ASTRO_TARGET === "cloudflare";
 
@@ -44,4 +43,3 @@ export default defineConfig({
   },
   adapter: useCloudflareAdapter ? cloudflare() : node({ mode: "standalone" }),
 });
-/* eslint-enable no-undef */

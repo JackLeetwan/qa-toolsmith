@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
 // Script to run Astro server for E2E tests
-/* eslint-disable no-console, no-undef */
 
 import { spawn } from "child_process";
 import path from "path";

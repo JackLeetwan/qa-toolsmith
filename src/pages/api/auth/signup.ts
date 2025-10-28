@@ -51,6 +51,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       });
 
       // ENHANCED: Log to console for CI debugging
+      // eslint-disable-next-line no-console
       console.error("🚨 SUPABASE SIGNUP ERROR:", {
         code: error.code,
         message: error.message,

@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
 // Script to run Astro dev server WITHOUT ENV_NAME for safe defaults E2E tests
-/* eslint-disable no-console, no-undef */
 
 import { spawn } from "child_process";
 
