@@ -18,8 +18,8 @@ test.describe("IBAN Generator - Copy Button Stability", () => {
   let ibanPage: IBANGeneratorPage;
 
   test.beforeEach(async ({ page }) => {
-    // Skip tests if features are disabled (ENV_NAME not set to local)
-    if (process.env.ENV_NAME !== "local") {
+    // Skip tests only when ENV_NAME is explicitly set and not "local"
+    if (process.env.ENV_NAME && process.env.ENV_NAME !== "local") {
       test.skip();
     }
 
@@ -92,8 +92,8 @@ test.describe("IBAN Generator - Copy Button Stability", () => {
  */
 test.describe("IBAN Generator - API Endpoint", () => {
   test.beforeAll(() => {
-    // Skip tests if features are disabled (ENV_NAME not set to local)
-    if (process.env.ENV_NAME !== "local") {
+    // Skip tests only when ENV_NAME is explicitly set and not "local"
+    if (process.env.ENV_NAME && process.env.ENV_NAME !== "local") {
       test.skip();
     }
   });
