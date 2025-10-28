@@ -4,17 +4,17 @@ import LoginForm from "@/components/auth/LoginForm";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 // Redirect if already logged in
-// @ts-ignore - Astro global provided by the framework
+// @ts-expect-error - Astro global provided by the framework
 const user = Astro.locals.user;
 
 if (user) {
-  // @ts-ignore - Astro global provided by the framework
+  // @ts-expect-error - Astro global provided by the framework
   const url = new URL(Astro.request.url);
   const nextUrl = url.searchParams.get("next") || "/";
   return Astro.redirect(nextUrl);
 }
 
-// @ts-ignore - Astro global provided by the framework
+// @ts-expect-error - Astro global provided by the framework
 const currentUrl = new URL(Astro.request.url);
 const showCheckEmailBanner = currentUrl.searchParams.get("check_email") === "1";
 ---
@@ -27,6 +27,6 @@ const showCheckEmailBanner = currentUrl.searchParams.get("check_email") === "1";
       </AlertDescription>
     </Alert>
   )}
-  {/* @ts-ignore - client directive is handled by Astro, not a React prop */}
+  {/* @ts-expect-error - client directive is handled by Astro, not a React prop */}
   <LoginForm client:idle />
 </AuthLayout>
