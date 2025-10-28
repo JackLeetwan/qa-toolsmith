@@ -44,6 +44,11 @@ export async function middlewareHandler(
     supabase = createSupabaseServerInstance({
       cookies: context.cookies,
       headers: context.request.headers,
+      runtimeEnv: (
+        context.locals as unknown as {
+          runtime?: { env?: Record<string, string> };
+        }
+      ).runtime?.env,
     });
   } catch (error) {
     logger.error("❌ Failed to create Supabase client:", error);
