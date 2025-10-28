@@ -470,7 +470,7 @@ describe("Signup API Endpoint", () => {
         data: { user: null, session: null },
         error: {
           message: "Auto-login failed",
-          status: 400,
+          status: 500,
         },
       });
 

@@ -1,8 +1,8 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { createSupabaseServerInstance } from '../../db/supabase.client';
-import type { AstroCookies } from 'astro';
+import { describe, it, expect, beforeEach, vi } from "vitest";
+import { createSupabaseServerInstance } from "../../db/supabase.client";
+import type { AstroCookies } from "astro";
 
-describe('Supabase Client Initialization', () => {
+describe("Supabase Client Initialization", () => {
   let mockCookies: AstroCookies;
   let mockHeaders: Headers;
 
@@ -14,19 +14,19 @@ describe('Supabase Client Initialization', () => {
       delete: vi.fn(),
       has: vi.fn(),
       getAll: vi.fn(),
-    } as any;
+    } as unknown as AstroCookies;
 
     // Mock headers
     mockHeaders = new Headers();
   });
 
-  it('should initialize with environment variables', () => {
+  it("should initialize with environment variables", () => {
     // Verify SUPABASE_URL and SUPABASE_KEY are set in test environment
     expect(process.env.SUPABASE_URL).toBeDefined();
     expect(process.env.SUPABASE_KEY).toBeDefined();
   });
 
-  it('should create Supabase server instance without throwing', () => {
+  it("should create Supabase server instance without throwing", () => {
     expect(() => {
       createSupabaseServerInstance({
         headers: mockHeaders,
@@ -35,7 +35,7 @@ describe('Supabase Client Initialization', () => {
     }).not.toThrow();
   });
 
-  it('should throw error when env vars are missing', () => {
+  it("should throw error when env vars are missing", () => {
     const originalUrl = process.env.SUPABASE_URL;
     const originalKey = process.env.SUPABASE_KEY;
 
@@ -49,7 +49,7 @@ describe('Supabase Client Initialization', () => {
           headers: mockHeaders,
           cookies: mockCookies,
         });
-      }).toThrow('Missing Supabase environment variables');
+      }).toThrow("Missing Supabase environment variables");
     } finally {
       // Restore env vars
       if (originalUrl) process.env.SUPABASE_URL = originalUrl;

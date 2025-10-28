@@ -54,8 +54,10 @@ export function useRegisterForm(options: UseRegisterFormOptions = {}) {
     register,
     handleSubmit,
     formState: { errors },
+    trigger,
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
+    mode: "onChange",
   });
 
   const handleFormSubmit = async (data: RegisterFormData) => {
@@ -128,5 +130,6 @@ export function useRegisterForm(options: UseRegisterFormOptions = {}) {
     isSubmitting,
     apiError,
     setApiError,
+    trigger,
   };
 }

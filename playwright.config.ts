@@ -56,25 +56,27 @@ export default defineConfig({
         ...devices["Desktop Chrome"],
         // In CI, use port 3000 since only one server is running
         // In local development, use port 3001 for different project configuration
-        baseURL: process.env.CI ? "http://localhost:3000" : "http://localhost:3001",
+        baseURL: process.env.CI
+          ? "http://localhost:3000"
+          : "http://localhost:3001",
       },
     },
   ],
 
   webServer: process.env.CI
-    ? undefined  // In CI, server is already started by workflow
+    ? undefined // In CI, server is already started by workflow
     : [
-    {
-      command: "node scripts/dev-e2e.js local",
-      url: "http://localhost:3000",
-      reuseExistingServer: true,
-      timeout: 120000,
-    },
-    {
-      command: "node scripts/dev-e2e.js",
-      url: "http://localhost:3001",
-      reuseExistingServer: true,
-      timeout: 120000,
-    },
-  ],
+        {
+          command: "node scripts/dev-e2e.js local",
+          url: "http://localhost:3000",
+          reuseExistingServer: true,
+          timeout: 120000,
+        },
+        {
+          command: "node scripts/dev-e2e.js",
+          url: "http://localhost:3001",
+          reuseExistingServer: true,
+          timeout: 120000,
+        },
+      ],
 });

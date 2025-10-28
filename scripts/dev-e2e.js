@@ -31,7 +31,7 @@ if (overrideEnvName) {
 console.log("📦 Building with Node adapter...");
 const buildProcess = spawn("npm", ["run", "build:node"], {
   stdio: "inherit",
-  env: { 
+  env: {
     ...env,
     SUPABASE_URL: env.SUPABASE_URL,
     SUPABASE_KEY: env.SUPABASE_KEY,
@@ -49,7 +49,7 @@ buildProcess.on("exit", (code) => {
   console.log("✅ Build successful, starting preview server...");
   const previewProcess = spawn("node", ["scripts/preview.js"], {
     stdio: "inherit",
-    env: { 
+    env: {
       ...env,
       PORT: env.PORT,
       SUPABASE_URL: env.SUPABASE_URL,

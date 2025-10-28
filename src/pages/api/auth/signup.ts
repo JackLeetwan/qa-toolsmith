@@ -80,7 +80,10 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
     // If auto-login fails due to unconfirmed email, return success with confirmation required
     if (signInError) {
-      if (signInError.message?.includes("Email not confirmed") || signInError.status === 400) {
+      if (
+        signInError.message?.includes("Email not confirmed") ||
+        signInError.status === 400
+      ) {
         return new Response(
           JSON.stringify({
             user: {
@@ -88,7 +91,8 @@ export const POST: APIRoute = async ({ request, cookies }) => {
               email: email,
             },
             emailConfirmationRequired: true,
-            message: "Konto utworzone. Sprawdź swoją skrzynkę email i potwierdź adres, aby się zalogować.",
+            message:
+              "Konto utworzone. Sprawdź swoją skrzynkę email i potwierdź adres, aby się zalogować.",
           }),
           {
             status: 200,

@@ -48,21 +48,27 @@ export const createSupabaseServerInstance = (context: {
     supabaseUrl: {
       fromImportMeta: import.meta.env.SUPABASE_URL ? "✅ Set" : "❌ Missing",
       fromProcessEnv: nodeProcess?.env?.SUPABASE_URL ? "✅ Set" : "❌ Missing",
-      final: supabaseUrl ? (supabaseUrl.includes("localhost") || supabaseUrl.includes("127.0.0.1") ? "⚠️ LOCALHOST" : "✅ CLOUD") : "❌ MISSING",
+      final: supabaseUrl
+        ? supabaseUrl.includes("localhost") || supabaseUrl.includes("127.0.0.1")
+          ? "⚠️ LOCALHOST"
+          : "✅ CLOUD"
+        : "❌ MISSING",
       value: supabaseUrl || "❌ NOT SET",
     },
     supabaseKey: {
       fromImportMeta: import.meta.env.SUPABASE_KEY ? "✅ Set" : "❌ Missing",
       fromProcessEnv: nodeProcess?.env?.SUPABASE_KEY ? "✅ Set" : "❌ Missing",
-      final: supabaseKey ? `✅ Set (${supabaseKey.substring(0, 20)}...)` : "❌ MISSING",
+      final: supabaseKey
+        ? `✅ Set (${supabaseKey.substring(0, 20)}...)`
+        : "❌ MISSING",
     },
     processAvailable: {
-      exists: typeof process !== 'undefined' ? "✅ Yes" : "❌ No",
+      exists: typeof process !== "undefined" ? "✅ Yes" : "❌ No",
       env: nodeProcess?.env ? "✅ Yes" : "❌ No",
     },
     globalThis: {
       process: nodeProcess ? "✅ Available" : "❌ Not available",
-    }
+    },
   });
 
   if (!supabaseUrl || !supabaseKey) {

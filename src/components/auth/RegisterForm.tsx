@@ -35,19 +35,29 @@ export default function RegisterForm({
     }
   }, [navigateTo, onRedirect]);
 
-  const handleSuccess = useCallback((emailConfirmationRequired?: boolean, message?: string) => {
-    if (emailConfirmationRequired) {
-      toast.success(message || "Konto utworzone! Sprawdź swoją skrzynkę email, aby potwierdzić adres i się zalogować.");
-      if (onEmailConfirmationRequired) {
-        onEmailConfirmationRequired("", message || "Konto utworzone! Sprawdź swoją skrzynkę email, aby potwierdzić adres i się zalogować.");
+  const handleSuccess = useCallback(
+    (emailConfirmationRequired?: boolean, message?: string) => {
+      if (emailConfirmationRequired) {
+        toast.success(
+          message ||
+            "Konto utworzone! Sprawdź swoją skrzynkę email, aby potwierdzić adres i się zalogować.",
+        );
+        if (onEmailConfirmationRequired) {
+          onEmailConfirmationRequired(
+            "",
+            message ||
+              "Konto utworzone! Sprawdź swoją skrzynkę email, aby potwierdzić adres i się zalogować.",
+          );
+        }
+      } else {
+        toast.success("Konto utworzone pomyślnie!");
+        setTimeout(() => {
+          setNavigateTo("/");
+        }, 500);
       }
-    } else {
-      toast.success("Konto utworzone pomyślnie!");
-      setTimeout(() => {
-        setNavigateTo("/");
-      }, 500);
-    }
-  }, [onEmailConfirmationRequired]);
+    },
+    [onEmailConfirmationRequired],
+  );
 
   const {
     register,
