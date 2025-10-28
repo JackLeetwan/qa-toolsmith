@@ -222,6 +222,18 @@ async function globalTeardown() {
 
     const adminClient = createClient(process.env.SUPABASE_URL, serviceRole);
 
+    interface SupabaseAdminApi {
+      listUsers: (params: { page: number; perPage: number }) => Promise<{
+        data?: { users?: { id: string; email?: string }[] };
+        error?: { message: string };
+      }>;
+      deleteUser: (id: string) => Promise<{ error?: { message: string } }>;
+    }
+
+    const admin = (
+      adminClient as unknown as { auth: { admin: SupabaseAdminApi } }
+    ).auth.admin;
+
     // Fetch users in pages and delete those matching our E2E patterns
     const emailPrefixes = [
       "test-registration-",
@@ -238,7 +250,7 @@ async function globalTeardown() {
     let totalDeleted = 0;
 
     for (let page = 1; page <= maxPages; page++) {
-      const { data, error } = await (adminClient as any).auth.admin.listUsers({
+      const { data, error } = await admin.listUsers({
         page,
         perPage,
       });
@@ -296,9 +308,7 @@ async function globalTeardown() {
         await adminClient.from("profiles").delete().eq("id", userId);
 
         // Finally, delete the auth user
-        const { error: deleteErr } = await (adminClient as any).auth.admin.deleteUser(
-          userId,
-        );
+        const { error: deleteErr } = await admin.deleteUser(userId);
         if (deleteErr) {
           console.warn(
             `⚠️  Failed to delete auth user ${userEmail} (${userId}):`,

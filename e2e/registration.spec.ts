@@ -10,7 +10,7 @@ import { test, expect } from "@playwright/test";
 test.describe("User Registration", () => {
   test.beforeEach(async ({ page }) => {
     // Clean up - ensure we're logged out
-    await page.goto("/");
+    await page.goto("/", { waitUntil: "networkidle" });
   });
 
   test("should successfully register a new user and auto-login", async ({
@@ -76,7 +76,7 @@ test.describe("User Registration", () => {
   test("should display validation errors for invalid email", async ({
     page,
   }) => {
-    await page.goto("/auth/register");
+    await page.goto("/auth/register", { waitUntil: "networkidle" });
 
     // Wait for form to load
     const emailInput = page.locator('input[type="email"]');
@@ -105,7 +105,7 @@ test.describe("User Registration", () => {
     const timestamp = Date.now();
     const testEmail = `test-validation-${timestamp}@mailinator.com`;
 
-    await page.goto("/auth/register");
+    await page.goto("/auth/register", { waitUntil: "networkidle" });
 
     // Wait for form to load
     const emailInput = page.locator('input[type="email"]');
@@ -121,8 +121,8 @@ test.describe("User Registration", () => {
     await confirmPasswordInput.type("short");
     await submitButton.click();
 
-    // Wait for validation to complete
-    await page.waitForTimeout(500);
+    // Wait for validation to complete and alert to appear
+    await page.waitForTimeout(2000);
 
     // Should display validation error for short password
     await expect(
@@ -140,7 +140,7 @@ test.describe("User Registration", () => {
     const timestamp = Date.now();
     const testEmail = `test-password-validation-${timestamp}@mailinator.com`;
 
-    await page.goto("/auth/register");
+    await page.goto("/auth/register", { waitUntil: "networkidle" });
 
     // Wait for form to load
     const emailInput = page.locator('input[type="email"]');
@@ -156,8 +156,8 @@ test.describe("User Registration", () => {
     await confirmPasswordInput.type("12345678");
     await submitButton.click();
 
-    // Wait for validation to complete
-    await page.waitForTimeout(500);
+    // Wait for validation to complete and alert to appear
+    await page.waitForTimeout(2000);
 
     // Should display validation error for password without letters
     await expect(
@@ -175,7 +175,7 @@ test.describe("User Registration", () => {
     const timestamp = Date.now();
     const testEmail = `test-password-validation2-${timestamp}@mailinator.com`;
 
-    await page.goto("/auth/register");
+    await page.goto("/auth/register", { waitUntil: "networkidle" });
 
     // Wait for form to load
     const emailInput = page.locator('input[type="email"]');
@@ -191,8 +191,8 @@ test.describe("User Registration", () => {
     await confirmPasswordInput.type("password");
     await submitButton.click();
 
-    // Wait for validation to complete
-    await page.waitForTimeout(500);
+    // Wait for validation to complete and alert to appear
+    await page.waitForTimeout(2000);
 
     // Should display validation error for password without numbers
     await expect(
@@ -210,7 +210,7 @@ test.describe("User Registration", () => {
     const timestamp = Date.now();
     const testEmail = `test-password-mismatch-${timestamp}@mailinator.com`;
 
-    await page.goto("/auth/register");
+    await page.goto("/auth/register", { waitUntil: "networkidle" });
 
     // Wait for form to load
     const emailInput = page.locator('input[type="email"]');
@@ -226,8 +226,8 @@ test.describe("User Registration", () => {
     await confirmPasswordInput.type("DifferentPass456");
     await submitButton.click();
 
-    // Wait for validation to complete
-    await page.waitForTimeout(500);
+    // Wait for validation to complete and alert to appear
+    await page.waitForTimeout(2000);
 
     // Should display validation error for mismatched passwords
     await expect(
@@ -244,7 +244,7 @@ test.describe("User Registration", () => {
     const testEmail = `test-existing-${Date.now()}@mailinator.com`;
     const testPassword = "SecurePass123";
 
-    await page.goto("/auth/register");
+    await page.goto("/auth/register", { waitUntil: "networkidle" });
 
     const emailInput = page.locator('input[type="email"]');
     const passwordInput = page.locator('input[type="password"]').first();
@@ -281,7 +281,7 @@ test.describe("User Registration", () => {
   });
 
   test("should have link to login page", async ({ page }) => {
-    await page.goto("/auth/register");
+    await page.goto("/auth/register", { waitUntil: "networkidle" });
 
     // Should have link to login page
     const loginLink = page.locator('a[href="/auth/login"]');
