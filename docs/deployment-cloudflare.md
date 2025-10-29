@@ -91,6 +91,8 @@ For detailed workflow documentation, see `.github/workflows/README.md`.
 - Supabase project with database migrations applied
 - Git repository (GitHub, GitLab, or Bitbucket)
 
+**📚 For detailed configuration steps:** See `docs/SETUP_GUIDE.md` (Polish) for step-by-step instructions on setting up GitHub Secrets and Cloudflare environment variables.
+
 ## Step 1: Fork/Clone Repository
 
 1. Fork the repository or connect your Cloudflare Pages account to your Git repository
@@ -98,28 +100,17 @@ For detailed workflow documentation, see `.github/workflows/README.md`.
 
 ## Step 2: Configure Environment Variables in Cloudflare Pages
 
-In Cloudflare Pages dashboard:
+**📚 For detailed setup instructions:** See `docs/SETUP_GUIDE.md` (Polish), section "KROK 2: Konfiguracja Cloudflare"
 
-1. Go to your project → Settings → Environment Variables
-2. Add the following **required** variables:
+Add the following **required** variables in Cloudflare Pages → Settings → Environment Variables:
 
-### Production Environment Variables
+- `SUPABASE_URL` - Your Supabase project URL
+- `SUPABASE_KEY` - Supabase anon/public key
+- `SUPABASE_SERVICE_KEY` - Supabase service_role key (⚠️ Keep secret)
+- `ENV_NAME` - Set to `production`
+- `OPENROUTER_API_KEY` - Optional, for AI features
 
-```
-SUPABASE_URL = https://your-project.supabase.co
-SUPABASE_KEY = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlvdXItcmVmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc4MzAyMDAsImV4cCI6MjAzMzQwNjIwMH0.your-key
-SUPABASE_SERVICE_KEY = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlvdXItcmVmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NzgzMDIwMCwiZXhwIjoyMDMzNDA2MjAwfQ.your-key
-ENV_NAME = production
-OPENROUTER_API_KEY = sk-or-v1-your-key
-```
-
-**Important Notes:**
-
-- `SUPABASE_KEY` is the **anon/public** key (starts with `eyJhbG...` and has role `anon`)
-- `SUPABASE_SERVICE_KEY` is the **service_role** key (starts with `eyJhbG...` and has role `service_role`)
-- Keys can be found in Supabase Dashboard → Settings → API
-- Never commit these keys to git
-- `ENV_NAME` is configured as a public environment variable in `astro.config.mjs` and is used for both server-side and client-side feature flags
+**Key Locations:** Supabase Dashboard → Settings → API
 
 ## Step 3: Build Settings
 
@@ -301,4 +292,28 @@ For deployment issues:
 2. Review Cloudflare Pages logs
 3. Test `/api/env-check` endpoint
 4. Contact project maintainers
+
+---
+
+## See Also
+
+### Related Documentation
+
+- **[Tech Stack](./tech-stack.md)** - Complete technology overview and deployment configuration
+- **[API Documentation](./api.md)** - API endpoints and authentication details
+- **[Setup Guide](./SETUP_GUIDE.md)** - Polish setup instructions with environment configuration
+- **[Architecture Overview](../.ai/ARCHITECTURE.md)** - High-level architecture and database design
+- **[README](../README.md)** - Project overview and getting started
+
+### Configuration Files
+
+- **`astro.config.mjs`** - Astro configuration with Cloudflare adapter
+- **`wrangler.toml`** - Cloudflare Workers configuration
+- **`.github/workflows/deploy-cloudflare.yml`** - Deployment CI/CD workflow
+
+### Troubleshooting
+
+- **Environment variables not working**: See [Environment Variables](#environment-variables) section
+- **Build fails in CI/CD**: Check [GitHub Actions Secrets](#github-actions-secrets) configuration
+- **Deployment fails**: Review [Deployment Workflow](#deployment-workflow) logs
 

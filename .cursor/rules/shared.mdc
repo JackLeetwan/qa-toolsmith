@@ -60,9 +60,10 @@ Zawsze przestrzegaj poniższej struktury katalogów:
     - Zwracaj strukturyzowane błędy: `{ error: { code, message, details } }`
     - Używaj snake_case w odpowiedziach API dla zgodności z backendem
 10. **Environment Variables:**
-    - Używaj `import.meta.env` zamiast `process.env` (kompatybilne z Cloudflare Workers)
-    - Aktualizuj `src/env.d.ts` przy dodawaniu nowych zmiennych
-    - Aktualizuj `.env.example` zgodnie ze zmianami
+    - Używaj **Astro 5's typed environment system** (`astro:env`) zamiast `import.meta.env`
+    - Server-side: `import { VARIABLE } from 'astro:env/server'`
+    - Client-side: `import { VARIABLE } from 'astro:env/client'`
+    - **📚 Szczegóły:** See `backend-api.mdc` for complete environment variable documentation
 
 📚 **Szczegółowe wytyczne:**
 - **Frontend:** Zobacz `frontend-coding.mdc` dla szczegółów Astro, React, Tailwind, shadcn/ui
