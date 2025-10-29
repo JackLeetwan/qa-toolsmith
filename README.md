@@ -8,6 +8,7 @@
 QA Toolsmith to lekkie, otwartoźródłowe narzędzie dla testerów, które porządkuje codzienną pracę: szybkie tworzenie raportów defektów, eksplorację z notatkami i czasomierzem, prostą bazę wiedzy oraz generowanie danych testowych (np. IBAN DE/AT z walidacją). Skupiamy się na prostocie, szybkości i gotowości do użycia „od ręki”.
 
 ### Najważniejsze możliwości
+
 - ✅ Logowanie e‑mail/hasło, role: Admin i User
 - ✅ Generator i walidator IBAN (DE/AT), tryb deterministyczny przez seed
 - ✅ Stabilny zestaw testów (unit + E2E) i gotowy pipeline CI
@@ -36,6 +37,7 @@ npm run preview
 ```
 
 Podstawowe komendy:
+
 - `npm run dev` – tryb deweloperski
 - `npm run build` – budowa produkcyjna
 - `npm run preview` – podgląd produkcyjny
@@ -51,6 +53,7 @@ Pełny opis endpointów (m.in. IBAN Generator/Validator) znajdziesz w dokumentac
 ## Wdrożenie
 
 Projekt działa świetnie na Cloudflare Pages (SSR). Krótki przegląd:
+
 - globalna infrastruktura (Workers), dobry darmowy próg,
 - kompatybilne SSR (Astro), proste środowiska i podglądy PR.
 

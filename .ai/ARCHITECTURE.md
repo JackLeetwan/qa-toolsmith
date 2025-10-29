@@ -16,16 +16,19 @@ This document provides high-level architecture overview for QA Toolsmith MVP, co
 ### Key Architectural Decisions
 
 **Backend as a Service (Supabase)**
+
 - PostgreSQL database with Row Level Security (RLS) for multi-tenant data isolation
 - Built-in authentication with JWT tokens
 - Serverless-friendly architecture compatible with Cloudflare Workers
 
 **Astro SSR + React**
+
 - Astro for server-rendered pages and API endpoints
 - React for interactive client-side components only
 - Minimal JavaScript footprint for better performance
 
 **State Management**
+
 - Server-side data fetching with Astro SSR
 - React hooks for local component state
 - localStorage for offline-first features (autosave)
@@ -35,6 +38,7 @@ This document provides high-level architecture overview for QA Toolsmith MVP, co
 **📚 Detailed API documentation:** See `docs/api.md` for complete endpoint specifications, request/response formats, and examples.
 
 **Key Design Principles:**
+
 - RESTful endpoints with snake_case responses
 - Keyset pagination for stable performance
 - Structured error responses with codes
@@ -42,6 +46,7 @@ This document provides high-level architecture overview for QA Toolsmith MVP, co
 - Rate limiting on auth and write endpoints
 
 **Main Endpoints:**
+
 - `/api/auth/*` - Authentication (login, logout, reset password)
 - `/api/templates` - Template management (global + user-scoped forks)
 - `/api/charters` - Exploration sessions with timer
@@ -73,6 +78,7 @@ This document provides high-level architecture overview for QA Toolsmith MVP, co
 ## Database Architecture
 
 **Core Tables:**
+
 - `profiles` - User profiles with roles (admin/user), linked to Supabase machines
 - `templates` - Global and user-scoped templates with fork lineage
 - `charters` - Exploration sessions with timer and optimistic locking
@@ -84,18 +90,21 @@ This document provides high-level architecture overview for QA Toolsmith MVP, co
 - `usage_events` - Product analytics (charter/generator/kb)
 
 **Relationships:**
+
 - `profiles (1:N)` → `templates`, `charters`, `kb_entries`, and other user artifacts
 - `templates` can fork to user-scoped copies via `origin_template_id`
 - `charters (1:N)` → `charter_notes`
 - `kb_entries (1:N)` → `kb_notes`
 
 **Key Constraints:**
+
 - RLS policies enforce per-user data isolation on all tables
 - Templates: Unique combination of scope/name/owner_id
 - Charters: One active session per user (partial unique constraint)
 - KB: Unique canonical URL per user
 
 **Indexes:**
+
 - BTREE indexes on (user_id, updated_at DESC, id DESC) for keyset pagination
 - GIN indexes for FTS search (KB search_vector)
 - GIN indexes on tags and text fields for filtering
@@ -121,15 +130,15 @@ This document provides high-level architecture overview for QA Toolsmith MVP, co
 
 ### Error Handling
 
-| HTTP Code | UI Handling                                 |
-|-----------|---------------------------------------------|
-| 401       | Modal re-login + intent preservation        |
-| 403       | Banner "No permission"                      |
-| 409       | Conflict resolution dialog                  |
-| 422       | Inline form errors                          |
-| 429       | Rate limit banner with countdown            |
-| 500       | Error boundary with retry option            |
-| Offline   | Offline banner + retry queue                |
+| HTTP Code | UI Handling                          |
+| --------- | ------------------------------------ |
+| 401       | Modal re-login + intent preservation |
+| 403       | Banner "No permission"               |
+| 409       | Conflict resolution dialog           |
+| 422       | Inline form errors                   |
+| 429       | Rate limit banner with countdown     |
+| 500       | Error boundary with retry option     |
+| Offline   | Offline banner + retry queue         |
 
 ### Main Views
 
@@ -170,6 +179,7 @@ This document provides high-level architecture overview for QA Toolsmith MVP, co
 ### Environment Variables
 
 **Astro 5 typed environment system** (`astro:env`):
+
 - Server-side: `import { SUPABASE_URL, SUPABASE_KEY, ... } from 'astro:env/server'`
 - Client-side: `import { ENV_NAME } from 'astro:env/client'` (public only)
 - Priority: Cloudflare bindings → astro:env → Node.js fallback
@@ -194,6 +204,7 @@ This document provides high-level architecture overview for QA Toolsmith MVP, co
 **📚 Detailed testing documentation:** See test files in `src/__tests__/` for unit tests and `e2e/` for E2E tests.
 
 **Testing Strategy:**
+
 - **Unit Tests**: Vitest (1,167 tests across 34 files)
 - **E2E Tests**: Playwright (10 tests covering full workflows)
 - **Test Principles**: No sleeps, stable selectors (data-testid), test isolation

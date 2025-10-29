@@ -32,7 +32,7 @@ const BenefitsSection: React.FC = () => {
     <section className="relative">
       {/* Subtle background gradient for visual depth */}
       <div className="absolute inset-0 bg-gradient-to-b from-muted/20 via-transparent to-transparent rounded-2xl -z-10"></div>
-      
+
       <div className="bg-card/50 backdrop-blur-sm rounded-2xl p-8 md:p-12 border border-primary/10 shadow-lg">
         {/* Section header with improved spacing */}
         <div className="text-center mb-10">
@@ -41,7 +41,7 @@ const BenefitsSection: React.FC = () => {
           </h2>
           <div className="w-16 h-1 bg-primary/30 rounded-full mx-auto"></div>
         </div>
-        
+
         {/* Benefits grid with improved spacing */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
           {benefits.map((benefit, index) => (

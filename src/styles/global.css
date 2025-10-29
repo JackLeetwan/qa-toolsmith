@@ -118,11 +118,11 @@
   --popover-foreground: oklch(0.95 0 0); /* White text on popovers */
   --primary: oklch(0.6 0.12 240); /* Brighter Geist blue for dark mode */
   --primary-foreground: oklch(0.22 0 0); /* Dark text on primary */
-  --secondary: oklch(0.30 0 0); /* Lighter secondary background (~#4D4D4D) */
+  --secondary: oklch(0.3 0 0); /* Lighter secondary background (~#4D4D4D) */
   --secondary-foreground: oklch(0.95 0 0); /* White text on secondary */
   --muted: oklch(0.28 0 0); /* Lighter muted background (~#474747) */
   --muted-foreground: oklch(0.65 0 0); /* Better contrast for muted text */
-  --accent: oklch(0.30 0 0); /* Lighter accent background (~#4D4D4D) */
+  --accent: oklch(0.3 0 0); /* Lighter accent background (~#4D4D4D) */
   --accent-foreground: oklch(0.95 0 0); /* White text on accent */
   --destructive: oklch(0.704 0.191 22.216); /* Keep existing red */
   --destructive-foreground: oklch(0.95 0 0); /* White text on destructive */
@@ -140,9 +140,9 @@
 .dark-medium {
   --background: oklch(0.26 0 0); /* ~#424242 */
   --foreground: oklch(0.97 0 0); /* a bit brighter text */
-  --card: oklch(0.30 0 0); /* ~#4D4D4D */
+  --card: oklch(0.3 0 0); /* ~#4D4D4D */
   --card-foreground: oklch(0.97 0 0);
-  --popover: oklch(0.30 0 0);
+  --popover: oklch(0.3 0 0);
   --popover-foreground: oklch(0.97 0 0);
   --primary: oklch(0.62 0.12 240);
   --primary-foreground: oklch(0.24 0 0);
@@ -154,8 +154,8 @@
   --accent-foreground: oklch(0.97 0 0);
   --destructive: oklch(0.704 0.191 22.216);
   --destructive-foreground: oklch(0.97 0 0);
-  --border: oklch(0.40 0 0); /* clearer separation */
-  --input: oklch(0.40 0 0);
+  --border: oklch(0.4 0 0); /* clearer separation */
+  --input: oklch(0.4 0 0);
   --ring: oklch(0.62 0.12 240);
   --chart-1: oklch(0.62 0.12 240);
   --chart-2: oklch(0.72 0.15 200);

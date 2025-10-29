@@ -5,10 +5,12 @@ Prosta instrukcja konfiguracji wszystkich wymaganych sekretów i zmiennych środ
 ## 🎯 Ważne: Różnica między GitHub a Cloudflare
 
 **GitHub Secrets** → do testów E2E w CI/CD
+
 - `ENV_NAME = integration` (włączamy wszystkie funkcje do testowania)
 - **Supabase credentials**: Zazwyczaj te same co w Cloudflare (production baza)
 
 **Cloudflare Environment Variables** → do produkcji
+
 - `ENV_NAME = production` (tylko MVP features włączone)
 - **Supabase credentials**: Production credentials (gdy użytkownicy używają aplikacji)
 
@@ -17,6 +19,7 @@ Prosta instrukcja konfiguracji wszystkich wymaganych sekretów i zmiennych środ
 ## 📋 Wymagane dane wejściowe
 
 Zanim zaczniesz, zbierz:
+
 1. **Supabase credentials** - z Supabase Dashboard
 2. **Cloudflare credentials** - z Cloudflare Dashboard
 3. **Dostęp do GitHub** - do konfiguracji sekretów
@@ -35,25 +38,29 @@ Zanim zaczniesz, zbierz:
 ### 1.2 Dodaj Sekrety Supabase
 
 **Secret 1: `SUPABASE_URL`**
+
 - **Name**: `SUPABASE_URL`
 - **Secret**: `https://xxxxx.supabase.co` (twój URL)
 - **Gdzie znaleźć**: Supabase Dashboard → Settings → API → Project URL
 
 **Secret 2: `SUPABASE_KEY`**
+
 - **Name**: `SUPABASE_KEY`
 - **Secret**: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...` (anon key)
 - **Gdzie znaleźć**: Supabase Dashboard → Settings → API → Project API keys → `anon` `public`
 
 **Secret 3: `SUPABASE_SERVICE_KEY`**
+
 - **Name**: `SUPABASE_SERVICE_KEY`
 - **Secret**: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...` (service role key)
 - **Gdzie znaleźć**: Supabase Dashboard → Settings → API → Project API keys → `service_role` (⚠️ NIE udostępniaj tego klucza)
 
 **Secret 4: `ENV_NAME`**
+
 - **Name**: `ENV_NAME`
 - **Secret**: `integration`
 - **Value**: `integration` dla testów E2E i GitHub Actions
-- **Dlaczego nie `production`?**: 
+- **Dlaczego nie `production`?**:
   - W CI testujemy E2E z production database, ale potrzebujemy włączyć WSZYSTKIE funkcje do testowania
   - W `integration` (zobacz `src/features/config.integration.ts`) są rozpoczęte: generators, charters, templates, knowledgeBase
   - W `production` (zobacz `src/features/config.production.ts`) dla MVP są wyłączone: charters, templates, knowledgeBase
@@ -61,6 +68,7 @@ Zanim zaczniesz, zbierz:
 - **Uwaga**: W Cloudflare Pages będziemy używać `production`, ale w GitHub Secrets używamy `integration`
 
 **Secret 5: `OPENROUTER_API_KEY`** (opcjonalnie)
+
 - **Name**: `OPENROUTER_API_KEY`
 - **Secret**: `sk-or-v1-xxxxx`
 - **Gdzie znaleźć**: https://openrouter.ai/keys (opcjonalnie, tylko jeśli używasz AI features)
@@ -68,14 +76,17 @@ Zanim zaczniesz, zbierz:
 ### 1.3 Dodaj Sekrety Cloudflare
 
 **Secret 6: `CLOUDFLARE_API_TOKEN`**
+
 - **Name**: `CLOUDFLARE_API_TOKEN`
 - **Secret**: (utworzysz w kroku 2.1)
 
 **Secret 7: `CLOUDFLARE_ACCOUNT_ID`**
+
 - **Name**: `CLOUDFLARE_ACCOUNT_ID`
 - **Secret**: (pokazane w kroku 2.2)
 
 **Secret 8: `CLOUDFLARE_PAGES_PROJECT_NAME`** (opcjonalnie)
+
 - **Name**: `CLOUDFLARE_PAGES_PROJECT_NAME`
 - **Secret**: `qa-toolsmith`
 - **Note**: Domyślnie `qa-toolsmith`, ale możesz zmienić jeśli masz inną nazwę projektu
@@ -83,14 +94,15 @@ Zanim zaczniesz, zbierz:
 ### 1.4 Weryfikacja GitHub Secrets
 
 Po dodaniu wszystkich sekretów, lista w GitHub powinna wyglądać tak:
+
 - ✅ SUPABASE_URL
-   - ✅ SUPABASE_KEY
-   - ✅ SUPABASE_SERVICE_KEY
-   - ✅ ENV_NAME (`integration`)
-   - ✅ OPENROUTER_API_KEY (jeśli dodałeś)
-   - ✅ CLOUDFLARE_API_TOKEN
-   - ✅ CLOUDFLARE_ACCOUNT_ID
-   - ✅ CLOUDFLARE_PAGES_PROJECT_NAME (jeśli dodałeś)
+  - ✅ SUPABASE_KEY
+  - ✅ SUPABASE_SERVICE_KEY
+  - ✅ ENV_NAME (`integration`)
+  - ✅ OPENROUTER_API_KEY (jeśli dodałeś)
+  - ✅ CLOUDFLARE_API_TOKEN
+  - ✅ CLOUDFLARE_ACCOUNT_ID
+  - ✅ CLOUDFLARE_PAGES_PROJECT_NAME (jeśli dodałeś)
 
 ---
 
@@ -108,7 +120,7 @@ Po dodaniu wszystkich sekretów, lista w GitHub powinna wyglądać tak:
      - **Pierwszy dropdown**: Wybierz **"Account"**
      - **Drugi dropdown**: Wybierz **"Cloudflare Pages"**
      - **Trzeci dropdown**: Wybierz **"Edit"**
-   - **Account Resources**: 
+   - **Account Resources**:
      - W pierwszym dropdown wybierz **"Include"**
      - W drugim dropdown wybierz **swój account** (np. "Jakub.litkowski@gmail.com's Account")
    - **Zone Resources**: Możesz pominąć (nie wymagane dla Pages)
@@ -168,6 +180,7 @@ ENV_NAME = production
 ### 2.5 Weryfikacja Cloudflare Variables
 
 Po dodaniu, lista powinna zawierać:
+
 - ✅ SUPABASE_URL
 - ✅ SUPABASE_KEY
 - ✅ SUPABASE_SERVICE_KEY
@@ -181,10 +194,12 @@ Po dodaniu, lista powinna zawierać:
 ### 3.1 Weryfikacja że wszystkie sekrety są ustawione
 
 W GitHub:
+
 - Settings → Secrets and variables → Actions
 - Sprawdź czy wszystkie 8 sekretów są na liście
 
 W Cloudflare:
+
 - Workers & Pages → Twój projekt → Settings → Environment Variables
 - Sprawdź czy wszystkie zmienne są dodane
 
@@ -229,12 +244,14 @@ Po udanym deployment:
 ### Problem: CI Pipeline fails z "Missing secrets"
 
 **Rozwiązanie:**
+
 - Sprawdź czy wszystkie wymagane sekrety są dodane w GitHub Settings
 - Sprawdź czy nazwy sekretów są dokładnie jak w liście (wielkość liter!)
 
 ### Problem: Deployment skipped
 
 **Rozwiązanie:**
+
 - Sprawdź czy `CLOUDFLARE_API_TOKEN` jest poprawny
 - Sprawdź czy `CLOUDFLARE_ACCOUNT_ID` jest poprawny
 - Zobacz logi GitHub Actions dla szczegółów
@@ -242,6 +259,7 @@ Po udanym deployment:
 ### Problem: Application nie działa po deployment (500 errors)
 
 **Rozwiązanie:**
+
 - Sprawdź czy environment variables są dodane w Cloudflare Pages
 - Sprawdź endpoint `/api/env-check` - czy wszystkie zmienne są `true`?
 - Sprawdź logi w Cloudflare Pages dashboard
@@ -249,6 +267,7 @@ Po udanym deployment:
 ### Problem: Nie widzę endpointu `/api/env-check`
 
 **Rozwiązanie:**
+
 - To normalne! Endpoint może być dostępny tylko jeśli został zaimplementowany
 - Sprawdź endpoint `/api/health` zamiast tego
 
@@ -267,6 +286,7 @@ Po udanym deployment:
 ## ✨ To wszystko!
 
 Po wykonaniu wszystkich kroków, aplikacja będzie automatycznie:
+
 - ✅ Testowana przy każdym PR
 - ✅ Deployowana do produkcji przy merge do `master`
 - ✅ Available na `https://qa-toolsmith.pages.dev` (lub custom domain)
@@ -290,4 +310,3 @@ Powodzenia! 🚀
 - **Zmienne środowiskowe**: Zobacz `.cursor/rules/backend-api.mdc` dla szczegółowej dokumentacji
 - **Cloudflare Setup**: Zobacz sekcję "Cloudflare Pages Setup" w tym przewodniku
 - **GitHub Secrets**: Zobacz sekcję "Konfiguracja GitHub Secrets" w tym przewodniku
-

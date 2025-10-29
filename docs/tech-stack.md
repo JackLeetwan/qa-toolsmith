@@ -7,6 +7,7 @@ QA Toolsmith is built with modern web technologies focused on performance, devel
 ## Technology Stack
 
 ### Frontend
+
 - **Astro 5** (v5.13.7) - Static Site Generator with SSR support via `@astrojs/cloudflare` adapter
   - API endpoints using `context` parameter for request handling
   - Middleware support with `onRequest` export
@@ -23,6 +24,7 @@ QA Toolsmith is built with modern web technologies focused on performance, devel
 - **Shadcn/ui** - Accessible UI components built on Radix UI
 
 ### Backend & Database
+
 - **Supabase** - Backend-as-a-Service with SSR support via `@supabase/ssr` (v0.7.0)
   - PostgreSQL database with Row Level Security (RLS)
   - Built-in JWT authentication
@@ -30,17 +32,20 @@ QA Toolsmith is built with modern web technologies focused on performance, devel
   - SQL migrations with Supabase CLI
 
 ### AI Integration
+
 - **Openrouter.ai** - Multi-provider AI API (supports OpenAI, Anthropic, Google, etc.)
 - Environment-based configuration with per-user daily limits
 - Structured JSON responses with schema validation
 
 ### Testing
+
 - **Vitest** (v3.2.4) - Fast unit testing framework with Vite-native performance
 - **Playwright** (v1.56.1) - Multi-browser E2E testing with Chromium support
 - **React Testing Library** (v16.3.0) - Component testing utilities
 - **@testing-library/user-event** (v14.6.1) - Realistic user interaction simulation
 
 ### Development Tools
+
 - **ESLint** (v9.38.0) - Code linting with TypeScript, Astro, and React support
 - **Prettier** - Code formatting with Astro plugin
 - **Husky** (v9.1.7) - Git hooks for quality gates
@@ -51,6 +56,7 @@ QA Toolsmith is built with modern web technologies focused on performance, devel
 QA Toolsmith is deployed on **Cloudflare Pages** using the official `@astrojs/cloudflare` adapter (v12.6.10). This provides optimal integration with Cloudflare Workers for server-side rendering support.
 
 **Key Configuration:**
+
 - **Adapter**: `@astrojs/cloudflare` v12.6.10 for Cloudflare Workers integration with Astro 5
 - **Build Command**: `npm run build` with `ASTRO_TARGET=cloudflare`
 - **Build Output**: `dist/` directory with Cloudflare Workers-compatible bundles
@@ -69,6 +75,7 @@ The application requires SSR due to server-side API endpoints (authentication, d
 QA Toolsmith can also be deployed as a Docker container for flexibility across various hosting platforms (DigitalOcean, AWS, Azure, etc.).
 
 **Key Features:**
+
 - **Multi-stage build**: Optimized image size (~200MB)
 - **Non-root user**: Enhanced security with `nodejs:1001` user
 - **Health checks**: Built-in endpoint monitoring at `/api/health`
@@ -76,6 +83,7 @@ QA Toolsmith can also be deployed as a Docker container for flexibility across v
 - **GitHub Container Registry**: Ready for `ghcr.io` deployment
 
 **Quick Start:**
+
 ```bash
 docker build -t jayleetwan/qa-toolsmith:latest .
 docker run -d -p 3000:3000 \
@@ -89,18 +97,21 @@ For detailed Docker deployment instructions, see [Docker Deployment Guide](./doc
 ## Development Workflow
 
 ### Local Development
+
 ```bash
 npm run dev          # Start development server
 npm run dev:e2e       # Start with E2E test environment
 ```
 
 ### Production Build
+
 ```bash
 npm run build        # Build for production
 npm run preview      # Preview production build
 ```
 
 ### CI/CD Pipeline
+
 - **GitHub Actions**: Automated testing and deployment
 - **CI Workflow** (`.github/workflows/ci.yml`): Lint → Build → Unit Tests → E2E Tests
 - **Deployment Workflow** (`.github/workflows/deploy-cloudflare.yml`): Automatic on master branch merges to Cloudflare Pages

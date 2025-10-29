@@ -24,6 +24,7 @@ We will acknowledge receipt within 48 hours and provide an initial response with
 This project follows these security guidelines:
 
 ### Environment Variables
+
 - ✅ Never commit `.env` files to git
 - ✅ Use environment variables for all secrets
 - ✅ Store production secrets in Cloudflare Pages Dashboard (Secrets)
@@ -31,6 +32,7 @@ This project follows these security guidelines:
 - ✅ Use `.env.example` with placeholder values
 
 ### Code Security
+
 - ✅ Use Supabase RLS (Row Level Security) policies
 - ✅ Validate and sanitize all inputs
 - ✅ Use parameterized queries to prevent SQL injection
@@ -38,12 +40,14 @@ This project follows these security guidelines:
 - ✅ Use HTTPS everywhere
 
 ### Infrastructure
+
 - ✅ Cloudflare security features enabled (WAF, DDoS protection)
 - ✅ All secrets stored in secure vaults (not in code/config files)
 - ✅ Access logs monitored regularly
 - ✅ Security updates applied promptly
 
 ### Development
+
 - ✅ Code reviews required for all changes
 - ✅ Automated security scanning in CI/CD pipeline
 - ✅ Dependency vulnerability scanning
@@ -89,4 +93,3 @@ For security issues, contact: [security@qa-toolsmith.dev]
 ---
 
 **Last updated:** 2025-01-14
-

@@ -11,12 +11,14 @@ QA Toolsmith uses GitHub Actions for automated testing and deployment to Cloudfl
 The CI/CD is split into two separate workflows for better security and performance:
 
 #### CI Pipeline (`.github/workflows/ci.yml`)
+
 - **Purpose**: Continuous Integration for PR validation
 - **Triggers**: Push to `main`/`master`, Pull Requests
 - **Jobs**: Lint → Build → Unit Tests → E2E Tests → Status Comment
 - **Artifacts**: 30-day retention (push) / 7-day retention (PR)
 
 #### Deployment Pipeline (`.github/workflows/deploy-cloudflare.yml`)
+
 - **Purpose**: Production deployment to Cloudflare Pages
 - **Triggers**: Push to `master` branch, Manual dispatch
 - **Jobs**: Build → Deploy via Wrangler
@@ -64,6 +66,7 @@ The CI/CD is split into two separate workflows for better security and performan
 ### Required GitHub Secrets
 
 #### CI Pipeline
+
 - `SUPABASE_URL` - Supabase project URL
 - `SUPABASE_KEY` - Supabase anon key
 - `E2E_USERNAME` (optional) - Test user email
@@ -71,6 +74,7 @@ The CI/CD is split into two separate workflows for better security and performan
 - `E2E_USERNAME_ID` (optional) - Test user UUID
 
 #### Deployment Pipeline
+
 - `CLOUDFLARE_API_TOKEN` - Cloudflare API token with Pages permissions
 - `CLOUDFLARE_ACCOUNT_ID` - Cloudflare account ID
 - `CLOUDFLARE_PAGES_PROJECT_NAME` (optional) - Project name, defaults to 'qa-toolsmith'
@@ -168,6 +172,7 @@ Visit `https://your-project.pages.dev` in your browser. You should see the landi
 **Problem:** Missing or incorrect environment variables
 
 **Solution:**
+
 1. Run the environment check endpoint: `https://your-project.pages.dev/api/env-check`
 2. Verify all variables show `true`
 3. If any show `false`, check Cloudflare Pages settings
@@ -179,6 +184,7 @@ Visit `https://your-project.pages.dev` in your browser. You should see the landi
 **Problem:** Variables not accessible at runtime
 
 **Solution:**
+
 1. Verify variables are set in Cloudflare Pages (not .env file)
 2. Check that you're using `SUPABASE_KEY` (not `SUPABASE_ANON_KEY`)
 3. Ensure you've selected the correct environment (Production)
@@ -189,6 +195,7 @@ Visit `https://your-project.pages.dev` in your browser. You should see the landi
 **Problem:** Build errors during deployment
 
 **Solution:**
+
 1. Check build logs in Cloudflare Pages dashboard
 2. Ensure Node.js version matches (22.14.0)
 3. Verify all dependencies are in `package.json`
@@ -199,6 +206,7 @@ Visit `https://your-project.pages.dev` in your browser. You should see the landi
 **Problem:** Login/register returns errors
 
 **Solution:**
+
 1. Verify Supabase keys are correct
 2. Check Supabase project is running
 3. Ensure migrations are applied: `supabase db push`
@@ -209,6 +217,7 @@ Visit `https://your-project.pages.dev` in your browser. You should see the landi
 **Problem:** Navigation links (Generators, etc.) are hidden or feature flags not working
 
 **Solution:**
+
 1. Verify `ENV_NAME` is set to `production` in Cloudflare Pages environment variables
 2. Check the environment check endpoint: `https://your-project.pages.dev/api/env-check`
 3. Ensure `ENV_NAME` shows `true` in the response
@@ -239,18 +248,25 @@ QA Toolsmith uses **`astro:env`** (Astro 5's typed environment variable system) 
 Environment variables are accessed through Astro's environment modules:
 
 **Server-side access** (API routes, server components):
+
 ```typescript
-import { SUPABASE_URL, SUPABASE_KEY, OPENROUTER_API_KEY } from 'astro:env/server';
+import {
+  SUPABASE_URL,
+  SUPABASE_KEY,
+  OPENROUTER_API_KEY,
+} from "astro:env/server";
 ```
 
 **Client-side access** (only public variables):
+
 ```typescript
-import { ENV_NAME } from 'astro:env/client';
+import { ENV_NAME } from "astro:env/client";
 ```
 
 ### Variable Schema
 
 The project defines a schema in `astro.config.mjs` specifying:
+
 - **Type safety**: Each variable has a defined type (string, enum, etc.)
 - **Access level**: `server` for secrets, `client` for public values, `public` for client-accessible server vars
 - **Validation**: Invalid types fail early at runtime
@@ -288,6 +304,7 @@ For more details on implementation, see `src/db/supabase.client.ts` and `src/lib
 ## Support
 
 For deployment issues:
+
 1. Check this documentation
 2. Review Cloudflare Pages logs
 3. Test `/api/env-check` endpoint
@@ -316,4 +333,3 @@ For deployment issues:
 - **Environment variables not working**: See [Environment Variables](#environment-variables) section
 - **Build fails in CI/CD**: Check [GitHub Actions Secrets](#github-actions-secrets) configuration
 - **Deployment fails**: Review [Deployment Workflow](#deployment-workflow) logs
-
