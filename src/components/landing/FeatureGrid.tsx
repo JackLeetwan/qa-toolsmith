@@ -43,18 +43,20 @@ const FeatureGrid: React.FC = () => {
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
-      {features.map((feature, index) => (
-        <FeatureCard
-          key={index}
-          icon={feature.icon}
-          title={feature.title}
-          description={feature.description}
-          href={feature.href}
-          linkText={feature.linkText}
-        />
-      ))}
-    </div>
+    <section className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+        {features.map((feature, index) => (
+          <FeatureCard
+            key={index}
+            icon={feature.icon}
+            title={feature.title}
+            description={feature.description}
+            href={feature.href}
+            linkText={feature.linkText}
+          />
+        ))}
+      </div>
+    </section>
   );
 };
 

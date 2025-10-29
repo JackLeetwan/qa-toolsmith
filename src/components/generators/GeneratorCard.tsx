@@ -5,7 +5,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import type { GeneratorMeta } from "@/types/types";
 import {
   CreditCard,
@@ -74,13 +73,9 @@ export default function GeneratorCard({ item }: GeneratorCardProps) {
             </div>
           )}
           <div className="mt-4">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
-            >
+            <div className="w-full h-9 inline-flex items-center justify-center rounded-md bg-muted text-foreground/80 text-sm font-medium transition-colors group-hover:bg-primary group-hover:text-primary-foreground hover:bg-primary hover:text-primary-foreground">
               Open Generator
-            </Button>
+            </div>
           </div>
         </CardContent>
       </a>

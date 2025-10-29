@@ -22,10 +22,10 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
   linkText = "Przejdź →",
 }) => {
   return (
-    <Card className="bg-card/50 hover:bg-muted/50 transition-all duration-300 cursor-pointer">
+    <Card className="group bg-card/50 hover:bg-muted/50 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer">
       <CardContent className="p-6">
         <div className="flex items-center mb-4">
-          <div className="w-12 h-12 bg-primary/20 rounded-lg flex items-center justify-center mr-4">
+          <div className="w-12 h-12 bg-primary/20 group-hover:bg-primary/30 rounded-lg flex items-center justify-center mr-4 transition-colors">
             <Icon className="w-6 h-6 text-primary" />
           </div>
           <h3 className="text-xl font-semibold text-primary">{title}</h3>
