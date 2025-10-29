@@ -43,7 +43,7 @@ const FeatureGrid: React.FC = () => {
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+    <section className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
       {features.map((feature, index) => (
         <FeatureCard
           key={index}
@@ -54,7 +54,7 @@ const FeatureGrid: React.FC = () => {
           linkText={feature.linkText}
         />
       ))}
-    </div>
+    </section>
   );
 };
 

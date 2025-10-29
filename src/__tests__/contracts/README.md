@@ -40,6 +40,7 @@ const fixtures = {
 ```
 
 **Guidelines for fixtures:**
+
 - Use realistic, complete data
 - Include all required DTO fields (reference `src/types/types.ts`)
 - Use snake_case keys exclusively
@@ -56,12 +57,14 @@ expect(violations).toHaveLength(0);
 ```
 
 **What it catches:**
+
 - camelCase: `invalidKey` ❌ → should be `invalid_key` ✓
 - PascalCase: `ValidKey` ❌ → should be `valid_key` ✓
 - UPPER_SNAKE_CASE: `VALID_KEY` ❌ → should be `valid_key` ✓
 - Leading/trailing underscores: `_private` or `key_` ❌ → should be `private` or `key_` ✓
 
 **Valid patterns:**
+
 - Single word: `id`, `name`, `status`
 - Multiple words: `user_id`, `created_at`, `last_modified`
 - With numbers: `key_1`, `account_2fa`, `api_v3`
@@ -84,6 +87,7 @@ npm run typecheck
 ```
 
 **What it catches:**
+
 - Missing required fields in fixtures
 - Type mismatches (e.g., string vs number)
 - Optional fields that should be required
@@ -209,4 +213,3 @@ npm run lint
 - [Testing Guidelines](../../docs/TESTING_GUIDELINES.md) — General testing principles and E2E diagnostics
 - [Types Documentation](../../src/types/types.ts) — All DTO definitions
 - [Vitest Documentation](https://vitest.dev/guide/testing-types.html) — `expectTypeOf` reference
-

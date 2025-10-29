@@ -32,20 +32,20 @@ curl http://localhost:3000/api/health
 
 ### Required Variables
 
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `SUPABASE_URL` | Your Supabase project URL | `https://xxxxx.supabase.co` |
+| Variable       | Description                   | Example                                   |
+| -------------- | ----------------------------- | ----------------------------------------- |
+| `SUPABASE_URL` | Your Supabase project URL     | `https://xxxxx.supabase.co`               |
 | `SUPABASE_KEY` | Supabase anonymous/public key | `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...` |
 
 ### Optional Variables
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `SUPABASE_SERVICE_KEY` | Service role key for admin operations | - |
-| `OPENROUTER_API_KEY` | AI assistant integration key | - |
-| `AUTH_RESET_REDIRECT_URL` | Password reset redirect URL | - |
-| `ENV_NAME` | Environment name (local, integration, production) | `production` |
-| `PORT` | Server port | `3000` |
+| Variable                  | Description                                       | Default      |
+| ------------------------- | ------------------------------------------------- | ------------ |
+| `SUPABASE_SERVICE_KEY`    | Service role key for admin operations             | -            |
+| `OPENROUTER_API_KEY`      | AI assistant integration key                      | -            |
+| `AUTH_RESET_REDIRECT_URL` | Password reset redirect URL                       | -            |
+| `ENV_NAME`                | Environment name (local, integration, production) | `production` |
+| `PORT`                    | Server port                                       | `3000`       |
 
 ### Example .env File
 
@@ -202,11 +202,13 @@ docker run -d \
 The Dockerfile uses a two-stage build for optimized image size and security:
 
 **Stage 1 - Builder:**
+
 - Installs all dependencies (dev + production)
 - Builds application with Node.js adapter
 - Generates production artifacts
 
 **Stage 2 - Runner:**
+
 - Only production dependencies (~200MB vs ~600MB)
 - Non-root user (`nodejs:1001`)
 - Alpine Linux base for minimal attack surface
@@ -253,6 +255,7 @@ curl http://localhost:3000/api/health
 ```
 
 Health check returns:
+
 - HTTP 200: Container is healthy
 - HTTP 500: Container is unhealthy
 
@@ -333,6 +336,7 @@ docker-compose up -d --build
 The Docker image is production-ready and secure for:
 
 **DigitalOcean App Platform:**
+
 ```bash
 # Set environment variables in App Platform dashboard
 # Image: ghcr.io/jayleetwan/qa-toolsmith:latest
@@ -340,16 +344,19 @@ The Docker image is production-ready and secure for:
 ```
 
 **AWS ECS / Fargate:**
+
 - Use task definition environment variables
 - No secrets in container image
 - IAM roles for additional security
 
 **Azure Container Instances:**
+
 - Environment variables in container group
 - Not in image metadata
 - Production-grade security
 
 **Google Cloud Run:**
+
 - Secrets Manager integration
 - Environment variables at runtime
 - Secure by default
@@ -363,10 +370,10 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1'
+          cpus: "1"
           memory: 512M
         reservations:
-          cpus: '0.5'
+          cpus: "0.5"
           memory: 256M
 ```
 
@@ -400,12 +407,12 @@ docker-compose exec qa-toolsmith sh
 
 ## Command Reference
 
-| Task | Command |
-|------|---------|
-| Start | `docker-compose up -d` |
-| Stop | `docker-compose down` |
-| Logs | `docker-compose logs -f` |
-| Restart | `docker-compose restart` |
-| Rebuild | `docker-compose up -d --build` |
-| Health | `curl http://localhost:3000/api/health` |
-| Shell | `docker-compose exec qa-toolsmith sh` |
+| Task    | Command                                 |
+| ------- | --------------------------------------- |
+| Start   | `docker-compose up -d`                  |
+| Stop    | `docker-compose down`                   |
+| Logs    | `docker-compose logs -f`                |
+| Restart | `docker-compose restart`                |
+| Rebuild | `docker-compose up -d --build`          |
+| Health  | `curl http://localhost:3000/api/health` |
+| Shell   | `docker-compose exec qa-toolsmith sh`   |

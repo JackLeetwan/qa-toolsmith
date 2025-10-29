@@ -95,39 +95,46 @@ GeneratorLayout (Astro layout)
 ### Component Details
 
 #### GeneratorLayout.astro
+
 - **Purpose**: Shared layout with breadcrumb navigation
 - **Features**: Focus management, responsive design, ARIA landmarks
 - **Props**: `{ title: string, description?: string, children: ReactNode }`
 
 #### GeneratorsHubView.tsx
+
 - **Purpose**: Main hub page with generator catalog
 - **Features**: Responsive grid (1/2/3 columns), navigation cards
 - **Data**: Static `generatorsMeta[]` configuration
 
 #### GeneratorCard.tsx
+
 - **Purpose**: Individual generator card with icon and description
 - **Features**: Click navigation, hover states, accessibility labels
 - **Props**: `{ item: GeneratorMeta }`
 
 #### IBANGeneratorView.tsx
+
 - **Purpose**: Main container with state management for IBAN operations
 - **State**: `IbanViewState` with useReducer for complex state transitions
 - **Features**: URL synchronization, localStorage persistence
 - **Props**: None (container component)
 
 #### IBANGeneratorForm.tsx
+
 - **Purpose**: Form for IBAN generation with validation
 - **Validation**: Country required, seed optional (64 char limit, regex validation)
 - **Features**: Real-time validation, error display, loading states
 - **Props**: `{ onGenerated: (result) => void }`
 
 #### IBANValidatorForm.tsx
+
 - **Purpose**: Form for IBAN validation with normalization
 - **Features**: Auto-normalization (remove spaces, uppercase), format hints
 - **Validation**: Basic format check before API call
 - **Props**: `{ onValidated: (result) => void }`
 
 #### GeneratorHistory.tsx
+
 - **Purpose**: Persistent history management with UI
 - **Features**: FIFO limit (10 items), rehydration on click, clear with confirmation
 - **Responsive**: Collapsible on mobile, sidebar on desktop
@@ -236,7 +243,15 @@ GET /api/validators/iban?iban=DE89370400440532013000
 ```typescript
 export type IbanCountry = "DE" | "AT";
 export type OutputFormat = "text" | "json";
-export type GeneratorKind = "phone" | "address" | "plates" | "email" | "company" | "card" | "guid" | "string";
+export type GeneratorKind =
+  | "phone"
+  | "address"
+  | "plates"
+  | "email"
+  | "company"
+  | "card"
+  | "guid"
+  | "string";
 export type Country = "PL" | "DE" | "AT";
 
 export interface IbanGenerateQuery {
@@ -296,12 +311,14 @@ export interface IbanViewState {
 ### Validation Rules
 
 #### Seed Parameter
+
 - **Optional**: Can be omitted for random generation
 - **Max Length**: 64 characters
 - **Pattern**: `/^[A-Za-z0-9._-]+$/` (alphanumeric, dot, underscore, dash)
 - **Purpose**: Enables deterministic/repeatable generation
 
 #### IBAN Input (Validation)
+
 - **Normalization**: Automatic (spaces removed, converted to uppercase)
 - **Format**: `CCDD...` where CC=country code, DD=check digits
 - **Lengths**: DE=22 chars, AT=20 chars
@@ -324,7 +341,7 @@ const [state, dispatch] = useReducer(ibanReducer, initialState);
 
 ```typescript
 // FIFO queue with localStorage persistence
-const history = useLocalHistory<IbanGenerateResponse>('gen_history_iban', 10);
+const history = useLocalHistory<IbanGenerateResponse>("gen_history_iban", 10);
 
 // Methods: addItem(), clearHistory(), removeItem()
 // Automatic cleanup when limit exceeded
@@ -333,15 +350,18 @@ const history = useLocalHistory<IbanGenerateResponse>('gen_history_iban', 10);
 ## API Integration Details
 
 ### Generate IBAN
+
 ```typescript
 GET /api/generators/iban?country=DE&seed=test123
 ```
 
 **Caching Strategy:**
+
 - With seed: `Cache-Control: public, max-age=31536000, immutable`
 - Without seed: `cache: "no-store"`
 
 **Response:**
+
 ```json
 {
   "iban": "DE50185482443452538353",
@@ -351,14 +371,17 @@ GET /api/generators/iban?country=DE&seed=test123
 ```
 
 ### Validate IBAN
+
 ```typescript
 GET /api/validators/iban?iban=DE89370400440532013000
 ```
 
 **Caching Strategy:**
+
 - `Cache-Control: public, max-age=300` (5 minutes)
 
 **Response:**
+
 ```json
 {
   "valid": true
@@ -366,6 +389,7 @@ GET /api/validators/iban?iban=DE89370400440532013000
 ```
 
 **Error Response:**
+
 ```json
 {
   "valid": false,
@@ -376,20 +400,23 @@ GET /api/validators/iban?iban=DE89370400440532013000
 ## Error Handling
 
 ### Client-Side Validation
+
 - **Inline Errors**: Display immediately for format violations
 - **Submit Prevention**: Block API calls for invalid inputs
 - **User Feedback**: Clear error messages with suggestions
 
 ### API Error Mapping
-| HTTP Code | Error Code | UI Handling |
-|-----------|------------|-------------|
-| 400 | `invalid_country` | Inline error on country select |
-| 400 | `invalid_seed` | Inline error on seed input |
-| 400 | `bad_params` | Form validation errors |
-| 429 | `rate_limited` | Toast + retry after delay |
-| 500 | `internal` | Error boundary fallback |
+
+| HTTP Code | Error Code        | UI Handling                    |
+| --------- | ----------------- | ------------------------------ |
+| 400       | `invalid_country` | Inline error on country select |
+| 400       | `invalid_seed`    | Inline error on seed input     |
+| 400       | `bad_params`      | Form validation errors         |
+| 429       | `rate_limited`    | Toast + retry after delay      |
+| 500       | `internal`        | Error boundary fallback        |
 
 ### Network Error Handling
+
 - **Timeout**: 30s default, graceful degradation
 - **Offline**: Banner notification, queue requests
 - **Retry**: Exponential backoff for 5xx errors

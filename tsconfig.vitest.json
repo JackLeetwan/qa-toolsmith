@@ -9,6 +9,11 @@
     "paths": {
       "@/*": ["./src/*"]
     },
-    "types": ["vitest/globals", "vitest", "vite/client", "@testing-library/jest-dom"]
+    "types": [
+      "vitest/globals",
+      "vitest",
+      "vite/client",
+      "@testing-library/jest-dom"
+    ]
   }
 }

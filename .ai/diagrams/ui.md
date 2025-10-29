@@ -29,10 +29,12 @@ Przestrzegaj zasad składni Mermaid:
 - Używaj węzłów pośrednich dla złożonych relacji
 - Preferuj układ pionowy dla hierarchii
 - Używaj poprawnych typów połączeń: --> , --- , -.-> , ==> , --Tekst-->
+
 - Unikaj używania adresów URL, endpointów, nawiasów w nazwach węzłów
 - Używaj spójnego nazewnictwa w całym dokumencie
 
 Unikaj błędów:
+
 - Brak deklaracji sekcji Mermaid i typu diagramu na początku
 - Nieprawidłowe ID węzłów (niedozwolone znaki)
 - Niezamknięte subgrafy (brakujący "end")

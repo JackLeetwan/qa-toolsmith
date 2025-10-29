@@ -5,13 +5,16 @@ This directory contains the CI/CD workflows for QA Toolsmith.
 ## Workflows Overview
 
 ### CI Pipeline (`ci.yml`)
-**Trigger**: 
+
+**Trigger**:
+
 - Push to `main` or `master` branches
 - Pull requests to `main` or `master` branches
 
 **Purpose**: Continuous Integration checks for PR validation
 
 **Jobs**:
+
 - `lint`: Code quality and formatting checks
 - `build`: Application build with environment variable validation
 - `test`: Unit tests with coverage
@@ -19,20 +22,25 @@ This directory contains the CI/CD workflows for QA Toolsmith.
 - `status-comment`: Automated PR status comment (PR only)
 
 **Conditional Behavior**:
+
 - **On Push**: Full pipeline with 30-day artifact retention
 - **On Pull Request**: Lightweight checks with 7-day retention and status comments
 
 ### Deploy to Cloudflare Pages (`deploy-cloudflare.yml`)
-**Trigger**: 
+
+**Trigger**:
+
 - Push to `master` branch
 - Manual workflow dispatch
 
 **Purpose**: Production deployment to Cloudflare Pages
 
 **Jobs**:
+
 - `deploy`: Build and deploy to Cloudflare Pages using Wrangler
 
 **Deployment Strategy**:
+
 - Direct upload via Cloudflare Wrangler Action
 - Runs only on `master` branch pushes
 - Can be triggered manually for hotfixes
@@ -146,7 +154,7 @@ npm run preview
 
 ### Getting Cloudflare Secrets
 
-1. **API Token**: 
+1. **API Token**:
    - Go to Cloudflare Dashboard → My Profile → API Tokens
    - Create token with "Cloudflare Pages - Edit" template
    - Include your account ID

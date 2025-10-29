@@ -46,27 +46,27 @@ jobs:
         run: |
           echo "🔍 Checking required environment variables..."
           MISSING_VARS=()
-          
+
           if [ -z "${{ secrets.SUPABASE_URL }}" ]; then
             echo "❌ SUPABASE_URL is not set"
             MISSING_VARS+=("SUPABASE_URL")
           else
             echo "✅ SUPABASE_URL is set"
           fi
-          
+
           if [ -z "${{ secrets.SUPABASE_KEY }}" ]; then
             echo "❌ SUPABASE_KEY is not set"
             MISSING_VARS+=("SUPABASE_KEY")
           else
             echo "✅ SUPABASE_KEY is set"
           fi
-          
+
           if [ ${#MISSING_VARS[@]} -ne 0 ]; then
             echo "❌ Missing required environment variables: ${MISSING_VARS[*]}"
             echo "Please configure these in GitHub Secrets"
             exit 1
           fi
-          
+
           echo "✅ All required environment variables are set"
       - name: Build
         run: npm run build
@@ -141,7 +141,7 @@ jobs:
       - name: Start preview server
         run: |
           echo "🚀 Starting preview server..."
-          
+
           # Validate that secrets are configured
           if [ -z "$SUPABASE_URL" ]; then
             echo "❌ ERROR: SUPABASE_URL secret is not configured in GitHub!"
@@ -149,19 +149,19 @@ jobs:
             echo "and add SUPABASE_URL with your cloud Supabase project URL"
             exit 1
           fi
-          
+
           if [ -z "$SUPABASE_KEY" ]; then
             echo "❌ ERROR: SUPABASE_KEY secret is not configured in GitHub!"
             echo "Please go to Settings → Secrets and variables → Actions"
             echo "and add SUPABASE_KEY with your Supabase anon key"
             exit 1
           fi
-          
+
           echo "🔍 Verifying environment variables are set:"
           echo "  - SUPABASE_URL: ${SUPABASE_URL:+✅ Set (cloud URL)}"
           echo "  - SUPABASE_KEY: ${SUPABASE_KEY:+✅ Set}"
           echo "  - ENV_NAME: ${ENV_NAME:+✅ Set}"
-          
+
           # Pass environment variables directly to npm command to ensure they reach Node process
           SUPABASE_URL="$SUPABASE_URL" SUPABASE_KEY="$SUPABASE_KEY" ENV_NAME="$ENV_NAME" PORT="$PORT" npm run preview > server.log 2>&1 &
           SERVER_PID=$!
@@ -368,4 +368,3 @@ jobs:
                 body: commentBody
               });
             }
-

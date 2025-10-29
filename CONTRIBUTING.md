@@ -9,6 +9,7 @@ This project uses **GitHub Flow**, a lightweight, branch-based workflow. All cha
 ### Creating a Feature Branch
 
 1. **Start from an up-to-date master branch:**
+
    ```bash
    git checkout master
    git pull origin master
@@ -32,6 +33,7 @@ Use descriptive, kebab-case branch names prefixed with a type:
 ### Making Changes
 
 1. Make your changes and commit them (pre-commit hooks will run automatically):
+
    ```bash
    git add .
    git commit -m "feat: add IBAN generator for Germany"
@@ -48,6 +50,7 @@ Use descriptive, kebab-case branch names prefixed with a type:
 ### Creating a Pull Request
 
 1. **Push your branch to the remote:**
+
    ```bash
    git push origin feature/your-feature-name
    ```
@@ -137,6 +140,7 @@ npm run typecheck
 ## Quick Start
 
 1. **Clone & Install**
+
    ```bash
    git clone <repo>
    cd qa-toolsmith
@@ -180,6 +184,7 @@ npm run format                   # Formatting (dry-run, use with caution)
 **Issue**: Commit blocked due to lint/format errors.
 
 **Solution**: Run the failing command manually to understand the error:
+
 ```bash
 npm run lint           # See what ESLint found
 npm run lint:fix       # Auto-fix ESLint issues
@@ -188,6 +193,7 @@ npm run typecheck      # Find type errors
 ```
 
 Then stage the fixes and commit again:
+
 ```bash
 git add .
 git commit -m "Fix lint/format issues"
@@ -198,6 +204,7 @@ git commit -m "Fix lint/format issues"
 **Issue**: `npm install` did not properly install devDependencies.
 
 **Solution**:
+
 ```bash
 npm install
 npx husky install
@@ -208,6 +215,7 @@ npx husky install
 **Issue**: TypeScript is not installed.
 
 **Solution**:
+
 ```bash
 npm install
 ```
@@ -224,6 +232,7 @@ The project uses `.lintstagedrc` to configure which tools run on which files:
 ```
 
 This ensures:
+
 - TypeScript/JavaScript files get linted with ESLint (auto-fix enabled)
 - All staged files get formatted with Prettier
 

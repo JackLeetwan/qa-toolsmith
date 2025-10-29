@@ -113,12 +113,14 @@ Import the collection from `.postman/` directory to test all endpoints with pre-
 Before testing endpoints, ensure:
 
 1. **Astro dev server running:**
+
    ```bash
    npm run dev
    # Server runs on http://localhost:3000
    ```
 
 2. **Supabase credentials configured** in `.env.local`:
+
    ```
    SUPABASE_URL=https://your-project.supabase.co
    SUPABASE_KEY=your-anon-key
@@ -136,16 +138,20 @@ Before testing endpoints, ensure:
 ### IBAN Generator Caching
 
 **Random IBAN (no seed):**
+
 ```
 Cache-Control: no-store
 ```
+
 - Response is **never cached** (each request generates different IBAN)
 
 **Deterministic IBAN (with seed):**
+
 ```
 Cache-Control: public, max-age=31536000, immutable
 ETag: "encoded-hash"
 ```
+
 - Response is **cached for 1 year** (same seed always produces same IBAN)
 - Safe for CDN caching
 
@@ -154,6 +160,7 @@ ETag: "encoded-hash"
 ```
 Cache-Control: public, max-age=300
 ```
+
 - Validation results are cached for 5 minutes
 
 ---
@@ -161,20 +168,23 @@ Cache-Control: public, max-age=300
 ## Error Handling
 
 ### Client-Side Validation
+
 - **Inline Errors**: Display immediately for format violations
 - **Submit Prevention**: Block API calls for invalid inputs
 - **User Feedback**: Clear error messages with suggestions
 
 ### API Error Mapping
-| HTTP Code | Error Code | UI Handling |
-|-----------|------------|-------------|
-| 400 | `invalid_country` | Inline error on country select |
-| 400 | `invalid_seed` | Inline error on seed input |
-| 400 | `bad_params` | Form validation errors |
-| 429 | `rate_limited` | Toast + retry after delay |
-| 500 | `internal` | Error boundary fallback |
+
+| HTTP Code | Error Code        | UI Handling                    |
+| --------- | ----------------- | ------------------------------ |
+| 400       | `invalid_country` | Inline error on country select |
+| 400       | `invalid_seed`    | Inline error on seed input     |
+| 400       | `bad_params`      | Form validation errors         |
+| 429       | `rate_limited`    | Toast + retry after delay      |
+| 500       | `internal`        | Error boundary fallback        |
 
 ### Network Error Handling
+
 - **Timeout**: 30s default, graceful degradation
 - **Offline**: Banner notification, queue requests
 - **Retry**: Exponential backoff for 5xx errors
@@ -213,12 +223,14 @@ See individual endpoint documentation for:
 ## Request
 
 **Headers:**
+
 ```
 Content-Type: application/json
 X-Request-ID: <optional-unique-id>
 ```
 
 **Body:**
+
 ```json
 {
   "email": "test@example.com",
@@ -229,6 +241,7 @@ X-Request-ID: <optional-unique-id>
 ## Responses
 
 ### Success (200 OK)
+
 ```json
 {
   "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
@@ -244,15 +257,16 @@ X-Request-ID: <optional-unique-id>
 
 ### Test Scenarios
 
-| Scenario | Request | Response | Status | Error Code |
-|----------|---------|----------|--------|------------|
-| ✅ Valid login | Valid credentials | JWT + profile | 200 | - |
-| ❌ Invalid email | `"email": "not-an-email"` | Field validation error | 400 | `VALIDATION_ERROR` |
-| ❌ Short password | `"password": "short"` | Field validation error | 400 | `VALIDATION_ERROR` |
-| ❌ Wrong credentials | Wrong email/password | Generic error | 401 | `INVALID_CREDENTIALS` |
-| ⏱️ Rate limited | 11th request in 60s | Rate limit error | 429 | `RATE_LIMITED` |
+| Scenario             | Request                   | Response               | Status | Error Code            |
+| -------------------- | ------------------------- | ---------------------- | ------ | --------------------- |
+| ✅ Valid login       | Valid credentials         | JWT + profile          | 200    | -                     |
+| ❌ Invalid email     | `"email": "not-an-email"` | Field validation error | 400    | `VALIDATION_ERROR`    |
+| ❌ Short password    | `"password": "short"`     | Field validation error | 400    | `VALIDATION_ERROR`    |
+| ❌ Wrong credentials | Wrong email/password      | Generic error          | 401    | `INVALID_CREDENTIALS` |
+| ⏱️ Rate limited      | 11th request in 60s       | Rate limit error       | 429    | `RATE_LIMITED`        |
 
 **Notes:**
+
 - Rate limit resets after 60 seconds
 - Use Postman Collection Runner to test rate limiting (10 iterations + 1)
 - Invalid credentials error doesn't reveal which field is wrong (security)
@@ -260,6 +274,7 @@ X-Request-ID: <optional-unique-id>
 ## Postman Setup (Optional)
 
 ### Environment Variables
+
 ```
 BASE_URL = http://localhost:3000
 API_ENDPOINT = /api/auth/login
@@ -268,10 +283,15 @@ TEST_PASSWORD = testPassword123
 ```
 
 ### Tests Script
+
 ```javascript
 pm.test("Status is 200", () => pm.response.to.have.status(200));
-pm.test("Has access_token", () => pm.expect(pm.response.json()).to.have.property("access_token"));
-pm.test("Has profile", () => pm.expect(pm.response.json()).to.have.property("profile"));
+pm.test("Has access_token", () =>
+  pm.expect(pm.response.json()).to.have.property("access_token"),
+);
+pm.test("Has profile", () =>
+  pm.expect(pm.response.json()).to.have.property("profile"),
+);
 ```
 
 ---
@@ -660,6 +680,7 @@ console.log(ibans);
 - **GET `/api/generators/{kind}`** — Other data generators:
 
 ### Planned Generators
+
 - `phone` - Phone Number Generator
 - `address` - Address Generator
 - `plates` - License Plate Generator
