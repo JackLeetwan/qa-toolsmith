@@ -12,26 +12,37 @@ dotenv.config();
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
 
-console.log("\n🔍 Supabase Signup Diagnostic Test");
-console.log("====================================\n");
+// Reduce logging noise in CI
+const isCI = process.env.CI === "true";
+
+if (!isCI) {
+  console.log("\n🔍 Supabase Signup Diagnostic Test");
+  console.log("====================================\n");
+}
 
 // Check environment variables
-console.log("Environment Configuration:");
-console.log(`  - SUPABASE_URL: ${supabaseUrl ? "✅ Set" : "❌ Missing"}`);
-console.log(`  - SUPABASE_KEY: ${supabaseKey ? "✅ Set" : "❌ Missing"}`);
+if (!isCI) {
+  console.log("Environment Configuration:");
+  console.log(`  - SUPABASE_URL: ${supabaseUrl ? "✅ Set" : "❌ Missing"}`);
+  console.log(`  - SUPABASE_KEY: ${supabaseKey ? "✅ Set" : "❌ Missing"}`);
+}
 
 if (!supabaseUrl || !supabaseKey) {
   console.error("\n❌ ERROR: Missing required environment variables!");
-  console.error(
-    "   Make sure .env file exists with SUPABASE_URL and SUPABASE_KEY",
-  );
+  if (!isCI) {
+    console.error(
+      "   Make sure .env file exists with SUPABASE_URL and SUPABASE_KEY",
+    );
+  }
   process.exit(1);
 }
 
-console.log(
-  `  - URL Type: ${supabaseUrl.includes("localhost") ? "🏠 Local" : "☁️  Cloud"}`,
-);
-console.log(`  - Full URL: ${supabaseUrl}\n`);
+if (!isCI) {
+  console.log(
+    `  - URL Type: ${supabaseUrl.includes("localhost") ? "🏠 Local" : "☁️  Cloud"}`,
+  );
+  console.log(`  - Full URL: ${supabaseUrl}\n`);
+}
 
 // Create Supabase client
 const supabase = createClient(supabaseUrl, supabaseKey);
@@ -40,11 +51,12 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 const testEmail = `test-diagnostic-${Date.now()}@mailinator.com`;
 const testPassword = "SecurePass123";
 
-console.log("🧪 Testing Signup:");
-console.log(`  - Email: ${testEmail}`);
-console.log(`  - Password: ${testPassword.replace(/./g, "*")}\n`);
-
-console.log("📡 Calling supabase.auth.signUp()...\n");
+if (!isCI) {
+  console.log("🧪 Testing Signup:");
+  console.log(`  - Email: ${testEmail}`);
+  console.log(`  - Password: ${testPassword.replace(/./g, "*")}\n`);
+  console.log("📡 Calling supabase.auth.signUp()...\n");
+}
 
 try {
   const { data, error } = await supabase.auth.signUp({
@@ -101,22 +113,27 @@ try {
     process.exit(1);
   }
 
-  console.log("✅ SIGNUP SUCCESSFUL!\n");
-  console.log("User Data:");
-  console.log("  - ID:", data.user?.id || "N/A");
-  console.log("  - Email:", data.user?.email || "N/A");
-  console.log(
-    "  - Email Confirmed:",
-    data.user?.email_confirmed_at ? "✅ Yes" : "❌ No",
-  );
-  console.log("  - Created At:", data.user?.created_at || "N/A");
+  if (!isCI) {
+    console.log("✅ SIGNUP SUCCESSFUL!\n");
+    console.log("User Data:");
+    console.log("  - ID:", data.user?.id || "N/A");
+    console.log("  - Email:", data.user?.email || "N/A");
+    console.log(
+      "  - Email Confirmed:",
+      data.user?.email_confirmed_at ? "✅ Yes" : "❌ No",
+    );
+    console.log("  - Created At:", data.user?.created_at || "N/A");
 
-  if (!data.user?.email_confirmed_at) {
-    console.log("\n⚠️  WARNING: Email is not confirmed!");
-    console.log("   This might prevent auto-login after registration.");
+    if (!data.user?.email_confirmed_at) {
+      console.log("\n⚠️  WARNING: Email is not confirmed!");
+      console.log("   This might prevent auto-login after registration.");
+    }
+
+    console.log("\n✅ Test completed successfully");
+  } else {
+    // In CI, just log minimal success message
+    console.log("✅ Supabase signup test passed");
   }
-
-  console.log("\n✅ Test completed successfully");
 } catch (error) {
   console.error("\n❌ UNEXPECTED ERROR!\n");
   console.error(error);

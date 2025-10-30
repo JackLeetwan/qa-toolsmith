@@ -243,6 +243,7 @@ export interface Database {
         Row: {
           created_at: string;
           id: string;
+          is_public: boolean;
           search_vector: unknown;
           tags: string[];
           title: string;
@@ -254,6 +255,7 @@ export interface Database {
         Insert: {
           created_at?: string;
           id?: string;
+          is_public?: boolean;
           search_vector: unknown;
           tags?: string[];
           title: string;
@@ -265,6 +267,7 @@ export interface Database {
         Update: {
           created_at?: string;
           id?: string;
+          is_public?: boolean;
           search_vector?: unknown;
           tags?: string[];
           title?: string;

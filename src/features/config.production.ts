@@ -10,7 +10,7 @@ export const flags: FeatureFlags = {
     generators: true,
     charters: false,
     templates: false,
-    knowledgeBase: false,
+    knowledgeBase: true,
     export: false,
   },
 };

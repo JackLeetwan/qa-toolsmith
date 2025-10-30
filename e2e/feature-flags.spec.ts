@@ -69,9 +69,7 @@ test.describe("Safe Defaults Protection", () => {
       await expect(page.locator("nav a[href='/generators']")).not.toBeVisible();
 
       // Knowledge Base link should not be visible
-      await expect(
-        page.locator("nav a[href='/knowledge-base']"),
-      ).not.toBeVisible();
+      await expect(page.locator("nav a[href='/kb']")).not.toBeVisible();
 
       // Templates link should not be visible (requires auth anyway)
       await expect(page.locator("nav a[href='/templates']")).not.toBeVisible();

@@ -6,22 +6,25 @@
  */
 
 const startServer = () => {
-  console.log("\n🔍 Final Environment Check:");
   const supabaseUrl = process.env.SUPABASE_URL;
-  const urlDisplay = supabaseUrl
-    ? supabaseUrl.includes("localhost") || supabaseUrl.includes("127.0.0.1")
-      ? `⚠️ LOCALHOST (${supabaseUrl})`
-      : `✅ CLOUD (${supabaseUrl.split(".")[0]}.supabase.co)`
-    : "❌ MISSING";
 
-  console.log(`  - SUPABASE_URL: ${urlDisplay}`);
-  console.log(
-    `  - SUPABASE_KEY: ${process.env.SUPABASE_KEY ? "✅ Set" : "❌ MISSING"}`,
-  );
-  console.log(
-    `  - ENV_NAME: ${process.env.ENV_NAME || "⚠️ Not set (defaults to development)"}`,
-  );
-  console.log(`  - PORT: ${process.env.PORT || 3000}\n`);
+  if (!isCI) {
+    console.log("\n🔍 Final Environment Check:");
+    const urlDisplay = supabaseUrl
+      ? supabaseUrl.includes("localhost") || supabaseUrl.includes("127.0.0.1")
+        ? `⚠️ LOCALHOST (${supabaseUrl})`
+        : `✅ CLOUD (${supabaseUrl.split(".")[0]}.supabase.co)`
+      : "❌ MISSING";
+
+    console.log(`  - SUPABASE_URL: ${urlDisplay}`);
+    console.log(
+      `  - SUPABASE_KEY: ${process.env.SUPABASE_KEY ? "✅ Set" : "❌ MISSING"}`,
+    );
+    console.log(
+      `  - ENV_NAME: ${process.env.ENV_NAME || "⚠️ Not set (defaults to development)"}`,
+    );
+    console.log(`  - PORT: ${process.env.PORT || 3000}\n`);
+  }
 
   // Verify minimum required variables
   if (!supabaseUrl || !process.env.SUPABASE_KEY) {
@@ -46,22 +49,30 @@ const startServer = () => {
 
   // Warn if using localhost
   if (supabaseUrl.includes("localhost") || supabaseUrl.includes("127.0.0.1")) {
-    console.warn("⚠️  WARNING: SUPABASE_URL points to localhost!");
-    console.warn(
-      "    This will only work if Supabase emulator is running locally.",
-    );
-    console.warn(
-      "    For CI/CD, ensure SUPABASE_URL points to your cloud project.",
-    );
+    if (!isCI) {
+      console.warn("⚠️  WARNING: SUPABASE_URL points to localhost!");
+      console.warn(
+        "    This will only work if Supabase emulator is running locally.",
+      );
+      console.warn(
+        "    For CI/CD, ensure SUPABASE_URL points to your cloud project.",
+      );
+    } else {
+      console.warn("⚠️  WARNING: SUPABASE_URL points to localhost in CI!");
+    }
   }
 
-  console.log("✅ All required environment variables are set");
-  console.log("🚀 Starting Astro server...\n");
+  if (!isCI) {
+    console.log("✅ All required environment variables are set");
+    console.log("🚀 Starting Astro server...\n");
+  }
 
   // Now import and start the Astro server
   import("../dist/server/entry.mjs")
     .then(() => {
-      console.log("✅ Astro server entry loaded and started");
+      if (!isCI) {
+        console.log("✅ Astro server entry loaded and started");
+      }
     })
     .catch((err) => {
       console.error("❌ Failed to load server:", err);
@@ -70,23 +81,31 @@ const startServer = () => {
 };
 
 // Step 1: Always try to load dotenv (for local development)
-console.log("📚 Attempting to load .env file via dotenv...");
+const isCI = process.env.CI === "true";
+if (!isCI) {
+  console.log("📚 Attempting to load .env file via dotenv...");
+}
+
 import("dotenv")
   .then(({ config }) => {
     const result = config();
-    if (result.parsed) {
-      console.log(
-        `✅ Loaded .env file with ${Object.keys(result.parsed).length} variables`,
-      );
-    } else {
-      console.log("ℹ️  No .env file found (expected in CI/CD environment)");
+    if (!isCI) {
+      if (result.parsed) {
+        console.log(
+          `✅ Loaded .env file with ${Object.keys(result.parsed).length} variables`,
+        );
+      } else {
+        console.log("ℹ️  No .env file found (expected in CI/CD environment)");
+      }
     }
 
     // Step 2: After dotenv attempt, start server with whatever env vars we have
     startServer();
   })
   .catch(() => {
-    console.warn("⚠️  dotenv module not available, continuing without it");
+    if (!isCI) {
+      console.warn("⚠️  dotenv module not available, continuing without it");
+    }
     // Still try to start server - process.env should have CI/CD variables
     startServer();
   });

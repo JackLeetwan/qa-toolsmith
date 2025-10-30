@@ -237,7 +237,7 @@ describe("Middleware", () => {
   });
 
   describe("protected paths", () => {
-    const protectedPaths = ["/kb", "/templates", "/charters", "/admin"];
+    const protectedPaths = ["/templates", "/charters", "/admin"];
 
     it.each(protectedPaths)(
       "should redirect to login for protected path without auth: %s",
@@ -271,7 +271,7 @@ describe("Middleware", () => {
     );
 
     it("should allow access to protected path with authenticated user", async () => {
-      mockUrl.pathname = "/kb";
+      mockUrl.pathname = "/templates";
       const mockUser = { id: "user-123", email: "user@example.com" };
       mockSupabaseAuth.getUser.mockResolvedValue({
         data: { user: mockUser },
@@ -309,7 +309,7 @@ describe("Middleware", () => {
     });
 
     it("should handle protected paths with subpaths", async () => {
-      mockUrl.pathname = "/kb/articles/123";
+      mockUrl.pathname = "/templates/articles/123";
       mockSupabaseAuth.getUser.mockResolvedValue({
         data: { user: null },
         error: null,
@@ -326,9 +326,98 @@ describe("Middleware", () => {
       await middlewareHandler(context, mockNext);
 
       expect(mockRedirect).toHaveBeenCalledWith(
-        `/auth/login?next=${encodeURIComponent("/kb/articles/123")}`,
+        `/auth/login?next=${encodeURIComponent("/templates/articles/123")}`,
       );
       expect(mockNext).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("kb public access", () => {
+    it("should allow access to /kb without authentication", async () => {
+      mockUrl.pathname = "/kb";
+      mockSupabaseAuth.getUser.mockResolvedValue({
+        data: { user: null },
+        error: null,
+      });
+
+      const context = createAPIContext(
+        mockLocals,
+        mockCookies,
+        mockUrl,
+        mockRequest,
+      );
+
+      await middlewareHandler(context, mockNext);
+
+      expect(mockNext).toHaveBeenCalled();
+      expect(mockRedirect).not.toHaveBeenCalled();
+      expect(mockLocals.user).toBeUndefined();
+      expect(mockLogger.info).toHaveBeenCalledWith(
+        "✅ Public path, allowing access:",
+        "/kb",
+      );
+    });
+
+    it("should allow access to /kb subpaths without authentication", async () => {
+      mockUrl.pathname = "/kb/articles/123";
+      mockSupabaseAuth.getUser.mockResolvedValue({
+        data: { user: null },
+        error: null,
+      });
+
+      const context = createAPIContext(
+        mockLocals,
+        mockCookies,
+        mockUrl,
+        mockRequest,
+      );
+
+      await middlewareHandler(context, mockNext);
+
+      expect(mockNext).toHaveBeenCalled();
+      expect(mockRedirect).not.toHaveBeenCalled();
+      expect(mockLogger.info).toHaveBeenCalledWith(
+        "✅ Public path, allowing access:",
+        "/kb/articles/123",
+      );
+    });
+
+    it("should set user context for authenticated user on /kb", async () => {
+      mockUrl.pathname = "/kb";
+      const mockUser = { id: "user-123", email: "user@example.com" };
+      mockSupabaseAuth.getUser.mockResolvedValue({
+        data: { user: mockUser },
+        error: null,
+      });
+
+      // Mock profile fetch
+      mockSupabaseClientMock.from.mockReturnValue({
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            single: vi.fn().mockResolvedValue({
+              data: { role: "user" },
+              error: null,
+            }),
+          }),
+        }),
+      } as unknown as ReturnType<SupabaseClient<Database>["from"]>);
+
+      const context = createAPIContext(
+        mockLocals,
+        mockCookies,
+        mockUrl,
+        mockRequest,
+      );
+
+      await middlewareHandler(context, mockNext);
+
+      expect(mockNext).toHaveBeenCalled();
+      expect(mockRedirect).not.toHaveBeenCalled();
+      expect(mockLocals.user).toEqual({
+        id: "user-123",
+        email: "user@example.com",
+        role: "user",
+      });
     });
   });
 
@@ -558,7 +647,7 @@ describe("Middleware", () => {
 
   describe("redirect behavior", () => {
     it("should include current path in redirect URL", async () => {
-      mockUrl.pathname = "/kb/page";
+      mockUrl.pathname = "/templates/page";
       mockSupabaseAuth.getUser.mockResolvedValue({
         data: { user: null },
         error: null,
@@ -575,12 +664,12 @@ describe("Middleware", () => {
       await middlewareHandler(context, mockNext);
 
       expect(mockRedirect).toHaveBeenCalledWith(
-        "/auth/login?next=%2Fkb%2Fpage",
+        "/auth/login?next=%2Ftemplates%2Fpage",
       );
     });
 
     it("should handle paths with query parameters in redirect", async () => {
-      mockUrl.pathname = "/kb/page";
+      mockUrl.pathname = "/templates/page";
       mockUrl.search = "?param=value";
       mockSupabaseAuth.getUser.mockResolvedValue({
         data: { user: null },
@@ -598,13 +687,13 @@ describe("Middleware", () => {
       await middlewareHandler(context, mockNext);
 
       expect(mockRedirect).toHaveBeenCalledWith(
-        "/auth/login?next=%2Fkb%2Fpage",
+        "/auth/login?next=%2Ftemplates%2Fpage",
       );
     });
 
     it("should handle paths with special characters in redirect", async () => {
       // Create a new URL object with the encoded path
-      mockUrl = new URL("https://example.com/kb/path%20with%20spaces");
+      mockUrl = new URL("https://example.com/templates/path%20with%20spaces");
       mockSupabaseAuth.getUser.mockResolvedValue({
         data: { user: null },
         error: null,
@@ -621,7 +710,7 @@ describe("Middleware", () => {
       await middlewareHandler(context, mockNext);
 
       expect(mockRedirect).toHaveBeenCalledWith(
-        "/auth/login?next=%2Fkb%2Fpath%2520with%2520spaces",
+        "/auth/login?next=%2Ftemplates%2Fpath%2520with%2520spaces",
       );
     });
   });
@@ -914,7 +1003,7 @@ describe("Middleware", () => {
     });
 
     it("should return redirect result for protected paths", async () => {
-      mockUrl.pathname = "/kb";
+      mockUrl.pathname = "/templates";
       mockSupabaseAuth.getUser.mockResolvedValue({
         data: { user: null },
         error: null,
@@ -933,7 +1022,7 @@ describe("Middleware", () => {
       expect(result).toEqual(
         new Response(null, {
           status: 302,
-          headers: { Location: "/auth/login?next=%2Fkb" },
+          headers: { Location: "/auth/login?next=%2Ftemplates" },
         }),
       ); // redirect() returns a Response
       expect(mockRedirect).toHaveBeenCalled();

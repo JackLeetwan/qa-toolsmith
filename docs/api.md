@@ -17,6 +17,14 @@ This directory contains documentation for the QA Toolsmith REST API endpoints.
 - **[GET /generators/iban](#get-apigeneratorsiban--iban-generator-endpoint)** - Generate valid IBAN codes (DE, AT, PL) with optional seed
 - **[GET /validators/iban](#get-apivalidatorsiban--iban-validator-endpoint)** - Validate existing IBANs
 
+### 📚 Knowledge Base
+
+- **[GET /api/kb/entries](#get-apikbentries--list-kb-entries)** - List KB entries with public access (pagination supported)
+- **[POST /api/kb/entries](#post-apikbentries--create-kb-entry)** - Create a new KB entry (requires authentication)
+- **[GET /api/kb/entries/[id]](#get-apikbentriesid--get-kb-entry)** - Get a single KB entry by ID
+- **[PUT /api/kb/entries/[id]](#put-apikbentriesid--update-kb-entry)** - Update a KB entry (requires authentication)
+- **[DELETE /api/kb/entries/[id]](#delete-apikbentriesid--delete-kb-entry)** - Delete a KB entry (requires authentication)
+
 ---
 
 ## API Conventions
@@ -795,6 +803,905 @@ Cache-Control: public, max-age=300
 - The IBAN will be normalized: spaces removed, converted to uppercase
 - The validator uses the ISO 13616 mod-97 algorithm
 - Country-specific formats are validated for DE, AT, and PL
+
+---
+
+# GET /api/kb/entries — List KB Entries
+
+## Overview
+
+**URL:** `GET /api/kb/entries`  
+**Purpose:** Retrieve KB entries with conditional access logic based on authentication status.  
+**Authentication:** Optional (public access supported, but authenticated users see more entries)
+
+## Request
+
+**Query Parameters:**
+
+| Parameter | Type   | Required | Description                                                      | Example                         |
+| --------- | ------ | -------- | ---------------------------------------------------------------- | ------------------------------- |
+| `after`   | string | ❌ No    | Cursor for keyset pagination (format: `"updated_at,id"`)        | `?after=2024-01-01T00:00:00Z,entry-id` |
+| `limit`   | number | ❌ No    | Number of items per page (1-100, default: 20)                     | `?limit=10`                      |
+
+## Conditional Access Logic
+
+The endpoint returns different results based on authentication:
+
+- **Unauthenticated users (anonymous):**
+  - Only entries with `is_public = true` are returned
+  
+- **Authenticated users:**
+  - Own entries (`user_id = auth.uid()`) + public entries (`is_public = true`)
+
+Note: Internal search metadata field `search_vector` is never returned in responses.
+
+## Responses
+
+### ✅ Success Response (200 OK)
+
+**Response Format:**
+
+```json
+{
+  "items": [
+    {
+      "id": "uuid",
+      "user_id": "uuid",
+      "title": "string",
+      "url_original": "string",
+      "url_canonical": "string",
+      "tags": ["string"],
+      "is_public": true,
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z"
+    }
+  ],
+  "next_cursor": "2024-01-01T00:00:00Z,entry-id"
+}
+```
+
+**Response Fields:**
+
+- `items`: Array of `KBEntryDTO` objects
+- `next_cursor`: Optional cursor string for pagination. If present, use as `?after=` parameter for next page. Format: `"updated_at,id"`
+
+### ❌ Error: Invalid Query Parameters (400 Bad Request)
+
+```json
+{
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "Invalid query parameters",
+    "details": [
+      {
+        "path": ["limit"],
+        "message": "Number must be between 1 and 100"
+      }
+    ]
+  }
+}
+```
+
+### ❌ Error: Server Error (500 Internal Server Error)
+
+```json
+{
+  "error": {
+    "code": "DATABASE_ERROR",
+    "message": "Database query failed"
+  }
+}
+```
+
+## Keyset Pagination
+
+This endpoint uses **keyset-based pagination** (also known as cursor-based pagination):
+
+1. **First request:** Omit `after` parameter to get first page
+2. **Next page:** Use `next_cursor` from response as `?after=` parameter
+3. **Last page:** `next_cursor` will be `undefined` when no more pages exist
+
+**Example pagination flow:**
+
+```bash
+# First page (default limit: 20)
+GET /api/kb/entries
+
+# Response includes next_cursor
+{
+  "items": [...],
+  "next_cursor": "2024-01-01T12:00:00Z,abc-123"
+}
+
+# Second page
+GET /api/kb/entries?after=2024-01-01T12:00:00Z,abc-123
+
+# Last page (no next_cursor)
+{
+  "items": [...],
+  "next_cursor": undefined
+}
+```
+
+## Request Examples
+
+### cURL
+
+**Unauthenticated user (public entries only):**
+
+```bash
+curl -X GET "https://example.com/api/kb/entries"
+```
+
+**Authenticated user (own entries + public entries):**
+
+```bash
+curl -X GET "https://example.com/api/kb/entries" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+**Pagination (second page):**
+
+```bash
+curl -X GET "https://example.com/api/kb/entries?after=2024-01-01T00:00:00Z,entry-id&limit=10"
+```
+
+### JavaScript (Fetch API)
+
+```javascript
+// First page
+fetch("https://example.com/api/kb/entries")
+  .then((response) => response.json())
+  .then((data) => {
+    console.log("Entries:", data.items);
+    console.log("Has next page:", !!data.next_cursor);
+    
+    // Load next page if available
+    if (data.next_cursor) {
+      return fetch(`https://example.com/api/kb/entries?after=${data.next_cursor}`);
+    }
+  })
+  .then((response) => response?.json())
+  .then((data) => console.log("Next page:", data?.items));
+```
+
+### Python (Requests)
+
+```python
+import requests
+
+# Authenticated request
+headers = {"Authorization": "Bearer YOUR_JWT_TOKEN"}
+response = requests.get("https://example.com/api/kb/entries", headers=headers)
+data = response.json()
+
+print(f"Found {len(data['items'])} entries")
+if data.get("next_cursor"):
+    # Fetch next page
+    next_response = requests.get(
+        "https://example.com/api/kb/entries",
+        headers=headers,
+        params={"after": data["next_cursor"]}
+    )
+    next_data = next_response.json()
+    print(f"Next page: {len(next_data['items'])} entries")
+```
+
+---
+
+# POST /api/kb/entries — Create KB Entry
+
+## Overview
+
+**URL:** `POST /api/kb/entries`  
+**Purpose:** Create a new KB entry.  
+**Authentication:** Required (Bearer JWT token)
+**Authorization:** Only admins may create public entries (`is_public = true`). Non-admins creating with `is_public: true` receive 403.
+
+## Request
+
+**Headers:**
+
+```
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN
+```
+
+**Body:**
+
+```json
+{
+  "title": "React Documentation",
+  "url_original": "https://react.dev",
+  "tags": ["react", "frontend"],
+  "is_public": true
+}
+```
+
+**Request Fields:**
+
+| Field        | Type           | Required | Description                                   |
+| ------------ | -------------- | -------- | --------------------------------------------- |
+| `title`      | string         | ✅ Yes   | Entry title (1-200 characters)                 |
+| `url_original` | string       | ✅ Yes   | Original URL (must be valid HTTP/HTTPS URL)   |
+| `tags`       | string[]       | ❌ No    | Array of tag strings (default: `[]`)          |
+| `is_public`  | boolean        | ❌ No    | Whether entry is publicly visible (default: `false`) |
+
+## Responses
+
+### ✅ Success Response (201 Created)
+
+```json
+{
+  "data": {
+    "id": "uuid",
+    "user_id": "uuid",
+    "title": "React Documentation",
+    "url_original": "https://react.dev",
+    "url_canonical": "https://react.dev",
+    "tags": ["react", "frontend"],
+    "is_public": true,
+    "created_at": "2024-01-01T12:00:00Z",
+    "updated_at": "2024-01-01T12:00:00Z"
+  }
+}
+```
+
+### ❌ Error: Validation Error (400 Bad Request)
+
+```json
+{
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "Invalid input",
+    "details": [
+      {
+        "path": ["title"],
+        "message": "Title is required"
+      }
+    ]
+  }
+}
+```
+
+### ❌ Error: Unauthenticated (401 Unauthorized)
+
+```json
+{
+  "error": {
+    "code": "UNAUTHENTICATED",
+    "message": "Authentication required"
+  }
+}
+```
+
+### ❌ Error: Forbidden (403 Forbidden)
+
+Returned when a non-admin user attempts to create a public entry (`is_public: true`).
+
+```json
+{
+  "error": {
+    "code": "FORBIDDEN",
+    "message": "Only admins can create public KB entries",
+    "details": null
+  }
+}
+```
+
+### ❌ Error: Server Error (500 Internal Server Error)
+
+```json
+{
+  "error": {
+    "code": "DATABASE_ERROR",
+    "message": "Database insert failed"
+  }
+}
+```
+
+## Request Examples
+
+### cURL
+
+```bash
+curl -X POST "https://example.com/api/kb/entries" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "React Documentation",
+    "url_original": "https://react.dev",
+    "tags": ["react", "frontend"],
+    "is_public": true
+  }'
+```
+
+Non-admin attempting to create a public entry (403):
+
+```bash
+curl -i -X POST "https://example.com/api/kb/entries" \
+  -H "Authorization: Bearer NON_ADMIN_JWT" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Public Attempt",
+    "url_original": "https://example.com",
+    "is_public": true
+  }'
+```
+
+### JavaScript (Fetch API)
+
+```javascript
+fetch("https://example.com/api/kb/entries", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer YOUR_JWT_TOKEN"
+  },
+  body: JSON.stringify({
+    title: "React Documentation",
+    url_original: "https://react.dev",
+    tags: ["react", "frontend"],
+    is_public: true
+  })
+})
+  .then((response) => response.json())
+  .then((data) => console.log("Created entry:", data.data));
+```
+
+Non-admin (403):
+
+```javascript
+const res = await fetch("https://example.com/api/kb/entries", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    Authorization: "Bearer NON_ADMIN_JWT",
+  },
+  body: JSON.stringify({ title: "x", url_original: "https://x", is_public: true }),
+});
+if (res.status === 403) {
+  console.log("Only admins can create public KB entries");
+}
+```
+
+### Python (Requests)
+
+```python
+import requests
+
+headers = {
+    "Authorization": "Bearer YOUR_JWT_TOKEN",
+    "Content-Type": "application/json"
+}
+payload = {
+    "title": "React Documentation",
+    "url_original": "https://react.dev",
+    "tags": ["react", "frontend"],
+    "is_public": True
+}
+
+response = requests.post(
+    "https://example.com/api/kb/entries",
+    headers=headers,
+    json=payload
+)
+data = response.json()
+print(f"Created entry: {data['data']['id']}")
+```
+
+Non-admin (403):
+
+```python
+resp = requests.post(
+    "https://example.com/api/kb/entries",
+    headers={"Authorization": "Bearer NON_ADMIN_JWT", "Content-Type": "application/json"},
+    json={"title": "x", "url_original": "https://x", "is_public": True},
+)
+assert resp.status_code == 403
+```
+
+---
+
+# GET /api/kb/entries/[id] — Get KB Entry
+
+## Overview
+
+**URL:** `GET /api/kb/entries/[id]`  
+**Purpose:** Retrieve a single KB entry by ID.  
+**Authentication:** Optional (RLS automatically enforces access control)
+
+## Request
+
+**URL Parameters:**
+
+| Parameter | Type   | Required | Description        |
+| --------- | ------ | -------- | ----------------- |
+| `id`      | string | ✅ Yes   | UUID of the entry  |
+
+## Access Control
+
+- **Unauthenticated users:** Can only access entries with `is_public = true`
+- **Authenticated users:** Can access own entries (`user_id = auth.uid()`) + public entries
+
+RLS policies automatically enforce these rules.
+
+## Responses
+
+### ✅ Success Response (200 OK)
+
+```json
+{
+  "data": {
+    "id": "uuid",
+    "user_id": "uuid",
+    "title": "React Documentation",
+    "url_original": "https://react.dev",
+    "url_canonical": "https://react.dev",
+    "tags": ["react", "frontend"],
+    "is_public": true,
+    "created_at": "2024-01-01T12:00:00Z",
+    "updated_at": "2024-01-01T12:00:00Z"
+  }
+}
+```
+
+Note: Internal field `search_vector` is not included in the response.
+
+### ❌ Error: Not Found (404 Not Found)
+
+Returned when:
+- Entry doesn't exist
+- User doesn't have access (RLS denies access)
+
+```json
+{
+  "error": {
+    "code": "NOT_FOUND",
+    "message": "Entry not found or access denied"
+  }
+}
+```
+
+### ❌ Error: Server Error (500 Internal Server Error)
+
+```json
+{
+  "error": {
+    "code": "DATABASE_ERROR",
+    "message": "Database query failed"
+  }
+}
+```
+
+## Request Examples
+
+### cURL
+
+**Unauthenticated (public entry only):**
+
+```bash
+curl -X GET "https://example.com/api/kb/entries/abc-123-def-456"
+```
+
+**Authenticated (own or public entry):**
+
+```bash
+curl -X GET "https://example.com/api/kb/entries/abc-123-def-456" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+### JavaScript (Fetch API)
+
+```javascript
+fetch("https://example.com/api/kb/entries/abc-123-def-456", {
+  headers: {
+    "Authorization": "Bearer YOUR_JWT_TOKEN"
+  }
+})
+  .then((response) => response.json())
+  .then((data) => console.log("Entry:", data.data))
+  .catch((error) => console.error("Error:", error));
+```
+
+### Python (Requests)
+
+```python
+import requests
+
+headers = {"Authorization": "Bearer YOUR_JWT_TOKEN"}
+response = requests.get(
+    "https://example.com/api/kb/entries/abc-123-def-456",
+    headers=headers
+)
+data = response.json()
+print(f"Entry: {data['data']['title']}")
+```
+
+---
+
+# PUT /api/kb/entries/[id] — Update KB Entry
+
+## Overview
+
+**URL:** `PUT /api/kb/entries/[id]`  
+**Purpose:** Update a KB entry (partial update supported).  
+**Authentication:** Required (Bearer JWT token)  
+**Authorization:**
+- Users can only update their own entries (RLS enforced)
+- Only admins can edit public entries or set `is_public: true`
+
+## Request
+
+**Headers:**
+
+```
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN
+```
+
+**URL Parameters:**
+
+| Parameter | Type   | Required | Description        |
+| --------- | ------ | -------- | ----------------- |
+| `id`      | string | ✅ Yes   | UUID of the entry  |
+
+**Body (all fields optional):**
+
+```json
+{
+  "title": "Updated Title",
+  "url_original": "https://updated-url.com",
+  "tags": ["updated", "tags"],
+  "is_public": false
+}
+```
+
+**Request Fields:**
+
+| Field        | Type           | Required | Description                                   |
+| ------------ | -------------- | -------- | --------------------------------------------- |
+| `title`      | string         | ❌ No    | Entry title (1-200 characters)                 |
+| `url_original` | string       | ❌ No    | Original URL (must be valid HTTP/HTTPS URL)   |
+| `tags`       | string[]       | ❌ No    | Array of tag strings                           |
+| `is_public`  | boolean        | ❌ No    | Whether entry is publicly visible             |
+
+**Note:** At least one field must be provided for update.
+
+## Responses
+
+### ✅ Success Response (200 OK)
+
+```json
+{
+  "data": {
+    "id": "uuid",
+    "user_id": "uuid",
+    "title": "Updated Title",
+    "url_original": "https://updated-url.com",
+    "url_canonical": "https://updated-url.com",
+    "tags": ["updated", "tags"],
+    "is_public": false,
+    "created_at": "2024-01-01T12:00:00Z",
+    "updated_at": "2024-01-01T13:00:00Z"
+  }
+}
+```
+
+### ❌ Error: Validation Error (400 Bad Request)
+
+```json
+{
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "Invalid input",
+    "details": [
+      {
+        "path": ["title"],
+        "message": "Title too long"
+      }
+    ]
+  }
+}
+```
+
+### ❌ Error: Unauthenticated (401 Unauthorized)
+
+```json
+{
+  "error": {
+    "code": "UNAUTHENTICATED",
+    "message": "Authentication required"
+  }
+}
+```
+
+### ❌ Error: Forbidden (403 Forbidden)
+
+Returned when a non-admin attempts to:
+- Edit a public entry
+- Set `is_public` to `true`
+
+```json
+{
+  "error": {
+    "code": "FORBIDDEN",
+    "message": "Only admins can edit public KB entries",
+    "details": null
+  }
+}
+```
+
+### ❌ Error: Not Found (404 Not Found)
+
+Returned when:
+- Entry doesn't exist
+- User is not the owner (RLS denies access)
+
+```json
+{
+  "error": {
+    "code": "NOT_FOUND",
+    "message": "Entry not found or access denied"
+  }
+}
+```
+
+### ❌ Error: Server Error (500 Internal Server Error)
+
+```json
+{
+  "error": {
+    "code": "DATABASE_ERROR",
+    "message": "Database update failed"
+  }
+}
+```
+
+## Request Examples
+
+### cURL
+
+```bash
+curl -X PUT "https://example.com/api/kb/entries/abc-123-def-456" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Updated Title",
+    "is_public": true
+  }'
+```
+
+Non-admin forbidden scenarios (403):
+
+```bash
+# Editing a public entry
+curl -i -X PUT "https://example.com/api/kb/entries/public-entry-id" \
+  -H "Authorization: Bearer NON_ADMIN_JWT" \
+  -H "Content-Type: application/json" \
+  -d '{"title": "x"}'
+
+# Setting is_public to true
+curl -i -X PUT "https://example.com/api/kb/entries/own-private-id" \
+  -H "Authorization: Bearer NON_ADMIN_JWT" \
+  -H "Content-Type: application/json" \
+  -d '{"is_public": true}'
+```
+
+### JavaScript (Fetch API)
+
+```javascript
+fetch("https://example.com/api/kb/entries/abc-123-def-456", {
+  method: "PUT",
+  headers: {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer YOUR_JWT_TOKEN"
+  },
+  body: JSON.stringify({
+    title: "Updated Title",
+    is_public: true
+  })
+})
+  .then((response) => response.json())
+  .then((data) => console.log("Updated entry:", data.data));
+```
+
+Non-admin (403):
+
+```javascript
+const res = await fetch("https://example.com/api/kb/entries/own-private-id", {
+  method: "PUT",
+  headers: { "Content-Type": "application/json", Authorization: "Bearer NON_ADMIN_JWT" },
+  body: JSON.stringify({ is_public: true }),
+});
+if (res.status === 403) {
+  console.log("Only admins can edit public KB entries");
+}
+```
+
+### Python (Requests)
+
+```python
+import requests
+
+headers = {
+    "Authorization": "Bearer YOUR_JWT_TOKEN",
+    "Content-Type": "application/json"
+}
+payload = {
+    "title": "Updated Title",
+    "is_public": True
+}
+
+response = requests.put(
+    "https://example.com/api/kb/entries/abc-123-def-456",
+    headers=headers,
+    json=payload
+)
+data = response.json()
+print(f"Updated entry: {data['data']['title']}")
+```
+
+Non-admin (403):
+
+```python
+resp = requests.put(
+    "https://example.com/api/kb/entries/own-private-id",
+    headers={"Authorization": "Bearer NON_ADMIN_JWT", "Content-Type": "application/json"},
+    json={"is_public": True},
+)
+assert resp.status_code == 403
+```
+
+---
+
+# DELETE /api/kb/entries/[id] — Delete KB Entry
+
+## Overview
+
+**URL:** `DELETE /api/kb/entries/[id]`  
+**Purpose:** Delete a KB entry.  
+**Authentication:** Required (Bearer JWT token)  
+**Authorization:**
+- Users can only delete their own private entries (RLS enforced)
+- Only admins can delete public entries
+
+## Request
+
+**Headers:**
+
+```
+Authorization: Bearer YOUR_JWT_TOKEN
+```
+
+**URL Parameters:**
+
+| Parameter | Type   | Required | Description        |
+| --------- | ------ | -------- | ----------------- |
+| `id`      | string | ✅ Yes   | UUID of the entry  |
+
+**Note:** Related notes are automatically cascade-deleted (foreign key constraint).
+
+## Responses
+
+### ✅ Success Response (204 No Content)
+
+No response body. Status code `204` indicates successful deletion.
+
+### ❌ Error: Unauthenticated (401 Unauthorized)
+
+```json
+{
+  "error": {
+    "code": "UNAUTHENTICATED",
+    "message": "Authentication required"
+  }
+}
+```
+
+### ❌ Error: Forbidden (403 Forbidden)
+
+Returned when a non-admin attempts to delete a public entry, or delete someone else's private entry.
+
+```json
+{
+  "error": {
+    "code": "FORBIDDEN",
+    "message": "Only admins can delete public KB entries",
+    "details": null
+  }
+}
+```
+
+or
+
+```json
+{
+  "error": {
+    "code": "FORBIDDEN",
+    "message": "You can delete only your own private KB entries",
+    "details": null
+  }
+}
+```
+
+### ❌ Error: Not Found (404 Not Found)
+
+Returned when:
+- Entry doesn't exist
+- User is not the owner (RLS denies access)
+
+```json
+{
+  "error": {
+    "code": "NOT_FOUND",
+    "message": "KB entry not found"
+  }
+}
+```
+
+### ❌ Error: Server Error (500 Internal Server Error)
+
+```json
+{
+  "error": {
+    "code": "DATABASE_ERROR",
+    "message": "Database delete failed"
+  }
+}
+```
+
+## Request Examples
+
+### cURL
+
+```bash
+curl -X DELETE "https://example.com/api/kb/entries/abc-123-def-456" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+Non-admin forbidden scenarios (403):
+
+```bash
+# Deleting public entry
+curl -i -X DELETE "https://example.com/api/kb/entries/public-entry-id" \
+  -H "Authorization: Bearer NON_ADMIN_JWT"
+
+# Deleting someone else's private entry
+curl -i -X DELETE "https://example.com/api/kb/entries/others-private-id" \
+  -H "Authorization: Bearer NON_ADMIN_JWT"
+```
+
+### JavaScript (Fetch API)
+
+```javascript
+fetch("https://example.com/api/kb/entries/abc-123-def-456", {
+  method: "DELETE",
+  headers: {
+    "Authorization": "Bearer YOUR_JWT_TOKEN"
+  }
+})
+  .then((response) => {
+    if (response.status === 204) {
+      console.log("Entry deleted successfully");
+    }
+  });
+```
+
+### Python (Requests)
+
+```python
+import requests
+
+headers = {"Authorization": "Bearer YOUR_JWT_TOKEN"}
+response = requests.delete(
+    "https://example.com/api/kb/entries/abc-123-def-456",
+    headers=headers
+)
+
+if response.status_code == 204:
+    print("Entry deleted successfully")
+```
 
 ---
 

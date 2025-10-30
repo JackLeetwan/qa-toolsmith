@@ -14,7 +14,7 @@ QA Toolsmith to lekkie, otwartoźródłowe narzędzie dla testerów, które porz
 - ✅ Stabilny zestaw testów (unit + E2E) i gotowy pipeline CI
 - 🚧 Szablony raportów defektów z eksportem do Markdown
 - 🚧 Exploration Charter: notatki z tagami, timer, skróty klawiaturowe
-- 🚧 Prosta Knowledge Base: CRUD, tagi, wyszukiwanie, eksport JSON
+- ✅ Prosta Knowledge Base: CRUD, tagi, publiczny dostęp, eksport JSON
 - 📋 Kolejne generatory danych (tel., adres, tablice, e‑mail, firma, karty, GUID, stringi)
 - 📋 Opcjonalny asystent AI do ulepszania treści (limity dzienne)
 
@@ -45,10 +45,16 @@ Podstawowe komendy:
 
 ## API i generatory
 
-Pełny opis endpointów (m.in. IBAN Generator/Validator) znajdziesz w dokumentacji API: `docs/api.md`.
+Pełny opis endpointów (m.in. IBAN Generator/Validator, Knowledge Base) znajdziesz w dokumentacji API: `docs/api.md`.
 
 - Przykład: `GET /api/generators/iban?country=DE[&seed=...]`
 - Przykład: `GET /api/validators/iban?iban=...`
+- Przykład: `GET /api/kb/entries` - lista wpisów Knowledge Base (publiczny dostęp)
+- Przykład: `POST /api/kb/entries` - tworzenie wpisu (wymaga autentykacji)
+
+Uwaga: publiczne wpisy KB (is_public=true) mają ograniczenia admin-only dla operacji tworzenia/edycji/usuwania. Szczegóły błędów 401/403/404 w `docs/api.md`.
+
+Krótki skrót zasad i wpływu na UI: `docs/kb-admin-restrictions.md`.
 
 ## Wdrożenie
 

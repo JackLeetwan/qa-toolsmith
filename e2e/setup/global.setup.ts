@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /**
  * Global setup for E2E tests
  *

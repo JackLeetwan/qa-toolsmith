@@ -43,9 +43,12 @@ test.describe("User Registration", () => {
     const confirmPasswordInput = page.locator('input[type="password"]').nth(1);
     const submitButton = page.locator('button[type="submit"]');
 
-    await emailInput.fill(testEmail);
-    await passwordInput.fill(testPassword);
-    await confirmPasswordInput.fill(testPassword);
+    await emailInput.clear();
+    await emailInput.type(testEmail);
+    await passwordInput.clear();
+    await passwordInput.type(testPassword);
+    await confirmPasswordInput.clear();
+    await confirmPasswordInput.type(testPassword);
 
     // Submit the form
     await submitButton.click();
@@ -80,23 +83,37 @@ test.describe("User Registration", () => {
 
     // Wait for form to load
     const emailInput = page.locator('input[type="email"]');
+    const passwordInput = page.locator('input[type="password"]').first();
+    const confirmPasswordInput = page.locator('input[type="password"]').nth(1);
     const submitButton = page.locator('button[type="submit"]');
+
     await expect(emailInput).toBeVisible();
+    await expect(passwordInput).toBeVisible();
+    await expect(confirmPasswordInput).toBeVisible();
     await expect(submitButton).toBeVisible();
 
-    // Fill form with invalid email and submit to trigger validation
+    // Fill form with invalid email and valid passwords to ensure only email validation fails
+    await emailInput.clear();
     await emailInput.type("invalid-email");
+    await passwordInput.clear();
+    await passwordInput.type("ValidPass123");
+    await confirmPasswordInput.clear();
+    await confirmPasswordInput.type("ValidPass123");
+
+    // Submit form to trigger validation
     await submitButton.click();
 
     // Wait for validation to complete
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(500);
 
     // Should display validation error for invalid email format
-    await expect(
-      page
-        .locator('p[role="alert"]')
-        .filter({ hasText: /Nieprawidłowy format email/i }),
-    ).toBeVisible();
+    const errorElement = page
+      .locator('p[role="alert"]')
+      .filter({ hasText: /Nieprawidłowy format email/i });
+    await expect(errorElement).toBeVisible({ timeout: 5000 });
+
+    // Check that we're still on the registration page (validation prevented submission)
+    await expect(page).toHaveURL(/\/auth\/register/);
   });
 
   test("should display validation errors for short password", async ({
@@ -112,26 +129,34 @@ test.describe("User Registration", () => {
     const passwordInput = page.locator('input[type="password"]').first();
     const confirmPasswordInput = page.locator('input[type="password"]').nth(1);
     const submitButton = page.locator('button[type="submit"]');
+
     await expect(emailInput).toBeVisible();
+    await expect(passwordInput).toBeVisible();
+    await expect(confirmPasswordInput).toBeVisible();
     await expect(submitButton).toBeVisible();
 
-    // Fill form with short password and submit to trigger validation
+    // Fill form with valid email, short password, and matching confirm password
+    await emailInput.clear();
     await emailInput.type(testEmail);
+    await passwordInput.clear();
     await passwordInput.type("short"); // Too short
+    await confirmPasswordInput.clear();
     await confirmPasswordInput.type("short");
+
+    // Submit form to trigger validation
     await submitButton.click();
 
-    // Wait for validation to complete and alert to appear
-    await page.waitForTimeout(2000);
+    // Wait for validation to complete
+    await page.waitForTimeout(500);
+
+    // Check that we're still on the registration page (validation prevented submission)
+    await expect(page).toHaveURL(/\/auth\/register/);
 
     // Should display validation error for short password
-    await expect(
-      page
-        .locator('p[role="alert"]')
-        .filter({ hasText: /co najmniej 8 znaków/i }),
-    ).toBeVisible({
-      timeout: 3000,
-    });
+    const errorElement = page
+      .locator('p[role="alert"]')
+      .filter({ hasText: /co najmniej 8 znaków/i });
+    await expect(errorElement).toBeVisible({ timeout: 5000 });
   });
 
   test("should display validation errors for password without letters", async ({
@@ -147,26 +172,34 @@ test.describe("User Registration", () => {
     const passwordInput = page.locator('input[type="password"]').first();
     const confirmPasswordInput = page.locator('input[type="password"]').nth(1);
     const submitButton = page.locator('button[type="submit"]');
+
     await expect(emailInput).toBeVisible();
+    await expect(passwordInput).toBeVisible();
+    await expect(confirmPasswordInput).toBeVisible();
     await expect(submitButton).toBeVisible();
 
-    // Fill form with password containing only numbers and submit to trigger validation
+    // Fill form with valid email, password containing only numbers, and matching confirm password
+    await emailInput.clear();
     await emailInput.type(testEmail);
+    await passwordInput.clear();
     await passwordInput.type("12345678");
+    await confirmPasswordInput.clear();
     await confirmPasswordInput.type("12345678");
+
+    // Submit form to trigger validation
     await submitButton.click();
 
-    // Wait for validation to complete and alert to appear
-    await page.waitForTimeout(2000);
+    // Wait for validation to complete
+    await page.waitForTimeout(500);
+
+    // Check that we're still on the registration page (validation prevented submission)
+    await expect(page).toHaveURL(/\/auth\/register/);
 
     // Should display validation error for password without letters
-    await expect(
-      page
-        .locator('p[role="alert"]')
-        .filter({ hasText: /co najmniej jedną literę/i }),
-    ).toBeVisible({
-      timeout: 3000,
-    });
+    const errorElement = page
+      .locator('p[role="alert"]')
+      .filter({ hasText: /co najmniej jedną literę/i });
+    await expect(errorElement).toBeVisible({ timeout: 5000 });
   });
 
   test("should display validation errors for password without numbers", async ({
@@ -182,26 +215,34 @@ test.describe("User Registration", () => {
     const passwordInput = page.locator('input[type="password"]').first();
     const confirmPasswordInput = page.locator('input[type="password"]').nth(1);
     const submitButton = page.locator('button[type="submit"]');
+
     await expect(emailInput).toBeVisible();
+    await expect(passwordInput).toBeVisible();
+    await expect(confirmPasswordInput).toBeVisible();
     await expect(submitButton).toBeVisible();
 
-    // Fill form with password containing only letters and submit to trigger validation
+    // Fill form with valid email, password containing only letters, and matching confirm password
+    await emailInput.clear();
     await emailInput.type(testEmail);
+    await passwordInput.clear();
     await passwordInput.type("password");
+    await confirmPasswordInput.clear();
     await confirmPasswordInput.type("password");
+
+    // Submit form to trigger validation
     await submitButton.click();
 
-    // Wait for validation to complete and alert to appear
-    await page.waitForTimeout(2000);
+    // Wait for validation to complete
+    await page.waitForTimeout(500);
+
+    // Check that we're still on the registration page (validation prevented submission)
+    await expect(page).toHaveURL(/\/auth\/register/);
 
     // Should display validation error for password without numbers
-    await expect(
-      page
-        .locator('p[role="alert"]')
-        .filter({ hasText: /co najmniej jedną cyfrę/i }),
-    ).toBeVisible({
-      timeout: 3000,
-    });
+    const errorElement = page
+      .locator('p[role="alert"]')
+      .filter({ hasText: /co najmniej jedną cyfrę/i });
+    await expect(errorElement).toBeVisible({ timeout: 5000 });
   });
 
   test("should display validation errors when passwords don't match", async ({
@@ -217,24 +258,34 @@ test.describe("User Registration", () => {
     const passwordInput = page.locator('input[type="password"]').first();
     const confirmPasswordInput = page.locator('input[type="password"]').nth(1);
     const submitButton = page.locator('button[type="submit"]');
+
     await expect(emailInput).toBeVisible();
+    await expect(passwordInput).toBeVisible();
+    await expect(confirmPasswordInput).toBeVisible();
     await expect(submitButton).toBeVisible();
 
-    // Fill form with mismatched passwords and submit to trigger validation
+    // Fill form with valid email, valid password, and mismatched confirm password
+    await emailInput.clear();
     await emailInput.type(testEmail);
+    await passwordInput.clear();
     await passwordInput.type("SecurePass123");
+    await confirmPasswordInput.clear();
     await confirmPasswordInput.type("DifferentPass456");
+
+    // Submit form to trigger validation
     await submitButton.click();
 
-    // Wait for validation to complete and alert to appear
-    await page.waitForTimeout(2000);
+    // Wait for validation to complete
+    await page.waitForTimeout(500);
+
+    // Check that we're still on the registration page (validation prevented submission)
+    await expect(page).toHaveURL(/\/auth\/register/);
 
     // Should display validation error for mismatched passwords
-    await expect(
-      page.locator('p[role="alert"]').filter({ hasText: /nie są identyczne/i }),
-    ).toBeVisible({
-      timeout: 3000,
-    });
+    const errorElement = page
+      .locator('p[role="alert"]')
+      .filter({ hasText: /nie są identyczne/i });
+    await expect(errorElement).toBeVisible({ timeout: 5000 });
   });
 
   test("should handle registration with existing email gracefully", async ({
@@ -252,9 +303,12 @@ test.describe("User Registration", () => {
     const submitButton = page.locator('button[type="submit"]');
 
     // Fill form with test email
-    await emailInput.fill(testEmail);
-    await passwordInput.fill(testPassword);
-    await confirmPasswordInput.fill(testPassword);
+    await emailInput.clear();
+    await emailInput.type(testEmail);
+    await passwordInput.clear();
+    await passwordInput.type(testPassword);
+    await confirmPasswordInput.clear();
+    await confirmPasswordInput.type(testPassword);
 
     // Submit the form
     await submitButton.click();

@@ -79,7 +79,7 @@ export async function middlewareHandler(
   context.locals.supabase = supabase;
 
   // Define protected paths that require authentication
-  const protectedPaths = ["/kb", "/templates", "/charters", "/admin"];
+  const protectedPaths = ["/templates", "/charters", "/admin"];
 
   // Check if current path is protected
   const isProtectedPath = protectedPaths.some(
