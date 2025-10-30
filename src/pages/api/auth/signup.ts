@@ -2,6 +2,7 @@ import type { APIRoute } from "astro";
 import { createSupabaseServerInstance } from "../../../db/supabase.client";
 import { z } from "zod";
 import { logger } from "../../../lib/utils/logger";
+import { AUTH_SIGNUP_REDIRECT_URL } from "astro:env/server";
 
 export const prerender = false;
 
@@ -38,9 +39,15 @@ export const POST: APIRoute = async ({ request, cookies, locals }) => {
       ).runtime?.env,
     });
 
+    const redirectUrl =
+      AUTH_SIGNUP_REDIRECT_URL && AUTH_SIGNUP_REDIRECT_URL !== "undefined"
+        ? AUTH_SIGNUP_REDIRECT_URL
+        : undefined;
+
     const { error } = await supabase.auth.signUp({
       email,
       password,
+      options: redirectUrl ? { emailRedirectTo: redirectUrl } : undefined,
     });
 
     if (error) {

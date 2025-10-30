@@ -44,6 +44,7 @@ curl http://localhost:3000/api/health
 | `SUPABASE_SERVICE_KEY`    | Service role key for admin operations             | -            |
 | `OPENROUTER_API_KEY`      | AI assistant integration key                      | -            |
 | `AUTH_RESET_REDIRECT_URL` | Password reset redirect URL                       | -            |
+| `AUTH_SIGNUP_REDIRECT_URL`| Email confirmation redirect URL                   | -            |
 | `ENV_NAME`                | Environment name (local, integration, production) | `production` |
 | `PORT`                    | Server port                                       | `3000`       |
 
@@ -63,6 +64,7 @@ OPENROUTER_API_KEY=your-openrouter-key-here
 
 # Auth Configuration (Optional)
 AUTH_RESET_REDIRECT_URL=https://qa-toolsmith.pages.dev/auth/reset/confirm
+AUTH_SIGNUP_REDIRECT_URL=https://qa-toolsmith.pages.dev
 ```
 
 ## Building the Image
