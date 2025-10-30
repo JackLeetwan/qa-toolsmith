@@ -28,7 +28,13 @@ describe("KbEntryForm", () => {
   describe("validation", () => {
     it("should display error when title is empty", async () => {
       const user = userEvent.setup();
-      render(<KbEntryForm onSubmit={mockOnSubmit} isLoading={false} />);
+      render(
+        <KbEntryForm
+          onSubmit={mockOnSubmit}
+          isLoading={false}
+          userRole="admin"
+        />,
+      );
 
       const urlInput = screen.getByLabelText(/url/i);
       const submitButton = screen.getByRole("button", { name: /utwórz/i });
@@ -43,7 +49,13 @@ describe("KbEntryForm", () => {
 
     it("should display error when url_original is invalid", async () => {
       const user = userEvent.setup();
-      render(<KbEntryForm onSubmit={mockOnSubmit} isLoading={false} />);
+      render(
+        <KbEntryForm
+          onSubmit={mockOnSubmit}
+          isLoading={false}
+          userRole="admin"
+        />,
+      );
 
       const titleInput = screen.getByLabelText(/tytuł/i);
       const urlInput = screen.getByLabelText(/url/i);
@@ -61,7 +73,13 @@ describe("KbEntryForm", () => {
 
     it("should validate max length for title (200 characters)", async () => {
       const user = userEvent.setup();
-      render(<KbEntryForm onSubmit={mockOnSubmit} isLoading={false} />);
+      render(
+        <KbEntryForm
+          onSubmit={mockOnSubmit}
+          isLoading={false}
+          userRole="admin"
+        />,
+      );
 
       const titleInput = screen.getByLabelText(/tytuł/i);
       const urlInput = screen.getByLabelText(/url/i);
@@ -79,7 +97,13 @@ describe("KbEntryForm", () => {
 
     it("should add and remove tags", async () => {
       const user = userEvent.setup();
-      render(<KbEntryForm onSubmit={mockOnSubmit} isLoading={false} />);
+      render(
+        <KbEntryForm
+          onSubmit={mockOnSubmit}
+          isLoading={false}
+          userRole="admin"
+        />,
+      );
 
       const tagInput = screen.getByPlaceholderText(/dodaj tag/i);
       const addButton = screen.getByRole("button", { name: /dodaj/i });
@@ -103,7 +127,13 @@ describe("KbEntryForm", () => {
 
     it("should add tag by pressing Enter", async () => {
       const user = userEvent.setup();
-      render(<KbEntryForm onSubmit={mockOnSubmit} isLoading={false} />);
+      render(
+        <KbEntryForm
+          onSubmit={mockOnSubmit}
+          isLoading={false}
+          userRole="admin"
+        />,
+      );
 
       const tagInput = screen.getByPlaceholderText(/dodaj tag/i);
 
@@ -116,7 +146,13 @@ describe("KbEntryForm", () => {
 
     it("should not add duplicate tags", async () => {
       const user = userEvent.setup();
-      render(<KbEntryForm onSubmit={mockOnSubmit} isLoading={false} />);
+      render(
+        <KbEntryForm
+          onSubmit={mockOnSubmit}
+          isLoading={false}
+          userRole="admin"
+        />,
+      );
 
       const tagInput = screen.getByPlaceholderText(/dodaj tag/i);
       const addButton = screen.getByRole("button", { name: /dodaj/i });
@@ -135,7 +171,13 @@ describe("KbEntryForm", () => {
   describe("submit", () => {
     it("should call onSubmit with correct data in create mode", async () => {
       const user = userEvent.setup();
-      render(<KbEntryForm onSubmit={mockOnSubmit} isLoading={false} />);
+      render(
+        <KbEntryForm
+          onSubmit={mockOnSubmit}
+          isLoading={false}
+          userRole="admin"
+        />,
+      );
 
       const titleInput = screen.getByLabelText(/tytuł/i);
       const urlInput = screen.getByLabelText(/url/i);
@@ -232,6 +274,7 @@ describe("KbEntryForm", () => {
           onSubmit={mockOnSubmit}
           initialData={initialData}
           isLoading={false}
+          userRole="admin"
         />,
       );
 
@@ -296,6 +339,7 @@ describe("KbEntryForm", () => {
           onSubmit={mockOnSubmit}
           initialData={initialData}
           isLoading={false}
+          userRole="admin"
         />,
       );
 
@@ -400,7 +444,13 @@ describe("KbEntryForm", () => {
     });
 
     it("should not show cancel button when onCancel is not provided", () => {
-      render(<KbEntryForm onSubmit={mockOnSubmit} isLoading={false} />);
+      render(
+        <KbEntryForm
+          onSubmit={mockOnSubmit}
+          isLoading={false}
+          userRole="admin"
+        />,
+      );
 
       expect(
         screen.queryByRole("button", { name: /anuluj/i }),
@@ -424,7 +474,13 @@ describe("KbEntryForm", () => {
 
   describe("form structure", () => {
     it("should have proper form structure", () => {
-      render(<KbEntryForm onSubmit={mockOnSubmit} isLoading={false} />);
+      render(
+        <KbEntryForm
+          onSubmit={mockOnSubmit}
+          isLoading={false}
+          userRole="admin"
+        />,
+      );
 
       const form = screen
         .getByRole("button", { name: /utwórz/i })
@@ -435,7 +491,13 @@ describe("KbEntryForm", () => {
     });
 
     it("should have required fields marked", () => {
-      render(<KbEntryForm onSubmit={mockOnSubmit} isLoading={false} />);
+      render(
+        <KbEntryForm
+          onSubmit={mockOnSubmit}
+          isLoading={false}
+          userRole="admin"
+        />,
+      );
 
       const titleLabel = screen.getByText(/tytuł/i);
       expect(titleLabel).toHaveTextContent(/\*/); // Required indicator

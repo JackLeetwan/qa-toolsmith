@@ -159,7 +159,7 @@ export default function KbEntriesList({
         <KbEntryForm
           onSubmit={handleCreate}
           onCancel={() => setShowCreateForm(false)}
-          role={effectiveRole}
+          userRole={effectiveRole}
         />
       </div>
     );
@@ -173,7 +173,7 @@ export default function KbEntriesList({
           initialData={editingEntry}
           onSubmit={handleUpdate}
           onCancel={() => setEditingEntry(null)}
-          role={effectiveRole}
+          userRole={effectiveRole}
         />
       </div>
     );

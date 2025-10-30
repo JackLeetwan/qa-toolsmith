@@ -20,7 +20,7 @@ interface KbEntryFormProps {
   initialData?: KBEntryDTO;
   isLoading?: boolean;
   onCancel?: () => void;
-  role?: "admin" | "user";
+  userRole?: "admin" | "user";
 }
 
 interface FormData {
@@ -35,11 +35,11 @@ export default function KbEntryForm({
   initialData,
   isLoading = false,
   onCancel,
-  role = "user",
+  userRole = "user",
 }: KbEntryFormProps) {
   const [tagInput, setTagInput] = useState("");
   const isEditMode = Boolean(initialData);
-  const isAdmin = role === "admin";
+  const isAdmin = userRole === "admin";
 
   // Use create schema for validation (all fields required in create mode)
   // For edit mode, we'll use partial validation

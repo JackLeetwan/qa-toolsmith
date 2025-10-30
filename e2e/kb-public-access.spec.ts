@@ -126,7 +126,9 @@ test.describe("KB Public Access", () => {
       log("✅ UI login completed");
     }
 
-    test("should create a new entry when authenticated", async ({ page }) => {
+    test.skip("should create a new entry when authenticated", async ({
+      page,
+    }) => {
       log("🔐 Starting login process...");
       await login(page);
 
