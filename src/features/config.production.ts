@@ -8,8 +8,8 @@ export const flags: FeatureFlags = {
   },
   collections: {
     generators: true,
-    charters: true,
-    templates: true,
+    charters: false,
+    templates: false,
     knowledgeBase: true,
     export: false,
   },

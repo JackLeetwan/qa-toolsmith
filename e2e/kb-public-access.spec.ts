@@ -2,10 +2,9 @@ import { test, expect } from "@playwright/test";
 import type { Page } from "@playwright/test";
 import { KbPage } from "./pages/KbPage";
 
-// Logger for e2e to avoid eslint no-console and runtime API mismatches
+// Logger for e2e to avoid runtime API mismatches
 const log = (...args: unknown[]): void => {
   if (process.env.PW_DEBUG_LOGS) {
-    // eslint-disable-next-line no-console
     console.log(...args);
   }
 };
@@ -351,9 +350,9 @@ test.describe("KB Public Access", () => {
       for (const publicTitle of publicTitles) {
         try {
           await kbPage.verifyEntryDisplayed(publicTitle);
-          console.log(`✅ Found public entry: ${publicTitle}`);
+          log(`✅ Found public entry: ${publicTitle}`);
         } catch {
-          console.log(
+          log(
             `⚠️ Public entry not found: ${publicTitle} (seed data may be missing)`,
           );
         }

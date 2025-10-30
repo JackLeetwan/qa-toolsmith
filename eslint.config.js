@@ -29,7 +29,11 @@ const baseConfig = tseslint.config({
 });
 
 const testConfig = tseslint.config({
-  files: ["**/*.test.{js,ts,tsx}", "**/test/**/*.{js,ts,tsx}"],
+  files: [
+    "**/*.test.{js,ts,tsx}",
+    "**/test/**/*.{js,ts,tsx}",
+    "**/e2e/**/*.{js,ts,tsx}",
+  ],
   rules: {
     "no-console": "off",
   },

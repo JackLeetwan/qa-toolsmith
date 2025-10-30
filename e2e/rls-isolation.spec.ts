@@ -1,6 +1,13 @@
 import { test, expect } from "@playwright/test";
 import { ChartersPage } from "./pages/ChartersPage";
 
+// Logger for e2e to avoid runtime API mismatches
+const log = (...args: unknown[]): void => {
+  if (process.env.PW_DEBUG_LOGS) {
+    console.log(...args);
+  }
+};
+
 /**
  * E2E Tests for Row Level Security (RLS) Data Isolation
  *
@@ -174,12 +181,12 @@ test.describe("RLS Data Isolation", () => {
 
       // Create own entry
       const entryTitle = `RLS Test ${Date.now()}`;
-      console.log(`🔍 Creating entry: ${entryTitle}`);
+      log(`🔍 Creating entry: ${entryTitle}`);
 
       // Check if "Dodaj wpis" button is visible
       const addButton = page.getByRole("button", { name: /dodaj wpis/i });
       await expect(addButton).toBeVisible();
-      console.log("🔍 Add entry button is visible");
+      log("🔍 Add entry button is visible");
 
       await addButton.click();
 
@@ -193,12 +200,12 @@ test.describe("RLS Data Isolation", () => {
       await page.waitForTimeout(2000); // Wait for creation
 
       // Check if entry was created
-      console.log("🔍 Checking if entry was created...");
+      log("🔍 Checking if entry was created...");
       const entryLocator = page
         .locator('[data-slot="card"]')
         .filter({ hasText: entryTitle });
       await expect(entryLocator).toBeVisible({ timeout: 5000 });
-      console.log("🔍 Entry was created successfully");
+      log("🔍 Entry was created successfully");
 
       // Verify edit/delete buttons exist for own entry
       const editButton = page

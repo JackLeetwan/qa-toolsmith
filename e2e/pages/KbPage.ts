@@ -2,6 +2,13 @@ import type { Page, Locator } from "@playwright/test";
 import { expect } from "@playwright/test";
 import { BasePage } from "./BasePage";
 
+// Logger for e2e to avoid runtime API mismatches
+const log = (...args: unknown[]): void => {
+  if (process.env.PW_DEBUG_LOGS) {
+    console.log(...args);
+  }
+};
+
 /**
  * KbPage represents the Knowledge Base page (/kb)
  * Encapsulates all selectors and actions related to the KB page
@@ -191,7 +198,7 @@ export class KbPage extends BasePage {
       .getByTestId("kb-entries-list")
       .isVisible()
       .catch(() => false);
-    console.log("🔍 KbPage Debug: Component exists:", componentExists);
+    log("🔍 KbPage Debug: Component exists:", componentExists);
 
     if (!componentExists) {
       // Take a screenshot for debugging
@@ -207,7 +214,7 @@ export class KbPage extends BasePage {
     const buttonExists = await this.getAddEntryButton()
       .isVisible()
       .catch(() => false);
-    console.log("🔍 KbPage Debug: Button exists:", buttonExists);
+    log("🔍 KbPage Debug: Button exists:", buttonExists);
 
     if (!buttonExists) {
       // Take a screenshot for debugging
@@ -216,15 +223,15 @@ export class KbPage extends BasePage {
       // Debug: Check component content
       const componentLocator = this.page.getByTestId("kb-entries-list");
       const componentText = await componentLocator.textContent();
-      console.log("🔍 KbPage Debug: Component text content:", componentText);
+      log("🔍 KbPage Debug: Component text content:", componentText);
 
       // Debug: Check page content
       const pageContent = await this.page.locator("body").textContent();
-      console.log(
+      log(
         "🔍 KbPage Debug: Page content includes 'Dodaj wpis':",
         pageContent?.includes("Dodaj wpis"),
       );
-      console.log(
+      log(
         "🔍 KbPage Debug: Page content includes 'Knowledge Base':",
         pageContent?.includes("Knowledge Base"),
       );
@@ -235,7 +242,7 @@ export class KbPage extends BasePage {
         consoleMessages.push(`${msg.type()}: ${msg.text()}`);
       });
       await this.page.waitForTimeout(1000);
-      console.log("🔍 KbPage Debug: Console messages:", consoleMessages);
+      log("🔍 KbPage Debug: Console messages:", consoleMessages);
 
       throw new Error(
         "Add Entry button not visible - component not rendering correctly",
