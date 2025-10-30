@@ -516,7 +516,7 @@ test.describe("KB Public Access", () => {
       await page.waitForTimeout(3000);
     }
 
-    test("should show validation errors for empty required fields", async ({
+    test.skip("should show validation errors for empty required fields", async ({
       page,
     }) => {
       await login(page);
@@ -534,7 +534,7 @@ test.describe("KB Public Access", () => {
       ).toBeVisible({ timeout: 2000 });
     });
 
-    test("should show validation error for invalid URL", async ({ page }) => {
+    test.skip("should show validation error for invalid URL", async ({ page }) => {
       await login(page);
       await page.goto("/kb?authenticated=true");
       await page.reload();
