@@ -25,6 +25,15 @@ vi.mock("../../../db/supabase.client", () => ({
   createSupabaseServerInstance: vi.fn(() => mockCreateSupabaseServerInstance()),
 }));
 
+// Mock astro:env/server with a variable we can control
+let mockAUTH_SIGNUP_REDIRECT_URL: string | undefined = undefined;
+vi.mock("astro:env/server", () => ({
+  get AUTH_SIGNUP_REDIRECT_URL() {
+    return mockAUTH_SIGNUP_REDIRECT_URL;
+  },
+  AUTH_RESET_REDIRECT_URL: undefined,
+}));
+
 vi.mock("../../../lib/utils/logger", () => ({
   logger: {
     debug: vi.fn(),
@@ -71,6 +80,7 @@ describe("Signup API Endpoint", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mockAUTH_SIGNUP_REDIRECT_URL = undefined;
 
     mockCookies = {
       get: vi.fn(),
@@ -139,16 +149,58 @@ describe("Signup API Endpoint", () => {
 
       expect(response.headers.get("Content-Type")).toBe("application/json");
 
-      // Verify signup was called with processed email
+      // Verify signup was called with processed email and no redirect URL (undefined by default)
       expect(mockSupabaseAuth.signUp).toHaveBeenCalledWith({
         email: "newuser@example.com",
         password: "SecurePass123",
+        options: undefined,
       });
 
       // Verify auto-login was called with processed email
       expect(mockSupabaseAuth.signInWithPassword).toHaveBeenCalledWith({
         email: "newuser@example.com",
         password: "SecurePass123",
+      });
+    });
+
+    it("should use redirect URL when AUTH_SIGNUP_REDIRECT_URL is set", async () => {
+      const requestBody = {
+        email: "user@example.com",
+        password: "SecurePass123",
+      };
+
+      mockAUTH_SIGNUP_REDIRECT_URL = "https://qa-toolsmith.pages.dev";
+
+      (
+        mockRequest.json as Mock<() => Promise<Partial<LoginRequest>>>
+      ).mockResolvedValue(requestBody);
+
+      const mockUser = {
+        id: "new-user-uuid-123",
+        email: "user@example.com",
+      };
+
+      // Mock successful signup
+      mockSupabaseAuth.signUp.mockResolvedValue({
+        data: { user: mockUser },
+        error: null,
+      });
+
+      // Mock successful auto-login
+      mockSupabaseAuth.signInWithPassword.mockResolvedValue({
+        data: { user: mockUser, session: { access_token: "jwt-token" } },
+        error: null,
+      });
+
+      const response = await POST(createAPIContext(mockRequest, mockCookies));
+
+      expect(response.status).toBe(200);
+
+      // Verify signup was called with redirect URL
+      expect(mockSupabaseAuth.signUp).toHaveBeenCalledWith({
+        email: "user@example.com",
+        password: "SecurePass123",
+        options: { emailRedirectTo: "https://qa-toolsmith.pages.dev" },
       });
     });
 
@@ -177,6 +229,7 @@ describe("Signup API Endpoint", () => {
       expect(mockSupabaseAuth.signUp).toHaveBeenCalledWith({
         email: "newuser@example.com",
         password: "SecurePass123",
+        options: undefined,
       });
 
       expect(mockSupabaseAuth.signInWithPassword).toHaveBeenCalledWith({
@@ -604,6 +657,7 @@ describe("Signup API Endpoint", () => {
       expect(mockSupabaseAuth.signUp).toHaveBeenCalledWith({
         email: "user@example.com",
         password: "Password123",
+        options: undefined,
       });
     });
 
@@ -633,6 +687,7 @@ describe("Signup API Endpoint", () => {
       expect(mockSupabaseAuth.signUp).toHaveBeenCalledWith({
         email: "user@example.com",
         password: "Pass123!@#",
+        options: undefined,
       });
     });
 
@@ -688,6 +743,7 @@ describe("Signup API Endpoint", () => {
       expect(mockSupabaseAuth.signUp).toHaveBeenCalledWith({
         email: "user@example.com",
         password: maxPassword,
+        options: undefined,
       });
       expect(mockSupabaseAuth.signInWithPassword).toHaveBeenCalledWith({
         email: "user@example.com",
@@ -800,6 +856,7 @@ describe("Signup API Endpoint", () => {
       expect(mockSupabaseAuth.signUp).toHaveBeenCalledWith({
         email: "user@example.com",
         password: "SecurePass123",
+        options: undefined,
       });
     });
   });

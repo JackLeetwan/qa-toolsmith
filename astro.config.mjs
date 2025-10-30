@@ -66,6 +66,11 @@ export default defineConfig({
         access: "public",
         optional: true,
       }),
+      AUTH_SIGNUP_REDIRECT_URL: envField.string({
+        context: "server",
+        access: "public",
+        optional: true,
+      }),
     },
     // Disable secret validation during Docker build (secrets provided at runtime)
     validateSecrets: process.env.ASTRO_TARGET !== "node",

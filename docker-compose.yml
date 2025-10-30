@@ -22,6 +22,7 @@ services:
       - SUPABASE_SERVICE_KEY=${SUPABASE_SERVICE_KEY:-}
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
       - AUTH_RESET_REDIRECT_URL=${AUTH_RESET_REDIRECT_URL:-}
+      - AUTH_SIGNUP_REDIRECT_URL=${AUTH_SIGNUP_REDIRECT_URL:-}
       - ENV_NAME=${ENV_NAME:-local}
       # Runtime configuration
       - NODE_ENV=production

@@ -647,4 +647,4 @@ Wszystkie testy działają w oryginalnej formie. Jedyny problem (API ↔ UI sess
 
 ---
 
-*Ten plan został stworzony na podstawie analizy kodu źródłowego QA Toolsmith, dokumentacji projektu oraz doświadczeń z podobnymi migracjami testów E2E. Aktualizacja: Październik 2025 - dodano skip dla testu tworzenia wpisów KB po autoryzacji, naprawiono seed data żeby nie trafiała do produkcji.*
+*Ten plan został stworzony na podstawie analizy kodu źródłowego QA Toolsmith, dokumentacji projektu oraz doświadczeń z podobnymi migracjami testów E2E. Aktualizacja: Październik 2025 - dodano skip dla testu tworzenia wpisów KB po autoryzacji, naprawiono seed data żeby nie trafiała do produkcji, dodano konfigurację AUTH_SIGNUP_REDIRECT_URL dla poprawnych linków potwierdzających email.*
