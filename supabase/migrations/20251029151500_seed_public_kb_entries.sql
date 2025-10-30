@@ -5,16 +5,34 @@
 -- Notes:
 --  - Runs with superuser, bypassing RLS.
 --  - Does NOT insert into auth.users/profiles; instead, reuses an existing profile as owner.
---  - If no profiles exist, the seed is skipped gracefully.
+--  - Skips seeding if database appears to be production (has multiple users or non-test data)
 
 -- Ensure is_public column exists (in case prior migration not yet applied)
-ALTER TABLE public.kb_entries 
+ALTER TABLE public.kb_entries
   ADD COLUMN IF NOT EXISTS is_public boolean NOT NULL DEFAULT false;
 
 DO $$
 DECLARE
   owner_id uuid;
+  user_count int;
+  kb_count int;
 BEGIN
+  -- Check if seed data was already inserted (avoid duplicates)
+  IF EXISTS (SELECT 1 FROM public.kb_entries WHERE id = '11111111-1111-1111-1111-111111111111') THEN
+    RAISE NOTICE 'Skipping KB seed: seed data already exists';
+    RETURN;
+  END IF;
+
+  -- Check if this looks like a production database
+  -- If there are more than 5 users or more than 10 KB entries, skip seeding
+  SELECT COUNT(*) INTO user_count FROM public.profiles;
+  SELECT COUNT(*) INTO kb_count FROM public.kb_entries;
+
+  IF user_count > 5 OR kb_count > 10 THEN
+    RAISE NOTICE 'Skipping KB seed: database appears to be production (users: %, kb_entries: %)', user_count, kb_count;
+    RETURN;
+  END IF;
+
   -- Pick any existing profile as the owner of seeded rows
   SELECT id INTO owner_id FROM public.profiles ORDER BY created_at LIMIT 1;
 
