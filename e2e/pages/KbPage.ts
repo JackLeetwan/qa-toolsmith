@@ -286,6 +286,14 @@ export class KbPage extends BasePage {
    */
   async submitForm(): Promise<void> {
     await this.getFormSubmitButton().click();
+
+    // Wait for form submission to complete by checking that the form heading is no longer visible
+    // This ensures the async create/update operation has finished and the form has been hidden
+    await expect(
+      this.page.getByRole("heading", {
+        name: /(dodaj nowy wpis|edytuj wpis)/i,
+      }),
+    ).not.toBeVisible({ timeout: 10000 });
   }
 
   /**

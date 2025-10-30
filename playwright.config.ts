@@ -42,6 +42,7 @@ export default defineConfig({
         ...devices["Desktop Chrome"],
         baseURL: "http://localhost:3000",
       },
+      // Default test user for chromium project
     },
     // Feature flags project - disabled in CI due to server configuration issues
     ...(process.env.CI

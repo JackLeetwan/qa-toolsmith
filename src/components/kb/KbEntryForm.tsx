@@ -35,7 +35,7 @@ export default function KbEntryForm({
   initialData,
   isLoading = false,
   onCancel,
-  role = "admin",
+  role = "user",
 }: KbEntryFormProps) {
   const [tagInput, setTagInput] = useState("");
   const isEditMode = Boolean(initialData);

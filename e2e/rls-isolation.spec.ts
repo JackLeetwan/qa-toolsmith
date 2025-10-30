@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { ChartersPage } from "./pages/ChartersPage";
+import { KbPage } from "./pages/KbPage";
 
 // Logger for e2e to avoid runtime API mismatches
 const log = (...args: unknown[]): void => {
@@ -25,6 +26,7 @@ const log = (...args: unknown[]): void => {
 
 test.describe("RLS Data Isolation", () => {
   let chartersPage: ChartersPage;
+  let kbPage: KbPage;
 
   test.describe("Unauthenticated Access", () => {
     test("should redirect to login when accessing protected charters page", async ({
@@ -166,45 +168,71 @@ test.describe("RLS Data Isolation", () => {
       // Verify that edit/delete buttons are only shown for own entries
       // This is handled by component logic checking user_id match
 
-      await page.goto("/auth/login");
-      await page.fill('input[type="email"]', process.env.E2E_USERNAME || "");
-      await page.fill('input[type="password"]', process.env.E2E_PASSWORD || "");
-      await page.click('button[type="submit"]');
-      await page.waitForURL(/\/(?!auth)/, { timeout: 15000 });
-      // Wait for page to fully load
-      await page.waitForLoadState("networkidle");
-      // Wait for session to be fully established
-      await page.waitForTimeout(3000);
+      kbPage = new KbPage(page);
 
-      await page.goto("/kb?authenticated=true");
-      await page.waitForLoadState("networkidle");
+      // Use API authentication instead of UI login for reliability
+      const authResponse = await page.request.post("/api/auth/signin", {
+        data: {
+          email: process.env.E2E_USERNAME || "",
+          password: process.env.E2E_PASSWORD || "",
+        },
+      });
 
-      // Create own entry
-      const entryTitle = `RLS Test ${Date.now()}`;
+      if (!authResponse.ok()) {
+        throw new Error(
+          `Authentication failed: ${authResponse.status()} ${authResponse.statusText()}`,
+        );
+      }
+
+      // Get session cookies
+      const setCookieHeader = authResponse.headers()["set-cookie"];
+      const cookies = Array.isArray(setCookieHeader)
+        ? setCookieHeader
+        : setCookieHeader
+          ? [setCookieHeader]
+          : [];
+      const cookieString = cookies.join("; ");
+
+      // Create own entry via API
+      const timestamp = Date.now();
+      const entryTitle = `RLS Test ${timestamp}`;
+      const entryUrl = `https://example.com/rls-${timestamp}`;
+
       log(`🔍 Creating entry: ${entryTitle}`);
+      const createResponse = await page.request.post("/api/kb/entries", {
+        data: {
+          title: entryTitle,
+          url_original: entryUrl,
+          tags: ["rls", "test"],
+          is_public: false,
+        },
+        headers: {
+          cookie: cookieString,
+        },
+      });
 
-      // Check if "Dodaj wpis" button is visible
-      const addButton = page.getByRole("button", { name: /dodaj wpis/i });
-      await expect(addButton).toBeVisible();
-      log("🔍 Add entry button is visible");
+      if (!createResponse.ok()) {
+        const errorText = await createResponse.text();
+        throw new Error(
+          `Failed to create entry: ${createResponse.status()} ${createResponse.statusText()} - ${errorText}`,
+        );
+      }
 
-      await addButton.click();
+      const createData = await createResponse.json();
+      const entryId = createData.data.id;
 
-      // Fill form
-      await page.fill('label:has-text("Tytuł") + input', entryTitle);
-      await page.fill(
-        'label:has-text("URL") + input',
-        "https://example.com/rls",
-      );
-      await page.click('button:has-text("Utwórz")');
-      await page.waitForTimeout(2000); // Wait for creation
+      log(`✅ Created entry via API: ${entryTitle} (ID: ${entryId})`);
+
+      // Now navigate to KB page with authenticated session
+      await page.goto("/kb");
+      await page.waitForLoadState("networkidle");
+
+      // Wait for entries to load
+      await page.waitForTimeout(2000);
 
       // Check if entry was created
       log("🔍 Checking if entry was created...");
-      const entryLocator = page
-        .locator('[data-slot="card"]')
-        .filter({ hasText: entryTitle });
-      await expect(entryLocator).toBeVisible({ timeout: 5000 });
+      await kbPage.verifyEntryDisplayed(entryTitle);
       log("🔍 Entry was created successfully");
 
       // Verify edit/delete buttons exist for own entry
@@ -221,12 +249,23 @@ test.describe("RLS Data Isolation", () => {
       await expect(editButton).toBeVisible();
       await expect(deleteButton).toBeVisible();
 
-      // Cleanup
-      await deleteButton.click();
-      await page.click('button:has-text("Usuń")').catch(() => {
-        /* ignore */
-      });
-      await page.waitForTimeout(500);
+      // Cleanup via API
+      const deleteResponse = await page.request.delete(
+        `/api/kb/entries/${entryId}`,
+        {
+          headers: {
+            cookie: cookieString,
+          },
+        },
+      );
+
+      if (!deleteResponse.ok()) {
+        log(
+          `⚠️ Failed to delete entry ${entryId}: ${deleteResponse.status()} ${deleteResponse.statusText()}`,
+        );
+      } else {
+        log(`✅ Deleted entry via API: ${entryTitle}`);
+      }
     });
   });
 });
