@@ -15,6 +15,7 @@ pages_build_output_dir = "dist"
 # - SUPABASE_SERVICE_KEY (service_role key)
 # - ENV_NAME (should be "production")
 # - OPENROUTER_API_KEY (optional, can be empty)
+# - AUTH_SIGNUP_REDIRECT_URL (for email confirmation redirects)
 
 # KV namespace for session storage (configured in Cloudflare Dashboard)
 # Uncomment and configure if needed:
