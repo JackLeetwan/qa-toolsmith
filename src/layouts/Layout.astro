@@ -1,5 +1,6 @@
 ---
 import "../styles/global.css";
+import { Toaster } from "@/components/ui/sonner";
 
 interface Props {
   title?: string;
@@ -39,6 +40,8 @@ const { title = "10x Astro Starter", description } = Astro.props;
   </head>
   <body>
     <slot />
+    <!-- Global toast notifications -->
+    <Toaster client:load />
   </body>
 </html>
 

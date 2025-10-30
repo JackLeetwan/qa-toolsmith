@@ -108,7 +108,7 @@ export default function TopBar({
                 {features.knowledgeBase && (
                   <li>
                     <a
-                      href="/knowledge-base"
+                      href="/kb"
                       className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                     >
                       Knowledge Base

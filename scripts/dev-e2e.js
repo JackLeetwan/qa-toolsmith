@@ -54,6 +54,12 @@ buildProcess.on("exit", (code) => {
       SUPABASE_URL: env.SUPABASE_URL,
       SUPABASE_KEY: env.SUPABASE_KEY,
       ENV_NAME: env.ENV_NAME,
+      // Pass E2E test credentials for mock user setup
+      E2E_USERNAME: env.E2E_USERNAME,
+      E2E_PASSWORD: env.E2E_PASSWORD,
+      E2E_USERNAME_ID: env.E2E_USERNAME_ID,
+      E2E_ADMIN_USERNAME: env.E2E_ADMIN_USERNAME,
+      E2E_ADMIN_PASSWORD: env.E2E_ADMIN_PASSWORD,
     },
     cwd: path.resolve(__dirname, ".."),
   });

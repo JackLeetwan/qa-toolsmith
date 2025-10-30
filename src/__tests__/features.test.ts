@@ -43,9 +43,9 @@ describe("Feature Flags", () => {
       // When ENV_NAME is undefined, code fallbacks to "production"
       // Check that production flags are used
       expect(isFeatureEnabled("collections.generators")).toBe(true); // production
-      expect(isFeatureEnabled("collections.templates")).toBe(false); // production
-      expect(isFeatureEnabled("collections.charters")).toBe(false); // production
-      expect(isFeatureEnabled("collections.knowledgeBase")).toBe(false); // production
+      expect(isFeatureEnabled("collections.templates")).toBe(true); // production
+      expect(isFeatureEnabled("collections.charters")).toBe(true); // production
+      expect(isFeatureEnabled("collections.knowledgeBase")).toBe(true); // production
       expect(isFeatureEnabled("collections.export")).toBe(false); // production
       expect(isFeatureEnabled("auth.passwordReset")).toBe(true); // production
       expect(isFeatureEnabled("auth.emailVerification")).toBe(true); // production
@@ -71,9 +71,9 @@ describe("Feature Flags", () => {
     ["integration", "auth.emailVerification", true],
     ["integration", "auth.socialLogin", false],
     ["production", "collections.generators", true],
-    ["production", "collections.templates", false],
-    ["production", "collections.charters", false],
-    ["production", "collections.knowledgeBase", false], // Currently disabled in config.production.ts
+    ["production", "collections.templates", true],
+    ["production", "collections.charters", true],
+    ["production", "collections.knowledgeBase", true],
     ["production", "collections.export", false],
     ["production", "auth.passwordReset", true],
     ["production", "auth.emailVerification", true],

@@ -37,25 +37,4 @@ test.describe("Homepage", () => {
       "Standardizuj codzienną pracę testerów z naszymi narzędziami",
     );
   });
-
-  test.skip("should navigate to feature pages", async () => {
-    // Test navigation to templates
-    await homePage.clickTemplatesLink();
-    await homePage.verifyPageUrl(/\/templates/);
-    await homePage.pageInstance.goBack();
-
-    // Test navigation to charters
-    await homePage.clickExplorationLink();
-    await homePage.verifyPageUrl(/\/charters/);
-    await homePage.pageInstance.goBack();
-
-    // Test navigation to knowledge base
-    await homePage.clickKnowledgeBaseLink();
-    await homePage.verifyPageUrl(/\/kb/);
-    await homePage.pageInstance.goBack();
-
-    // Test navigation to generators
-    await homePage.clickGenerateDataLink();
-    await homePage.verifyPageUrl(/\/generators/);
-  });
 });
