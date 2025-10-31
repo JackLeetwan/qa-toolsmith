@@ -162,17 +162,17 @@ This document provides high-level architecture overview for QA Toolsmith MVP, co
 
 ### Frontend
 
-- **Astro 5** (v5.13.7): SSR with minimal JavaScript, API endpoints
-- **React 19** (v19.1.1): Interactive components with React Compiler
+- **Astro 5** (v5.15.3): SSR with minimal JavaScript, API endpoints
+- **React 19** (v19.2.0): Interactive components with React Compiler
 - **TypeScript 5**: Static typing
-- **Tailwind 4** (v4.1.13): Utility-first CSS with native Vite integration
+- **Tailwind 4** (v4.1.16): Utility-first CSS with native Vite integration
 - **Shadcn/ui**: Accessible React components on Radix UI
 
 ### Backend
 
 - **Supabase**:
   - PostgreSQL database with Row Level Security (RLS)
-  - `@supabase/supabase-js` (v2.75.0) - BaaS SDK
+  - `@supabase/supabase-js` (v2.78.0) - BaaS SDK
   - `@supabase/ssr` (v0.7.0) - SSR support with cookie management
   - Built-in JWT authentication
 

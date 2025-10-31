@@ -3,6 +3,8 @@ import { createSupabaseServerInstance } from "../../../db/supabase.client";
 import { z } from "zod";
 import { logger } from "../../../lib/utils/logger";
 import { AUTH_SIGNUP_REDIRECT_URL } from "astro:env/server";
+import { consume } from "../../../lib/services/rate-limiter.service";
+import { getTrustedIp } from "../../../lib/helpers/request.helper";
 
 export const prerender = false;
 
@@ -31,6 +33,38 @@ export const POST: APIRoute = async ({ request, cookies, locals }) => {
     const body = await request.json();
     const { email, password } = signupSchema.parse(body);
 
+    // Rate limiting: 10 attempts per IP per 60 seconds
+    const clientIp = getTrustedIp(request);
+    logger.debug("🌐 Client IP for rate limiting:", clientIp);
+
+    try {
+      await consume(clientIp);
+      logger.debug("✅ Rate limit check passed");
+    } catch (rateLimitError) {
+      logger.warn("🚫 Rate limit exceeded for IP:", clientIp, {
+        retryAfter: (rateLimitError as Error & { retryAfter?: number })
+          .retryAfter,
+      });
+      return new Response(
+        JSON.stringify({
+          error: "RATE_LIMITED",
+          message: "Zbyt wiele prób rejestracji. Spróbuj ponownie później.",
+          retryAfter: (rateLimitError as Error & { retryAfter?: number })
+            .retryAfter,
+        }),
+        {
+          status: 429,
+          headers: {
+            "Content-Type": "application/json",
+            "Retry-After": String(
+              (rateLimitError as Error & { retryAfter?: number }).retryAfter ||
+                60,
+            ),
+          },
+        },
+      );
+    }
+
     const supabase = createSupabaseServerInstance({
       cookies,
       headers: request.headers,
@@ -44,7 +78,7 @@ export const POST: APIRoute = async ({ request, cookies, locals }) => {
         ? AUTH_SIGNUP_REDIRECT_URL
         : undefined;
 
-    const { error } = await supabase.auth.signUp({
+    const { data: signupData, error } = await supabase.auth.signUp({
       email,
       password,
       options: redirectUrl ? { emailRedirectTo: redirectUrl } : undefined,
@@ -82,56 +116,60 @@ export const POST: APIRoute = async ({ request, cookies, locals }) => {
       );
     }
 
-    // Try auto-login after successful signup (US-001)
-    const { data: signInData, error: signInError } =
+    // Signup successful - now auto-login the user
+    logger.debug("✅ Signup successful, attempting auto-login...");
+
+    const { data: signinData, error: signinError } =
       await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-    // If auto-login fails due to unconfirmed email, return success with confirmation required
-    if (signInError) {
-      if (
-        signInError.message?.includes("Email not confirmed") ||
-        signInError.status === 400
-      ) {
-        return new Response(
-          JSON.stringify({
-            user: {
-              id: "", // No user ID since not logged in
-              email: email,
-            },
-            emailConfirmationRequired: true,
-            message:
-              "Konto utworzone. Sprawdź swoją skrzynkę email i potwierdź adres, aby się zalogować.",
-          }),
-          {
-            status: 200,
-            headers: { "Content-Type": "application/json" },
-          },
-        );
-      }
+    if (signinError) {
+      logger.error("❌ Auto-login failed after signup:", {
+        message: signinError.message,
+        status: signinError.status,
+        code: signinError.code,
+        email: email.split("@")[0] + "@...",
+      });
 
-      // For other login errors, return generic error
+      // Return success but indicate email confirmation might be needed
       return new Response(
         JSON.stringify({
-          error: "UNKNOWN_ERROR",
-          message: "Konto utworzone, ale nie udało się zalogować.",
+          user: {
+            id: signupData.user?.id || "",
+            email: email,
+          },
+          emailConfirmationRequired: true,
+          message:
+            "Konto utworzone. Sprawdź swoją skrzynkę email i potwierdź adres, aby się zalogować.",
         }),
         {
-          status: 500,
+          status: 200,
           headers: { "Content-Type": "application/json" },
         },
       );
     }
 
-    // Auto-login successful
+    // Both signup and signin successful
+    logger.debug("✅ Signup and auto-login successful:", {
+      userId: signinData.user?.id
+        ? signinData.user.id.substring(0, 8) + "..."
+        : "unknown",
+      email: signinData.user?.email
+        ? signinData.user.email.split("@")[0] + "@..."
+        : "unknown",
+      sessionExists: !!signinData.session,
+    });
+
     return new Response(
       JSON.stringify({
         user: {
-          id: signInData.user?.id || "",
-          email: signInData.user?.email || "",
+          id: signinData.user?.id || "",
+          email: signinData.user?.email || "",
         },
+        emailConfirmationRequired: false,
+        message: "Konto utworzone i zalogowano pomyślnie.",
       }),
       {
         status: 200,

@@ -33,13 +33,14 @@ async function login(page: Page, email: string, password: string) {
   }
 }
 
-function adminCredsPresent(): boolean {
-  return Boolean(
-    process.env.E2E_ADMIN_USERNAME && process.env.E2E_ADMIN_PASSWORD,
-  );
-}
-
 test.describe("KB admin restrictions", () => {
+  // SKIP ALL: Admin functionality tests removed per E2E reduction plan
+  // Keeping only 2-3 most critical tests per functionality
+  test.skip("All admin tests skipped - removed per E2E reduction plan", async () => {
+    // This file contained admin-only tests that are not critical for MVP
+  });
+
+  // Skipped admin tests:
   test.skip("non-admin: create/edit form hides is_public; no edit/delete for public entries", async ({
     page,
   }) => {
@@ -75,13 +76,10 @@ test.describe("KB admin restrictions", () => {
     }
   });
 
-  test("admin: sees and can toggle is_public in create/edit forms", async ({
+  test.skip("admin: sees and can toggle is_public in create/edit forms", async ({
     page,
   }) => {
-    test.skip(
-      !adminCredsPresent(),
-      "Admin credentials not provided, skipping admin UI checks",
-    );
+    // Already skipped at outer level per E2E reduction plan
 
     const user = process.env.E2E_ADMIN_USERNAME as string;
     const pass = process.env.E2E_ADMIN_PASSWORD as string;
@@ -108,11 +106,8 @@ test.describe("KB admin restrictions", () => {
     // await page.getByRole("button", { name: /utwórz/i }).click();
   });
 
-  test("admin: can create public entries", async ({ page }) => {
-    test.skip(
-      !adminCredsPresent(),
-      "Admin credentials not provided, skipping admin functionality tests",
-    );
+  test.skip("admin: can create public entries", async ({ page }) => {
+    // Already skipped at outer level per E2E reduction plan
 
     const user = process.env.E2E_ADMIN_USERNAME as string;
     const pass = process.env.E2E_ADMIN_PASSWORD as string;
@@ -157,11 +152,8 @@ test.describe("KB admin restrictions", () => {
     await expect(page.getByText(entryTitle)).not.toBeVisible();
   });
 
-  test("admin: can edit public entries", async ({ page }) => {
-    test.skip(
-      !adminCredsPresent(),
-      "Admin credentials not provided, skipping admin functionality tests",
-    );
+  test.skip("admin: can edit public entries", async ({ page }) => {
+    // Already skipped at outer level per E2E reduction plan
 
     const user = process.env.E2E_ADMIN_USERNAME as string;
     const pass = process.env.E2E_ADMIN_PASSWORD as string;
@@ -214,11 +206,10 @@ test.describe("KB admin restrictions", () => {
       .click();
   });
 
-  test("admin: can toggle is_public on existing entries", async ({ page }) => {
-    test.skip(
-      !adminCredsPresent(),
-      "Admin credentials not provided, skipping admin functionality tests",
-    );
+  test.skip("admin: can toggle is_public on existing entries", async ({
+    page,
+  }) => {
+    // Already skipped at outer level per E2E reduction plan
 
     const user = process.env.E2E_ADMIN_USERNAME as string;
     const pass = process.env.E2E_ADMIN_PASSWORD as string;

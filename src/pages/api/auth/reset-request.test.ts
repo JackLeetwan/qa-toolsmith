@@ -31,6 +31,8 @@ vi.mock("../../../db/supabase.client.ts", () => ({
 vi.mock("../../../lib/utils/logger", () => ({
   logger: {
     debug: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
     error: vi.fn(),
   },
 }));
@@ -46,8 +48,18 @@ vi.mock("astro:env/server", () => ({
   SUPABASE_SERVICE_KEY: "test-service-key",
 }));
 
+vi.mock("../../../lib/services/rate-limiter.service", () => ({
+  consume: vi.fn(),
+}));
+
+vi.mock("../../../lib/helpers/request.helper", () => ({
+  getTrustedIp: vi.fn(() => "127.0.0.1"),
+}));
+
 import { createSupabaseServerInstance } from "../../../db/supabase.client.ts";
 import { logger } from "../../../lib/utils/logger";
+import { consume as consumeRateLimit } from "../../../lib/services/rate-limiter.service";
+// import { getTrustedIp } from "../../../lib/helpers/request.helper";
 
 // Helper to create mock Request for testing
 function createMockRequest(
@@ -99,6 +111,9 @@ describe("Reset Request API Endpoint", () => {
     vi.clearAllMocks();
     // Reset environment variable
     mockAUTH_RESET_REDIRECT_URL = undefined;
+
+    // Mock rate limiter to always succeed by default
+    vi.mocked(consumeRateLimit).mockResolvedValue();
 
     mockCookies = {
       get: vi.fn(),

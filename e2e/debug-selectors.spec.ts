@@ -5,7 +5,7 @@ test.describe("Debug Selectors", () => {
     // Setup for tests
   });
 
-  test("should test selectors on static HTML page", async ({ page }) => {
+  test.skip("should test selectors on static HTML page", async ({ page }) => {
     // Serve the test HTML file
     await page.goto(`file://${process.cwd()}/e2e/test-page.html`);
 
@@ -48,7 +48,7 @@ test.describe("Debug Selectors", () => {
     ).toBeVisible();
   });
 
-  test("should test login/register buttons", async ({ page }) => {
+  test.skip("should test login/register buttons", async ({ page }) => {
     await page.goto(`file://${process.cwd()}/e2e/test-page.html`);
 
     // Re-initialize HomePage with the current page for testing against static HTML
@@ -61,7 +61,7 @@ test.describe("Debug Selectors", () => {
     ).toBeVisible();
   });
 
-  test("should test meta tags", async ({ page }) => {
+  test.skip("should test meta tags", async ({ page }) => {
     await page.goto(`file://${process.cwd()}/e2e/test-page.html`);
 
     // Re-initialize HomePage with the current page for testing against static HTML

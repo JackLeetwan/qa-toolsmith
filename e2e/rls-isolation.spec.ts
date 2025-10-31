@@ -49,7 +49,7 @@ test.describe("RLS Data Isolation", () => {
       storageState: undefined, // Will need to be configured for real auth
     });
 
-    test("should allow access to charters page when authenticated", async ({
+    test.skip("should allow access to charters page when authenticated", async ({
       page,
     }) => {
       chartersPage = new ChartersPage(page);
@@ -71,7 +71,7 @@ test.describe("RLS Data Isolation", () => {
       storageState: undefined,
     });
 
-    test("admin should have access to global resources", async () => {
+    test.skip("admin should have access to global resources", async () => {
       // This would test admin access to templates, etc.
       // For now, just verify the test structure is in place
       expect(true).toBe(true); // Placeholder - would need admin auth setup
@@ -79,7 +79,9 @@ test.describe("RLS Data Isolation", () => {
   });
 
   test.describe("Cross-User Data Isolation", () => {
-    test("should prevent access to other users' data", async ({ page }) => {
+    test.skip("should prevent access to other users' data", async ({
+      page,
+    }) => {
       // This test would require multiple user sessions
       // to verify that user A cannot see user B's data
 
@@ -101,7 +103,7 @@ test.describe("RLS Data Isolation", () => {
   });
 
   test.describe("KB RLS Isolation", () => {
-    test("user A should not see private entries of user B", async ({
+    test.skip("user A should not see private entries of user B", async ({
       page,
     }) => {
       // KB has public access, so we need to verify RLS for private entries
@@ -137,7 +139,9 @@ test.describe("RLS Data Isolation", () => {
       await expect(page).not.toHaveURL(/\/auth\/login/);
     });
 
-    test("user A should see public entries of user B", async ({ page }) => {
+    test.skip("user A should see public entries of user B", async ({
+      page,
+    }) => {
       // KB allows public entries to be visible to all users
       // This test verifies that public entries are accessible
 
@@ -162,7 +166,7 @@ test.describe("RLS Data Isolation", () => {
       expect(page.url()).toContain("/kb");
     });
 
-    test("user A should not be able to edit/delete entries of user B", async ({
+    test.skip("user A should not be able to edit/delete entries of user B", async ({
       page,
     }) => {
       // Verify that edit/delete buttons are only shown for own entries

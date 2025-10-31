@@ -110,7 +110,7 @@ describe("GET /api/kb/entries/[id]", () => {
     );
 
     const response = await GET(context);
-    const body = await response.json();
+    const body = (await response.json()) as any;
 
     expect(response.status).toBe(200);
     expect(body.data).toBeDefined();

@@ -12,7 +12,7 @@ The Generators view provides a centralized hub for test data generation and vali
 
 ### Tech Stack
 
-- **Frontend**: Astro 5 (v5.13.7) + React 19 (v19.1.1) + TypeScript 5 + Tailwind 4 (v4.1.13)
+- **Frontend**: Astro 5 (v5.15.3) + React 19 (v19.2.0) + TypeScript 5 + Tailwind 4 (v4.1.16)
 - **UI Components**: Shadcn/ui (Card, Tabs, Select, Input, Alert, Toast, Collapsible) built on Radix UI
 - **Icons**: Lucide React (v0.487.0)
 - **State Management**: React hooks (useState, useReducer, useOptimistic) + React 19 features

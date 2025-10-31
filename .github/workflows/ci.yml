@@ -110,7 +110,7 @@ jobs:
   e2e-tests:
     name: E2E Tests
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 25
     permissions:
       checks: write
       contents: read
@@ -130,7 +130,7 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-          ENV_NAME: production
+          ENV_NAME: ${{ secrets.ENV_NAME }}
       - name: Install Playwright browsers
         run: npx playwright install chromium
       - name: Test Supabase Signup (Diagnostic)
@@ -180,7 +180,7 @@ jobs:
           PORT: 3000
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-          ENV_NAME: production
+          ENV_NAME: ${{ secrets.ENV_NAME }}
       - name: Wait for server to start
         run: |
           echo "⏳ Waiting for server to be ready..."
@@ -212,16 +212,26 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-          ENV_NAME: production
+          ENV_NAME: ${{ secrets.ENV_NAME }}
           E2E_USERNAME: ${{ secrets.E2E_USERNAME }}
           E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
           E2E_USERNAME_ID: ${{ secrets.E2E_USERNAME_ID }}
       - name: Run E2E tests
-        run: npm run test:e2e
+        run: |
+          echo "🚀 Starting E2E tests..."
+          npm run test:e2e
+          EXIT_CODE=$?
+          echo "📊 E2E tests finished with exit code: $EXIT_CODE"
+          if [ $EXIT_CODE -eq 0 ]; then
+            echo "✅ E2E tests completed successfully"
+          else
+            echo "❌ E2E tests failed with exit code: $EXIT_CODE"
+          fi
+          exit $EXIT_CODE
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-          ENV_NAME: production
+          ENV_NAME: ${{ secrets.ENV_NAME }}
           E2E_USERNAME: ${{ secrets.E2E_USERNAME }}
           E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
           E2E_USERNAME_ID: ${{ secrets.E2E_USERNAME_ID }}
@@ -258,7 +268,7 @@ jobs:
         uses: dorny/test-reporter@v2
         continue-on-error: true
         with:
-          name: E2E Tests
+          name: E2E Tests (KB auth tests skipped)
           path: test-results/junit.xml
           reporter: java-junit
           fail-on-empty: false

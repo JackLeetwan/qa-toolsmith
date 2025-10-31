@@ -1,17 +1,30 @@
 # QA Toolsmith
 
-[![CI](https://github.com/jakub-litkowski/qa-toolsmith/actions/workflows/ci.yml/badge.svg)](https://github.com/jakub-litkowski/qa-toolsmith/actions)
+[![CI](https://github.com/JackLeetwan/qa-toolsmith/actions/workflows/ci.yml/badge.svg)](https://github.com/JackLeetwan/qa-toolsmith/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen)](https://qa-toolsmith.pages.dev/)
+
+**[🔗 Zobacz demo na żywo](https://qa-toolsmith.pages.dev/)**
 
 ## O projekcie
 
-QA Toolsmith to lekkie, otwartoźródłowe narzędzie dla testerów, które porządkuje codzienną pracę: szybkie tworzenie raportów defektów, eksplorację z notatkami i czasomierzem, prostą bazę wiedzy oraz generowanie danych testowych (np. IBAN DE/AT z walidacją). Skupiamy się na prostocie, szybkości i gotowości do użycia „od ręki”.
+QA Toolsmith to lekkie, otwartoźródłowe narzędzie dla testerów, które porządkuje codzienną pracę: szybkie tworzenie raportów defektów, eksplorację z notatkami i czasomierzem, prostą bazę wiedzy oraz generowanie danych testowych (np. IBAN DE/AT z walidacją). Skupiamy się na prostocie, szybkości i gotowości do użycia „od ręki".
+
+### Stack technologiczny
+
+- **Framework:** Astro 5 (SSR) z adapterem Cloudflare Pages
+- **Frontend:** React 19 z TypeScript, Tailwind CSS, shadcn/ui
+- **Backend:** Supabase (PostgreSQL, Auth, RLS)
+- **AI:** OpenRouter integracja dla ulepszania treści
+- **Testowanie:** Vitest (unit), Playwright (E2E)
+- **CI/CD:** GitHub Actions
+- **Hosting:** Cloudflare Pages
 
 ### Najważniejsze możliwości
 
 - ✅ Logowanie e‑mail/hasło, role: Admin i User
 - ✅ Generator i walidator IBAN (DE/AT), tryb deterministyczny przez seed
-- ✅ Stabilny zestaw testów (unit + E2E) i gotowy pipeline CI
+- ✅ Stabilny zestaw testów (unit + E2E) i gotowy pipeline CI (KB testy wymagające autoryzacji tymczasowo pomijane)
 - 🚧 Szablony raportów defektów z eksportem do Markdown
 - 🚧 Exploration Charter: notatki z tagami, timer, skróty klawiaturowe
 - ✅ Prosta Knowledge Base: CRUD, tagi, publiczny dostęp, eksport JSON
@@ -23,7 +36,7 @@ QA Toolsmith to lekkie, otwartoźródłowe narzędzie dla testerów, które porz
 Wymagania: Node.js 22.14.0, npm
 
 ```bash
-git clone https://github.com/jakub-litkowski/qa-toolsmith.git
+git clone https://github.com/JackLeetwan/qa-toolsmith.git
 cd qa-toolsmith
 npm install
 npm run dev
@@ -77,7 +90,11 @@ Instrukcja krok‑po‑kroku: `docs/deployment-cloudflare.md`.
 
 ## Status projektu
 
-- MVP gotowe (v0.0.1). Aktywnie rozwijane funkcje dla kluczowych zadań QA.
+- ✅ **Produkcyjna wersja** dostępna na [qa-toolsmith.pages.dev](https://qa-toolsmith.pages.dev/)
+- ✅ **Pełne MVP** z autentykacją, CRUD Knowledge Base, generatorami danych
+- ✅ **AI integracja** dla ulepszania treści z limitami dziennymi
+- ✅ **Kompletny CI/CD** z testami automatycznymi
+- 🚧 Rozwijane: szablony raportów i exploration charters (placeholder dostępne)
 
 ## Licencja
 
