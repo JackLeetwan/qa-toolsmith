@@ -10,12 +10,12 @@ QA Toolsmith to otwartoźródłowa aplikacja internetowa dla testerów oprogramo
 
 ## Tech Stack
 
-- **Framework:** Astro 5 (SSR) z adapterem `@astrojs/cloudflare` dla Cloudflare Pages
-- **UI:** React 19 z TypeScript 5
-- **Stylowanie:** Tailwind 4 i shadcn/ui
-- **Backend:** Supabase (PostgreSQL, Auth)
+- **Framework:** Astro 5 (v5.15.3, SSR) z adapterem `@astrojs/cloudflare` dla Cloudflare Pages
+- **UI:** React 19 (v19.2.0) z TypeScript 5
+- **Stylowanie:** Tailwind 4 (v4.1.16) i shadcn/ui
+- **Backend:** Supabase (PostgreSQL, Auth) `@supabase/supabase-js` (v2.78.0)
 - **Hosting:** Cloudflare Pages (SSR z Workers)
-- **Testowanie:** Vitest (testy jednostkowe), Playwright (testy E2E)
+- **Testowanie:** Vitest (v4.0.5, testy jednostkowe), Playwright (v1.56.1, testy E2E)
 
 ## Project Structure
 

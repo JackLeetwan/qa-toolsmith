@@ -80,11 +80,12 @@ async function globalTeardown() {
         cleanupResults.push(`charter_notes: ${charterNotesCount ?? 0} rows`);
       }
 
-      // 3.2. KB notes (child of kb_entries)
+      // 3.2. KB notes (child of kb_entries, exclude seed data)
       const { error: kbNotesError, count: kbNotesCount } = await supabase
         .from("kb_notes")
         .delete()
-        .eq("user_id", userId);
+        .eq("user_id", userId)
+        .not("id", "eq", "33333333-3333-3333-3333-333333333333");
 
       if (kbNotesError) {
         console.error("⚠️  Error deleting kb_notes:", kbNotesError.message);
@@ -104,11 +105,16 @@ async function globalTeardown() {
         cleanupResults.push(`charters: ${chartersCount ?? 0} rows`);
       }
 
-      // 3.4. KB entries
+      // 3.4. KB entries (exclude seed data to preserve it for other tests)
       const { error: kbEntriesError, count: kbEntriesCount } = await supabase
         .from("kb_entries")
         .delete()
-        .eq("user_id", userId);
+        .eq("user_id", userId)
+        .not(
+          "id",
+          "in",
+          '("11111111-1111-1111-1111-111111111111","22222222-2222-2222-2222-222222222222")',
+        );
 
       if (kbEntriesError) {
         console.error("⚠️  Error deleting kb_entries:", kbEntriesError.message);

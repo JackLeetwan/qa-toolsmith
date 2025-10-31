@@ -40,7 +40,7 @@ function adminCredsPresent(): boolean {
 }
 
 test.describe("KB admin restrictions", () => {
-  test.skip("non-admin: create/edit form hides is_public; no edit/delete for public entries", async ({
+  test("non-admin: create/edit form hides is_public; no edit/delete for public entries", async ({
     page,
   }) => {
     const user = process.env.E2E_USERNAME as string;

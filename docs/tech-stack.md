@@ -8,16 +8,16 @@ QA Toolsmith is built with modern web technologies focused on performance, devel
 
 ### Frontend
 
-- **Astro 5** (v5.13.7) - Static Site Generator with SSR support via `@astrojs/cloudflare` adapter
+- **Astro 5** (v5.15.3) - Static Site Generator with SSR support via `@astrojs/cloudflare` adapter
   - API endpoints using `context` parameter for request handling
   - Middleware support with `onRequest` export
   - Cloudflare Workers integration via `context.locals.runtime`
-- **React 19** (v19.1.1) - Component library for interactive UI elements
+- **React 19** (v19.2.0) - Component library for interactive UI elements
   - React Compiler support enabled
   - New hooks: `use()` for async data fetching, `useOptimistic()` for optimistic UI updates
   - Enhanced Suspense for better loading states
 - **TypeScript 5** - Type-safe JavaScript with strict mode enabled
-- **Tailwind CSS 4** (v4.1.13) - Utility-first CSS framework
+- **Tailwind CSS 4** (v4.1.16) - Utility-first CSS framework
   - CSS-first configuration using `@import "tailwindcss"` and `@theme` directive
   - Native Vite integration via `@tailwindcss/vite` plugin (no PostCSS required)
   - Direct CSS variables for theme tokens (e.g., `--color-primary`, `--spacing-4`)
@@ -27,7 +27,7 @@ QA Toolsmith is built with modern web technologies focused on performance, devel
 
 - **Supabase** - Backend-as-a-Service with SSR support via `@supabase/ssr` (v0.7.0)
   - PostgreSQL database with Row Level Security (RLS)
-  - Built-in JWT authentication
+  - Built-in JWT authentication `@supabase/supabase-js` (v2.78.0)
   - Real-time subscriptions (future feature)
   - SQL migrations with Supabase CLI
 
@@ -39,7 +39,7 @@ QA Toolsmith is built with modern web technologies focused on performance, devel
 
 ### Testing
 
-- **Vitest** (v3.2.4) - Fast unit testing framework with Vite-native performance
+- **Vitest** (v4.0.5) - Fast unit testing framework with Vite-native performance
 - **Playwright** (v1.56.1) - Multi-browser E2E testing with Chromium support
 - **React Testing Library** (v16.3.0) - Component testing utilities
 - **@testing-library/user-event** (v14.6.1) - Realistic user interaction simulation
@@ -69,30 +69,6 @@ QA Toolsmith is deployed on **Cloudflare Pages** using the official `@astrojs/cl
 - **SSR**: Enabled via `output: "server"` in `astro.config.mjs`
 
 The application requires SSR due to server-side API endpoints (authentication, data generators, health checks), making Cloudflare Pages the ideal choice for its excellent SSR support and generous free tier.
-
-### Docker Deployment (Alternative)
-
-QA Toolsmith can also be deployed as a Docker container for flexibility across various hosting platforms (DigitalOcean, AWS, Azure, etc.).
-
-**Key Features:**
-
-- **Multi-stage build**: Optimized image size (~200MB)
-- **Non-root user**: Enhanced security with `nodejs:1001` user
-- **Health checks**: Built-in endpoint monitoring at `/api/health`
-- **Flexible configuration**: Runtime environment variables for all secrets
-- **GitHub Container Registry**: Ready for `ghcr.io` deployment
-
-**Quick Start:**
-
-```bash
-docker build -t jayleetwan/qa-toolsmith:latest .
-docker run -d -p 3000:3000 \
-  -e SUPABASE_URL=https://your-project.supabase.co \
-  -e SUPABASE_KEY=your-anon-key \
-  jayleetwan/qa-toolsmith:latest
-```
-
-For detailed Docker deployment instructions, see [Docker Deployment Guide](./docker.md).
 
 ## Development Workflow
 

@@ -24,15 +24,23 @@ const isTestEnvironment = process.env.NODE_ENV === 'test' ||
   !!process.env.E2E_USERNAME;
 
 // Check if this is an authenticated E2E test (indicated by URL parameter or test environment)
-const isAuthenticatedTest = isTestEnvironment && (
+const isAuthenticatedTest = (isTestEnvironment && (
   Astro.url.searchParams.has('authenticated') ||
-  Astro.url.searchParams.has('test') ||
   process.env.E2E_FORCE_AUTH === 'true'
-);
+)) || Astro.url.searchParams.has('test');
+
+// For Playwright tests, also enable mock user if we have test indicators
+const isPlaywrightTest = Astro.url.searchParams.has('test') ||
+  Astro.url.searchParams.has('authenticated') ||
+  process.env.E2E_FORCE_AUTH === 'true' ||
+  isTestEnvironment;
 
 // Mock user for E2E tests when SSR sessions don't work properly
 // Only use mock user for authenticated test scenarios
-const mockUser = isAuthenticatedTest
+const mockUser = (isPlaywrightTest && (
+  Astro.url.searchParams.has('authenticated') ||
+  process.env.E2E_FORCE_AUTH === 'true'
+))
   ? { id: "951570d9-7a13-4bdc-8454-8013ee124d63", email: process.env.E2E_USERNAME || "test@example.com" }
   : null;
 

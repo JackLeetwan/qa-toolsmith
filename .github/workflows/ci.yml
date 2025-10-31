@@ -108,7 +108,7 @@ jobs:
           retention-days: ${{ github.event_name == 'push' && '30' || '7' }}
 
   e2e-tests:
-    name: E2E Tests
+    name: E2E Tests (KB auth tests skipped)
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
@@ -343,7 +343,7 @@ jobs:
             | **Unit Tests** | ${{ needs.test.result == 'success' &&
               '✅ Passed' || '❌ Failed' }} | Test coverage |
             | **E2E Tests** | ${{ needs.e2e-tests.result == 'success' &&
-              '✅ Passed' || '❌ Failed' }} | Integration tests |
+              '✅ Passed (KB auth tests skipped)' || '❌ Failed (KB auth tests skipped)' }} | Integration tests |
 
             ### 📁 Artifacts & Reports
 

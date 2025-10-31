@@ -59,8 +59,8 @@ export async function middlewareHandler(
       return next();
     }
 
-    // For protected paths, return error
-    return new Response(
+    // For protected paths, return error with security headers
+    const errorResponse = new Response(
       JSON.stringify({
         error: {
           code: "CONFIGURATION_ERROR",
@@ -73,6 +73,18 @@ export async function middlewareHandler(
         headers: { "Content-Type": "application/json" },
       },
     );
+
+    // Add security headers
+    const secureErrorHeaders = new Headers(errorResponse.headers);
+    secureErrorHeaders.set("X-Frame-Options", "DENY");
+    secureErrorHeaders.set("X-Content-Type-Options", "nosniff");
+    secureErrorHeaders.set("X-XSS-Protection", "1; mode=block");
+
+    return new Response(errorResponse.body, {
+      status: errorResponse.status,
+      statusText: errorResponse.statusText,
+      headers: secureErrorHeaders,
+    });
   }
 
   // Set supabase client in locals
@@ -96,9 +108,21 @@ export async function middlewareHandler(
     logger.error("❌ Error getting user session:", sessionError);
     // For protected paths, redirect to login
     if (isProtectedPath) {
-      return context.redirect(
+      const redirectResponse = context.redirect(
         `/auth/login?next=${encodeURIComponent(pathname)}`,
       );
+
+      // Add security headers to redirect response
+      const secureRedirectHeaders = new Headers(redirectResponse.headers);
+      secureRedirectHeaders.set("X-Frame-Options", "DENY");
+      secureRedirectHeaders.set("X-Content-Type-Options", "nosniff");
+      secureRedirectHeaders.set("X-XSS-Protection", "1; mode=block");
+
+      return new Response(redirectResponse.body, {
+        status: redirectResponse.status,
+        statusText: redirectResponse.statusText,
+        headers: secureRedirectHeaders,
+      });
     }
     // For public paths, continue without user context
     logger.info(
@@ -118,9 +142,21 @@ export async function middlewareHandler(
         "🔒 Protected path requires auth, redirecting to login:",
         pathname,
       );
-      return context.redirect(
+      const redirectResponse = context.redirect(
         `/auth/login?next=${encodeURIComponent(pathname)}`,
       );
+
+      // Add security headers to redirect response
+      const secureRedirectHeaders = new Headers(redirectResponse.headers);
+      secureRedirectHeaders.set("X-Frame-Options", "DENY");
+      secureRedirectHeaders.set("X-Content-Type-Options", "nosniff");
+      secureRedirectHeaders.set("X-XSS-Protection", "1; mode=block");
+
+      return new Response(redirectResponse.body, {
+        status: redirectResponse.status,
+        statusText: redirectResponse.statusText,
+        headers: secureRedirectHeaders,
+      });
     }
     // For public paths, continue without user context
     logger.info("✅ Public path, allowing access:", pathname);
@@ -162,5 +198,53 @@ export async function middlewareHandler(
     pathname,
   });
 
-  return next();
+  // Get the response from the next handler
+  const response = await next();
+
+  // Add security headers to all responses
+  const securityHeaders = new Headers(response.headers);
+
+  // Content Security Policy - restrict resource loading
+  securityHeaders.set(
+    "Content-Security-Policy",
+    "default-src 'self'; " +
+      "script-src 'self'; " +
+      "style-src 'self' 'unsafe-inline'; " +
+      "img-src 'self' data: https:; " +
+      "font-src 'self' data:; " +
+      "connect-src 'self' https:; " +
+      "frame-ancestors 'none'; " +
+      "base-uri 'self'; " +
+      "form-action 'self'",
+  );
+
+  // Prevent clickjacking
+  securityHeaders.set("X-Frame-Options", "DENY");
+
+  // Prevent MIME type sniffing
+  securityHeaders.set("X-Content-Type-Options", "nosniff");
+
+  // Referrer Policy
+  securityHeaders.set("Referrer-Policy", "strict-origin-when-cross-origin");
+
+  // Prevent XSS attacks (legacy header, but still useful)
+  securityHeaders.set("X-XSS-Protection", "1; mode=block");
+
+  // Permissions Policy (formerly Feature Policy)
+  securityHeaders.set(
+    "Permissions-Policy",
+    "geolocation=(), microphone=(), camera=()",
+  );
+
+  // HTTP Strict Transport Security (HSTS)
+  securityHeaders.set(
+    "Strict-Transport-Security",
+    "max-age=31536000; includeSubDomains",
+  );
+
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers: securityHeaders,
+  });
 }

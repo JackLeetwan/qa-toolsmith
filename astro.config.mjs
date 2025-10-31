@@ -72,8 +72,8 @@ export default defineConfig({
         optional: true,
       }),
     },
-    // Disable secret validation during Docker build (secrets provided at runtime)
-    validateSecrets: process.env.ASTRO_TARGET !== "node",
+    // Enable secret validation for security
+    validateSecrets: true,
   },
   vite: {
     plugins: [tailwindcss()],
@@ -90,4 +90,7 @@ export default defineConfig({
     },
   },
   adapter: useCloudflareAdapter ? cloudflare() : node({ mode: "standalone" }),
+  security: {
+    checkOrigin: true,
+  },
 });

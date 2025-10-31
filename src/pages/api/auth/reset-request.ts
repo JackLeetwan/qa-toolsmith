@@ -3,6 +3,8 @@ import { createSupabaseServerInstance } from "../../../db/supabase.client";
 import { z } from "zod";
 import { logger } from "../../../lib/utils/logger";
 import { AUTH_RESET_REDIRECT_URL } from "astro:env/server";
+import { consume } from "../../../lib/services/rate-limiter.service";
+import { getTrustedIp } from "../../../lib/helpers/request.helper";
 
 const resetRequestSchema = z.object({
   email: z
@@ -20,6 +22,39 @@ export const POST: APIRoute = async ({ request, cookies, locals }) => {
   try {
     const body = await request.json();
     const { email } = resetRequestSchema.parse(body);
+
+    // Rate limiting: 10 attempts per IP per 60 seconds
+    const clientIp = getTrustedIp(request);
+    logger.debug("🌐 Client IP for rate limiting:", clientIp);
+
+    try {
+      await consume(clientIp);
+      logger.debug("✅ Rate limit check passed");
+    } catch (rateLimitError) {
+      logger.warn("🚫 Rate limit exceeded for IP:", clientIp, {
+        retryAfter: (rateLimitError as Error & { retryAfter?: number })
+          .retryAfter,
+      });
+      return new Response(
+        JSON.stringify({
+          error: "RATE_LIMITED",
+          message:
+            "Zbyt wiele prób resetowania hasła. Spróbuj ponownie później.",
+          retryAfter: (rateLimitError as Error & { retryAfter?: number })
+            .retryAfter,
+        }),
+        {
+          status: 429,
+          headers: {
+            "Content-Type": "application/json",
+            "Retry-After": String(
+              (rateLimitError as Error & { retryAfter?: number }).retryAfter ||
+                60,
+            ),
+          },
+        },
+      );
+    }
 
     const supabase = createSupabaseServerInstance({
       cookies,

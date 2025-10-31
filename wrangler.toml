@@ -17,6 +17,11 @@ pages_build_output_dir = "dist"
 # - OPENROUTER_API_KEY (optional, can be empty)
 # - AUTH_SIGNUP_REDIRECT_URL (for email confirmation redirects)
 
+# KV namespaces for application features
+[[kv_namespaces]]
+binding = "KV_RATE_LIMIT"
+id = "your-rate-limit-kv-namespace-id"
+
 # KV namespace for session storage (configured in Cloudflare Dashboard)
 # Uncomment and configure if needed:
 # [[kv_namespaces]]

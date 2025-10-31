@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2, X } from "lucide-react";
+import { sanitizeText } from "@/lib/utils/sanitize";
 import type {
   KBEntryDTO,
   CreateKBEntryCommand,
@@ -195,13 +196,13 @@ export default function KbEntryForm({
                   key={tag}
                   className="inline-flex items-center gap-1 px-2 py-1 bg-muted rounded text-sm"
                 >
-                  {tag}
+                  {sanitizeText(tag)}
                   <button
                     type="button"
                     onClick={() => removeTag(tag)}
                     disabled={isLoading}
                     className="hover:text-destructive focus:outline-none focus:ring-2 focus:ring-ring rounded"
-                    aria-label={`Usuń tag ${tag}`}
+                    aria-label={`Usuń tag ${sanitizeText(tag)}`}
                   >
                     <X className="h-3 w-3" />
                   </button>

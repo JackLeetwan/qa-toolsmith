@@ -27,12 +27,24 @@ vi.mock("../../../db/supabase.client", () => ({
 vi.mock("../../../lib/utils/logger", () => ({
   logger: {
     debug: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
     error: vi.fn(),
   },
 }));
 
+vi.mock("../../../lib/services/rate-limiter.service", () => ({
+  consume: vi.fn(),
+}));
+
+vi.mock("../../../lib/helpers/request.helper", () => ({
+  getTrustedIp: vi.fn(() => "127.0.0.1"),
+}));
+
 import { createSupabaseServerInstance } from "../../../db/supabase.client";
 import { logger } from "../../../lib/utils/logger";
+import { consume as consumeRateLimit } from "../../../lib/services/rate-limiter.service";
+// import { getTrustedIp } from "../../../lib/helpers/request.helper";
 
 // Type the mocked logger
 const mockLogger = vi.mocked(logger);
@@ -74,6 +86,9 @@ describe("Signin API Endpoint", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+
+    // Mock rate limiter to always succeed by default
+    vi.mocked(consumeRateLimit).mockResolvedValue();
 
     mockCookies = {
       get: vi.fn(),

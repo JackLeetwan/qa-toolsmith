@@ -1019,12 +1019,15 @@ describe("Middleware", () => {
 
       const result = await middlewareHandler(context, mockNext);
 
-      expect(result).toEqual(
-        new Response(null, {
-          status: 302,
-          headers: { Location: "/auth/login?next=%2Ftemplates" },
-        }),
-      ); // redirect() returns a Response
+      // The middleware now adds security headers to all responses
+      expect(result.status).toBe(302);
+      expect(result.headers.get("Location")).toBe(
+        "/auth/login?next=%2Ftemplates",
+      );
+      expect(result.headers.get("X-Frame-Options")).toBe("DENY");
+      expect(result.headers.get("X-Content-Type-Options")).toBe("nosniff");
+      expect(result.headers.get("X-XSS-Protection")).toBe("1; mode=block");
+      expect(result.headers.get("Content-Security-Policy")).toBeDefined();
       expect(mockRedirect).toHaveBeenCalled();
       expect(mockNext).not.toHaveBeenCalled();
     });

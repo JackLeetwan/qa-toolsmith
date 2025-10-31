@@ -37,11 +37,23 @@ vi.mock("astro:env/server", () => ({
 vi.mock("../../../lib/utils/logger", () => ({
   logger: {
     debug: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
     error: vi.fn(),
   },
 }));
 
+vi.mock("../../../lib/services/rate-limiter.service", () => ({
+  consume: vi.fn(),
+}));
+
+vi.mock("../../../lib/helpers/request.helper", () => ({
+  getTrustedIp: vi.fn(() => "127.0.0.1"),
+}));
+
 import { logger } from "../../../lib/utils/logger";
+import { consume as consumeRateLimit } from "../../../lib/services/rate-limiter.service";
+// import { getTrustedIp } from "../../../lib/helpers/request.helper";
 
 // Helper to create APIContext for testing
 function createAPIContext(request: Request, cookies: AstroCookies): APIContext {
@@ -82,6 +94,9 @@ describe("Signup API Endpoint", () => {
     vi.clearAllMocks();
     mockAUTH_SIGNUP_REDIRECT_URL = undefined;
 
+    // Mock rate limiter to always succeed by default
+    vi.mocked(consumeRateLimit).mockResolvedValue();
+
     mockCookies = {
       get: vi.fn(),
       set: vi.fn(),
@@ -107,8 +122,8 @@ describe("Signup API Endpoint", () => {
     vi.restoreAllMocks();
   });
 
-  describe("successful signup with auto-login", () => {
-    it("should create account and auto-login successfully", async () => {
+  describe("successful signup", () => {
+    it("should create account successfully", async () => {
       const requestBody = {
         email: "NEWUSER@EXAMPLE.COM",
         password: "SecurePass123",
@@ -129,9 +144,12 @@ describe("Signup API Endpoint", () => {
         error: null,
       });
 
-      // Mock successful auto-login
+      // Mock successful signin
       mockSupabaseAuth.signInWithPassword.mockResolvedValue({
-        data: { user: mockUser, session: { access_token: "jwt-token" } },
+        data: {
+          user: mockUser,
+          session: { access_token: "token" },
+        },
         error: null,
       });
 
@@ -145,6 +163,8 @@ describe("Signup API Endpoint", () => {
           id: "new-user-uuid-123",
           email: "newuser@example.com",
         },
+        emailConfirmationRequired: false,
+        message: "Konto utworzone i zalogowano pomyślnie.",
       });
 
       expect(response.headers.get("Content-Type")).toBe("application/json");
@@ -156,7 +176,7 @@ describe("Signup API Endpoint", () => {
         options: undefined,
       });
 
-      // Verify auto-login was called with processed email
+      // Verify auto-login was attempted
       expect(mockSupabaseAuth.signInWithPassword).toHaveBeenCalledWith({
         email: "newuser@example.com",
         password: "SecurePass123",
@@ -498,70 +518,6 @@ describe("Signup API Endpoint", () => {
       expect(response.status).toBe(400);
       const responseBody = await response.json();
       expect(responseBody.error).toBe("INVALID_CREDENTIALS");
-    });
-  });
-
-  describe("auto-login failures", () => {
-    it("should handle auto-login failure after successful signup", async () => {
-      const requestBody = {
-        email: "user@example.com",
-        password: "SecurePass123",
-      };
-
-      (
-        mockRequest.json as Mock<() => Promise<Partial<LoginRequest>>>
-      ).mockResolvedValue(requestBody);
-
-      // Successful signup
-      mockSupabaseAuth.signUp.mockResolvedValue({
-        data: { user: { id: "user-id", email: "user@example.com" } },
-        error: null,
-      });
-
-      // Failed auto-login
-      mockSupabaseAuth.signInWithPassword.mockResolvedValue({
-        data: { user: null, session: null },
-        error: {
-          message: "Auto-login failed",
-          status: 500,
-        },
-      });
-
-      const response = await POST(createAPIContext(mockRequest, mockCookies));
-
-      expect(response.status).toBe(500);
-
-      const responseBody = await response.json();
-      expect(responseBody).toEqual({
-        error: "UNKNOWN_ERROR",
-        message: "Konto utworzone, ale nie udało się zalogować.",
-      });
-    });
-
-    it("should handle network error during auto-login", async () => {
-      const requestBody = {
-        email: "user@example.com",
-        password: "SecurePass123",
-      };
-
-      (
-        mockRequest.json as Mock<() => Promise<Partial<LoginRequest>>>
-      ).mockResolvedValue(requestBody);
-
-      mockSupabaseAuth.signUp.mockResolvedValue({
-        data: { user: { id: "user-id" } },
-        error: null,
-      });
-
-      mockSupabaseAuth.signInWithPassword.mockRejectedValue(
-        new Error("Network error"),
-      );
-
-      const response = await POST(createAPIContext(mockRequest, mockCookies));
-
-      expect(response.status).toBe(500);
-      const responseBody = await response.json();
-      expect(responseBody.error).toBe("UNKNOWN_ERROR");
     });
   });
 

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { logger } from "@/lib/utils/logger";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,6 +14,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useKbEntries } from "@/lib/hooks/useKbEntries";
 import KbEntryForm from "@/components/kb/KbEntryForm";
+import { sanitizeText, sanitizeUrl } from "@/lib/utils/sanitize";
 import type {
   KBEntryDTO,
   CreateKBEntryCommand,
@@ -64,6 +66,19 @@ export default function KbEntriesList({
   // Prioritize explicitly passed props, then test fallback only for local dev
   const effectiveUser = mockUser ?? user ?? testFallbackUser;
   const effectiveRole = mockRole ?? role ?? "user";
+
+  // Debug logging for E2E tests
+  if (
+    typeof window !== "undefined" &&
+    window.location.search.includes("test")
+  ) {
+    logger.debug("🔍 KbEntriesList Debug:");
+    logger.debug("   mockUser:", mockUser);
+    logger.debug("   user:", user);
+    logger.debug("   testFallbackUser:", testFallbackUser);
+    logger.debug("   effectiveUser:", effectiveUser);
+    logger.debug("   effectiveRole:", effectiveRole);
+  }
 
   const {
     entries,
@@ -153,7 +168,20 @@ export default function KbEntriesList({
   }
 
   // Show create form when requested
+  if (
+    typeof window !== "undefined" &&
+    window.location.search.includes("test")
+  ) {
+    logger.debug("🔍 Render check - showCreateForm:", showCreateForm);
+  }
   if (showCreateForm) {
+    if (
+      typeof window !== "undefined" &&
+      window.location.search.includes("test")
+    ) {
+      logger.debug("🔍 Rendering create form");
+    }
+    logger.debug("🔍 KbEntriesList: Rendering KbEntryForm");
     return (
       <div data-testid="kb-entries-list">
         <KbEntryForm
@@ -185,7 +213,35 @@ export default function KbEntriesList({
       {effectiveUser && (
         <div className="mb-6">
           <Button
-            onClick={() => setShowCreateForm(true)}
+            onClick={() => {
+              try {
+                if (
+                  typeof window !== "undefined" &&
+                  window.location.search.includes("test")
+                ) {
+                  logger.debug(
+                    "🔍 Button clicked - setting showCreateForm to true",
+                  );
+                }
+                setShowCreateForm(true);
+                if (
+                  typeof window !== "undefined" &&
+                  window.location.search.includes("test")
+                ) {
+                  logger.debug(
+                    "🔍 showCreateForm set to true, current value:",
+                    true,
+                  );
+                }
+              } catch (error) {
+                if (
+                  typeof window !== "undefined" &&
+                  window.location.search.includes("test")
+                ) {
+                  logger.error("🔍 Error in button click handler:", error);
+                }
+              }
+            }}
             data-testid="kb-add-entry"
           >
             Dodaj wpis
@@ -247,12 +303,12 @@ export default function KbEntriesList({
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
                   <a
-                    href={entry.url_original}
+                    href={sanitizeUrl(entry.url_original)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="hover:underline"
                   >
-                    {entry.title}
+                    {sanitizeText(entry.title)}
                   </a>
                   {effectiveUser && effectiveUser.id === entry.user_id && (
                     <div className="flex gap-2">
@@ -276,7 +332,7 @@ export default function KbEntriesList({
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground mb-2">
-                  {entry.url_original}
+                  {sanitizeText(entry.url_original)}
                 </p>
                 {entry.tags && entry.tags.length > 0 && (
                   <div className="flex gap-2 flex-wrap">
@@ -285,7 +341,7 @@ export default function KbEntriesList({
                         key={tag}
                         className="px-2 py-1 bg-muted rounded text-xs"
                       >
-                        {tag}
+                        {sanitizeText(tag)}
                       </span>
                     ))}
                   </div>
@@ -319,7 +375,8 @@ export default function KbEntriesList({
             <AlertDialogHeader>
               <AlertDialogTitle>Usuń wpis</AlertDialogTitle>
               <AlertDialogDescription>
-                Czy na pewno chcesz usunąć wpis &quot;{entryToDelete.title}
+                Czy na pewno chcesz usunąć wpis &quot;
+                {sanitizeText(entryToDelete.title)}
                 &quot;? Tej akcji nie można cofnąć.
               </AlertDialogDescription>
             </AlertDialogHeader>

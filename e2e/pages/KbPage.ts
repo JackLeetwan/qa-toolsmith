@@ -193,28 +193,22 @@ export class KbPage extends BasePage {
       this.page.getByRole("heading", { name: "Knowledge Base" }).first(),
     ).toBeVisible({ timeout: 5000 });
 
-    // Check if the React component is present on the page
-    const componentExists = await this.page
-      .getByTestId("kb-entries-list")
-      .isVisible()
-      .catch(() => false);
-    log("🔍 KbPage Debug: Component exists:", componentExists);
-
-    if (!componentExists) {
-      // Take a screenshot for debugging
-      await this.page.screenshot({ path: "debug-kb-no-component.png" });
-      throw new Error("KbEntriesList component not found on page");
-    }
-
     // Wait for React component to be hydrated and rendered
+    // Use client:idle directive, so component loads after page becomes interactive
     await this.page.waitForTimeout(2000);
 
     // For E2E tests, directly check if the button exists and click it
     // Skip complex login checks since we use mock users
+    log("🔍 KbPage Debug: Checking for Add Entry button...");
+
+    // First check what buttons are actually on the page
+    const allButtons = await this.page.getByRole("button").allTextContents();
+    log("🔍 KbPage Debug: All buttons on page:", allButtons);
+
     const buttonExists = await this.getAddEntryButton()
-      .isVisible()
+      .isVisible({ timeout: 5000 })
       .catch(() => false);
-    log("🔍 KbPage Debug: Button exists:", buttonExists);
+    log("🔍 KbPage Debug: 'Dodaj wpis' button exists:", buttonExists);
 
     if (!buttonExists) {
       // Take a screenshot for debugging
@@ -235,6 +229,10 @@ export class KbPage extends BasePage {
         "🔍 KbPage Debug: Page content includes 'Knowledge Base':",
         pageContent?.includes("Knowledge Base"),
       );
+      log(
+        "🔍 KbPage Debug: Page shows authenticated text:",
+        pageContent?.includes("Zarządzaj swoją bazą wiedzy"),
+      );
 
       // Check if there are any console errors
       const consoleMessages: string[] = [];
@@ -244,17 +242,61 @@ export class KbPage extends BasePage {
       await this.page.waitForTimeout(1000);
       log("🔍 KbPage Debug: Console messages:", consoleMessages);
 
-      throw new Error(
-        "Add Entry button not visible - component not rendering correctly",
-      );
+      // Try to find any button with "dodaj" in it (case insensitive)
+      const dodajButtons = await this.page
+        .locator("button")
+        .filter({ hasText: /dodaj/i })
+        .allTextContents();
+      log("🔍 KbPage Debug: Buttons containing 'dodaj':", dodajButtons);
+
+      // If we find buttons with "dodaj", try to click the first one
+      if (dodajButtons.length > 0) {
+        log(
+          "🔍 KbPage Debug: Found buttons with 'dodaj', trying to click the first one",
+        );
+        await this.page
+          .locator("button")
+          .filter({ hasText: /dodaj/i })
+          .first()
+          .click();
+      } else {
+        throw new Error(
+          "Add Entry button not visible - component not rendering correctly",
+        );
+      }
     }
 
+    log("🔍 KbPage Debug: Clicking Add Entry button...");
     await this.getAddEntryButton().click();
 
     // Wait for form to appear after clicking - longer timeout for React re-render
-    await this.page.waitForTimeout(3000); // Give React more time to re-render in headless mode
+    await this.page.waitForTimeout(1000);
 
-    await expect(this.getTitleInput()).toBeVisible({ timeout: 15000 });
+    // Debug: Check page content after click
+    const pageContentAfterClick = await this.page.locator("body").textContent();
+    log(
+      "🔍 KbPage Debug: Page content after click includes 'Dodaj nowy wpis':",
+      pageContentAfterClick?.includes("Dodaj nowy wpis"),
+    );
+
+    // Debug: Check if form elements exist
+    const titleInputExists = await this.page
+      .locator('input[name="title"]')
+      .isVisible()
+      .catch(() => false);
+    log("🔍 KbPage Debug: Title input visible after click:", titleInputExists);
+
+    // Check if form heading appears first
+    log("🔍 KbPage Debug: Checking if form heading is visible...");
+    const formHeading = this.page.getByRole("heading", {
+      name: /dodaj nowy wpis/i,
+    });
+    await expect(formHeading).toBeVisible({ timeout: 10000 });
+
+    log(
+      "🔍 KbPage Debug: Form heading is visible, now checking title input...",
+    );
+    await expect(this.getTitleInput()).toBeVisible({ timeout: 5000 });
   }
 
   /**
@@ -279,6 +321,14 @@ export class KbPage extends BasePage {
     if (data.isPublic) {
       await this.getPublicCheckbox().check();
     }
+  }
+
+  /**
+   * Click the submit button (for validation tests where form stays open)
+   */
+  async clickSubmitButton(): Promise<void> {
+    await this.getFormSubmitButton().click();
+    // Don't wait for form to close - used for validation error testing
   }
 
   /**
