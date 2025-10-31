@@ -130,7 +130,7 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-          ENV_NAME: production
+          ENV_NAME: ${{ secrets.ENV_NAME }}
       - name: Install Playwright browsers
         run: npx playwright install chromium
       - name: Test Supabase Signup (Diagnostic)
@@ -180,7 +180,7 @@ jobs:
           PORT: 3000
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-          ENV_NAME: production
+          ENV_NAME: ${{ secrets.ENV_NAME }}
       - name: Wait for server to start
         run: |
           echo "⏳ Waiting for server to be ready..."
@@ -212,7 +212,7 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-          ENV_NAME: production
+          ENV_NAME: ${{ secrets.ENV_NAME }}
           E2E_USERNAME: ${{ secrets.E2E_USERNAME }}
           E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
           E2E_USERNAME_ID: ${{ secrets.E2E_USERNAME_ID }}
@@ -221,7 +221,7 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-          ENV_NAME: production
+          ENV_NAME: ${{ secrets.ENV_NAME }}
           E2E_USERNAME: ${{ secrets.E2E_USERNAME }}
           E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
           E2E_USERNAME_ID: ${{ secrets.E2E_USERNAME_ID }}
