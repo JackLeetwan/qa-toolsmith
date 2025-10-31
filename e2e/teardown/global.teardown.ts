@@ -11,6 +11,8 @@ import { createClient } from "@supabase/supabase-js";
  * - For single-developer projects: Safe to run after test completion
  * - For multi-developer projects: Consider alternative strategies (e.g., time-based cleanup, Supabase branching)
  *
+ * CI OPTIMIZATION: In CI environment, teardown is more conservative to avoid timeouts
+ *
  * Reference: Playwright Global Teardown
  * https://playwright.dev/docs/test-global-setup-teardown
  */
@@ -250,8 +252,9 @@ async function globalTeardown() {
     ];
 
     // Limit scanning to a reasonable number of pages to avoid long CI times
-    const perPage = 1000;
-    const maxPages = 5;
+    // In CI, be more conservative to avoid timeouts
+    const perPage = process.env.CI ? 100 : 1000;
+    const maxPages = process.env.CI ? 2 : 5;
     let totalDeleted = 0;
 
     for (let page = 1; page <= maxPages; page++) {

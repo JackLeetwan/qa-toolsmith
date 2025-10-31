@@ -26,11 +26,17 @@ export default defineConfig({
   globalSetup: "./e2e/setup/global.setup.ts",
   globalTeardown: "./e2e/teardown/global.teardown.ts",
 
-  reporter: [
-    ["html", { outputFolder: "./playwright-report" }],
-    ["json", { outputFile: "./test-results/results.json" }],
-    ["junit", { outputFile: "./test-results/junit.xml" }],
-  ],
+  reporter: process.env.CI
+    ? [
+        ["json", { outputFile: "./test-results/results.json" }],
+        ["junit", { outputFile: "./test-results/junit.xml" }],
+        ["github", { outputFolder: "./playwright-report" }],
+      ]
+    : [
+        ["html", { outputFolder: "./playwright-report" }],
+        ["json", { outputFile: "./test-results/results.json" }],
+        ["junit", { outputFile: "./test-results/junit.xml" }],
+      ],
 
   use: {
     // baseURL will be overridden per project

@@ -110,7 +110,7 @@ jobs:
   e2e-tests:
     name: E2E Tests (KB auth tests skipped)
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 25
     permissions:
       checks: write
       contents: read
@@ -217,7 +217,17 @@ jobs:
           E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
           E2E_USERNAME_ID: ${{ secrets.E2E_USERNAME_ID }}
       - name: Run E2E tests
-        run: npm run test:e2e
+        run: |
+          echo "🚀 Starting E2E tests..."
+          npm run test:e2e
+          EXIT_CODE=$?
+          echo "📊 E2E tests finished with exit code: $EXIT_CODE"
+          if [ $EXIT_CODE -eq 0 ]; then
+            echo "✅ E2E tests completed successfully"
+          else
+            echo "❌ E2E tests failed with exit code: $EXIT_CODE"
+          fi
+          exit $EXIT_CODE
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
