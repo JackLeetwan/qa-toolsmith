@@ -33,12 +33,6 @@ async function login(page: Page, email: string, password: string) {
   }
 }
 
-function adminCredsPresent(): boolean {
-  return Boolean(
-    process.env.E2E_ADMIN_USERNAME && process.env.E2E_ADMIN_PASSWORD,
-  );
-}
-
 test.describe("KB admin restrictions", () => {
   // SKIP ALL: Admin functionality tests removed per E2E reduction plan
   // Keeping only 2-3 most critical tests per functionality
@@ -212,7 +206,9 @@ test.describe("KB admin restrictions", () => {
       .click();
   });
 
-  test.skip("admin: can toggle is_public on existing entries", async ({ page }) => {
+  test.skip("admin: can toggle is_public on existing entries", async ({
+    page,
+  }) => {
     // Already skipped at outer level per E2E reduction plan
 
     const user = process.env.E2E_ADMIN_USERNAME as string;

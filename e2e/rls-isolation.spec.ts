@@ -79,7 +79,9 @@ test.describe("RLS Data Isolation", () => {
   });
 
   test.describe("Cross-User Data Isolation", () => {
-    test.skip("should prevent access to other users' data", async ({ page }) => {
+    test.skip("should prevent access to other users' data", async ({
+      page,
+    }) => {
       // This test would require multiple user sessions
       // to verify that user A cannot see user B's data
 
@@ -137,7 +139,9 @@ test.describe("RLS Data Isolation", () => {
       await expect(page).not.toHaveURL(/\/auth\/login/);
     });
 
-    test.skip("user A should see public entries of user B", async ({ page }) => {
+    test.skip("user A should see public entries of user B", async ({
+      page,
+    }) => {
       // KB allows public entries to be visible to all users
       // This test verifies that public entries are accessible
 

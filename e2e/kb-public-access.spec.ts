@@ -71,7 +71,9 @@ test.describe("KB Public Access", () => {
       expect(hasEntries || hasEmptyState).toBe(true);
     });
 
-    test.skip("should not see edit/delete buttons for entries", async ({ page }) => {
+    test.skip("should not see edit/delete buttons for entries", async ({
+      page,
+    }) => {
       await page.waitForLoadState("networkidle");
 
       // If there are entries visible, they should not have edit/delete buttons
@@ -130,7 +132,9 @@ test.describe("KB Public Access", () => {
         );
       }
     });
-    test.skip("should create a new entry when authenticated", async ({ page }) => {
+    test.skip("should create a new entry when authenticated", async ({
+      page,
+    }) => {
       log("🔐 Using API authentication for E2E test...");
 
       // Use API authentication instead of UI login for reliability
@@ -287,7 +291,9 @@ test.describe("KB Public Access", () => {
       // Skip toast verification in test env
     });
 
-    test.skip("should delete own entry when authenticated", async ({ page }) => {
+    test.skip("should delete own entry when authenticated", async ({
+      page,
+    }) => {
       await page.goto("/kb?test");
       await kbPage.setup();
 
@@ -482,7 +488,9 @@ test.describe("KB Public Access", () => {
       await expect(page).toHaveURL(/\/kb/);
     });
 
-    test.skip("user cannot edit/delete other users' entries", async ({ page }) => {
+    test.skip("user cannot edit/delete other users' entries", async ({
+      page,
+    }) => {
       // This test assumes RLS is working correctly
       // We can't easily test with multiple users in current setup,
       // but we can verify that edit/delete buttons are only visible for own entries
@@ -577,7 +585,9 @@ test.describe("KB Public Access", () => {
       ).toBeVisible({ timeout: 2000 });
     });
 
-    test.skip("should show validation error for invalid URL", async ({ page }) => {
+    test.skip("should show validation error for invalid URL", async ({
+      page,
+    }) => {
       await page.goto("/kb?test");
       await kbPage.setup();
       await kbPage.clickAddEntry();
