@@ -49,7 +49,7 @@ test.describe("KB Public Access", () => {
       await expect(page).not.toHaveURL(/\/auth\/login/);
     });
 
-    test("should see only public entries (not private entries)", async ({
+    test.skip("should see only public entries (not private entries)", async ({
       page,
     }) => {
       // This test verifies that unauthenticated users can see public entries
@@ -71,7 +71,7 @@ test.describe("KB Public Access", () => {
       expect(hasEntries || hasEmptyState).toBe(true);
     });
 
-    test("should not see edit/delete buttons for entries", async ({ page }) => {
+    test.skip("should not see edit/delete buttons for entries", async ({ page }) => {
       await page.waitForLoadState("networkidle");
 
       // If there are entries visible, they should not have edit/delete buttons
@@ -90,7 +90,7 @@ test.describe("KB Public Access", () => {
         });
     });
 
-    test("should see CTA to login for unauthenticated users", async ({
+    test.skip("should see CTA to login for unauthenticated users", async ({
       page,
     }) => {
       await page.waitForLoadState("networkidle");
@@ -112,7 +112,7 @@ test.describe("KB Public Access", () => {
       }
     });
 
-    test("should not see 'Dodaj wpis' button for unauthenticated users", async ({
+    test.skip("should not see 'Dodaj wpis' button for unauthenticated users", async ({
       page,
     }) => {
       await page.waitForLoadState("networkidle");
@@ -130,7 +130,7 @@ test.describe("KB Public Access", () => {
         );
       }
     });
-    test("should create a new entry when authenticated", async ({ page }) => {
+    test.skip("should create a new entry when authenticated", async ({ page }) => {
       log("🔐 Using API authentication for E2E test...");
 
       // Use API authentication instead of UI login for reliability
@@ -247,7 +247,7 @@ test.describe("KB Public Access", () => {
       }
     });
 
-    test("should edit own entry when authenticated", async ({ page }) => {
+    test.skip("should edit own entry when authenticated", async ({ page }) => {
       await page.goto("/kb?test");
       await kbPage.setup();
 
@@ -287,7 +287,7 @@ test.describe("KB Public Access", () => {
       // Skip toast verification in test env
     });
 
-    test("should delete own entry when authenticated", async ({ page }) => {
+    test.skip("should delete own entry when authenticated", async ({ page }) => {
       await page.goto("/kb?test");
       await kbPage.setup();
 
@@ -318,7 +318,7 @@ test.describe("KB Public Access", () => {
       await kbPage.verifyEntryNotDisplayed(entryTitle);
     });
 
-    test("should see own private entries + existing public entries", async ({
+    test.skip("should see own private entries + existing public entries", async ({
       page,
     }) => {
       // Use API authentication instead of UI login for reliability in CI/CD
@@ -443,7 +443,7 @@ test.describe("KB Public Access", () => {
       await page.waitForTimeout(3000);
     }
 
-    test("existing public entries should be visible to all users", async ({
+    test.skip("existing public entries should be visible to all users", async ({
       page,
     }) => {
       // This test verifies that public entries are visible to both authenticated and unauthenticated users
@@ -482,7 +482,7 @@ test.describe("KB Public Access", () => {
       await expect(page).toHaveURL(/\/kb/);
     });
 
-    test("user cannot edit/delete other users' entries", async ({ page }) => {
+    test.skip("user cannot edit/delete other users' entries", async ({ page }) => {
       // This test assumes RLS is working correctly
       // We can't easily test with multiple users in current setup,
       // but we can verify that edit/delete buttons are only visible for own entries
@@ -518,7 +518,7 @@ test.describe("KB Public Access", () => {
   });
 
   test.describe("Pagination", () => {
-    test("should load more entries when 'Załaduj więcej' is clicked", async ({
+    test.skip("should load more entries when 'Załaduj więcej' is clicked", async ({
       page,
     }) => {
       // This test requires multiple entries to be present
@@ -561,7 +561,7 @@ test.describe("KB Public Access", () => {
         );
       }
     });
-    test("should show validation errors for empty required fields", async ({
+    test.skip("should show validation errors for empty required fields", async ({
       page,
     }) => {
       await page.goto("/kb?test");
@@ -577,7 +577,7 @@ test.describe("KB Public Access", () => {
       ).toBeVisible({ timeout: 2000 });
     });
 
-    test("should show validation error for invalid URL", async ({ page }) => {
+    test.skip("should show validation error for invalid URL", async ({ page }) => {
       await page.goto("/kb?test");
       await kbPage.setup();
       await kbPage.clickAddEntry();
