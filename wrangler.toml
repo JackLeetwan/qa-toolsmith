@@ -22,6 +22,7 @@ pages_build_output_dir = "dist"
 binding = "KV_RATE_LIMIT"
 id = "your-rate-limit-kv-namespace-id"
 
+
 # KV namespace for session storage (configured in Cloudflare Dashboard)
 # Uncomment and configure if needed:
 # [[kv_namespaces]]
