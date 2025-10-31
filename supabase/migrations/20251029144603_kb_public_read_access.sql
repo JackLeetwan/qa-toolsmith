@@ -25,13 +25,14 @@ CREATE POLICY "anon can view public KB entries"
 -- =========================================
 -- KB ENTRIES - UPDATE AUTHENTICATED POLICY
 -- =========================================
--- Authenticated users can view their own entries OR public entries
+-- Authenticated users can view their own entries OR public entries OR all entries if admin
 DROP POLICY IF EXISTS "Users can view their own KB entries" ON public.kb_entries;
-CREATE POLICY "authenticated can view own or public KB entries"
+DROP POLICY IF EXISTS "kb_entries_select_own" ON public.kb_entries;
+CREATE POLICY "authenticated can view own, public, or all entries if admin"
   ON public.kb_entries
   FOR SELECT
   TO authenticated
-  USING (auth.uid() = user_id OR is_public = true);
+  USING (auth.uid() = user_id OR is_public = true OR is_admin(auth.uid()));
 
 -- =========================================
 -- KB NOTES - NEW ANON POLICY
@@ -52,17 +53,19 @@ CREATE POLICY "anon can view notes for public KB entries"
 -- =========================================
 -- KB NOTES - UPDATE AUTHENTICATED POLICY
 -- =========================================
--- Authenticated users can view notes for their own entries OR public entries
+-- Authenticated users can view notes for their own entries OR public entries OR all notes if admin
 DROP POLICY IF EXISTS "Users can view notes for their own KB entries" ON public.kb_notes;
-CREATE POLICY "authenticated can view notes for own or public KB entries"
+DROP POLICY IF EXISTS "kb_notes_select_own" ON public.kb_notes;
+CREATE POLICY "authenticated can view notes for own, public, or all if admin"
   ON public.kb_notes
   FOR SELECT
   TO authenticated
   USING (
     auth.uid() = user_id OR
+    is_admin(auth.uid()) OR
     EXISTS (
       SELECT 1 FROM public.kb_entries ke
-      WHERE ke.id = kb_notes.entry_id 
+      WHERE ke.id = kb_notes.entry_id
         AND ke.is_public = true
     )
   );
