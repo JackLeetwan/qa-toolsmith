@@ -18,9 +18,10 @@ pages_build_output_dir = "dist"
 # - AUTH_SIGNUP_REDIRECT_URL (for email confirmation redirects)
 
 # KV namespaces for application features
-[[kv_namespaces]]
-binding = "KV_RATE_LIMIT"
-id = "your-rate-limit-kv-namespace-id"
+# Temporarily disabled for MVP - rate limiting will use in-memory storage
+# [[kv_namespaces]]
+# binding = "KV_RATE_LIMIT"
+# id = "your-rate-limit-kv-namespace-id"
 
 
 # KV namespace for session storage (configured in Cloudflare Dashboard)
