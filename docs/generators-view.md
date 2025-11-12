@@ -463,7 +463,7 @@ Planned generators (currently placeholders):
 
 ## Known Limitations
 
-- Node.js version requirement: >=18.20.8 (Astro 5 requirement)
+- Node.js version requirement: 22.14.x (see package.json engines and .nvmrc)
 - History limited to 10 items per generator type
 - No cloud sync for history (localStorage only)
 - No export/import for history
