@@ -84,14 +84,12 @@ npm --version   # powinno pokazać wersję npm (np. 10.9.2)
 ### Problem: `nvm: command not found`
 
 **Rozwiązanie:**
-
 - Dodaj konfigurację nvm do `~/.bashrc` lub `~/.zshrc` (patrz wyżej)
 - Zrestartuj terminal lub uruchom `source ~/.bashrc` / `source ~/.zshrc`
 
 ### Problem: Node.js wersja się nie zmienia
 
 **Rozwiązanie:**
-
 ```bash
 # Wymuś użycie wersji z .nvmrc
 nvm use 22.14.0
@@ -103,7 +101,6 @@ node --version
 ### Problem: E2E testy nie działają
 
 **Rozwiązanie:**
-
 - Upewnij się, że używasz Node.js >= 22.14.0
 - Astro wymaga Node.js >= 18.20.8, ale projekt używa 22.14.x dla lepszej kompatybilności
 
