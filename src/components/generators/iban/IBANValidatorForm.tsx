@@ -110,6 +110,7 @@ export default function IBANValidatorForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    e.stopPropagation();
 
     // Validate input
     if (!validateInput(ibanInput)) {
@@ -125,12 +126,14 @@ export default function IBANValidatorForm({
 
     onLoadingChange(true);
 
-    const result = await validate({ iban: normalized });
+    try {
+      const result = await validate({ iban: normalized });
 
-    onLoadingChange(false);
-
-    if (result) {
-      onValidated(result);
+      if (result) {
+        onValidated(result);
+      }
+    } finally {
+      onLoadingChange(false);
     }
   };
 

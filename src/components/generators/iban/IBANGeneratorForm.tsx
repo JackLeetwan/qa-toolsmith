@@ -93,6 +93,7 @@ export default function IBANGeneratorForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    e.stopPropagation();
 
     // Validate seed
     if (!validateSeed(seedInput)) {
@@ -101,15 +102,17 @@ export default function IBANGeneratorForm({
 
     onLoadingChange(true);
 
-    const result = await generate({
-      country,
-      seed: seedInput || undefined,
-    });
+    try {
+      const result = await generate({
+        country,
+        seed: seedInput || undefined,
+      });
 
-    onLoadingChange(false);
-
-    if (result) {
-      onGenerated(result);
+      if (result) {
+        onGenerated(result);
+      }
+    } finally {
+      onLoadingChange(false);
     }
   };
 

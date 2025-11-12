@@ -35,6 +35,8 @@ QA Toolsmith to lekkie, otwartoźródłowe narzędzie dla testerów, które porz
 
 Wymagania: Node.js 22.14.0, npm
 
+📚 **Konfiguracja Node.js:** Zobacz [docs/NODE_VERSION_SETUP.md](docs/NODE_VERSION_SETUP.md) dla szczegółowych instrukcji ustawienia poprawnej wersji Node.js.
+
 ```bash
 git clone https://github.com/JackLeetwan/qa-toolsmith.git
 cd qa-toolsmith
