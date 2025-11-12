@@ -7,6 +7,7 @@ Ten dokument zawiera kompleksowy plan naprawy testów End-to-End (E2E) dla aplik
 ## 📊 **Aktualny Stan Problemów (Październik 2025)**
 
 ### **Podsumowanie Stanu:**
+
 - **26 testów przechodzi** (aktywne testy)
 - **11 testów failuje** (problemy z autoryzacją i komponentami)
 - **14 testów skipowanych** (według grep analysis)
@@ -15,6 +16,7 @@ Ten dokument zawiera kompleksowy plan naprawy testów End-to-End (E2E) dla aplik
 ### **Aktualne Problemy:**
 
 #### **Failujące Testy:**
+
 1. **Problemy z autoryzacją API** (400 Bad Request):
    - KB CRUD operations używają API auth, ale dostają 400 error
    - Przyczyna: nieprawidłowe credentials lub problem z API endpoint
@@ -28,11 +30,13 @@ Ten dokument zawiera kompleksowy plan naprawy testów End-to-End (E2E) dla aplik
    - Przyczyna: timeout/interruption w trakcie testów
 
 #### **Skipowane Testy:**
+
 - Wszystkie testy feature flags (4 pliki)
 - Wszystkie testy generators (1 plik)
 - Część testów admin KB (wymagają specjalnych credentials)
 
 ### **Przyczyna Główna:**
+
 - **API Authentication Issues**: Testy używają API calls do autoryzacji, ale credentials są nieprawidłowe
 - **Component Hydration Issues**: Problemy z renderowaniem komponentów React w SSR środowisku
 - **Test Interruptions**: Testy są przerywane podczas wykonywania
@@ -42,12 +46,14 @@ Ten dokument zawiera kompleksowy plan naprawy testów End-to-End (E2E) dla aplik
 ### **Główna Strategia: API-First Approach**
 
 Zamiast symulować logowanie przez UI, będziemy:
+
 1. **Używać API endpoints bezpośrednio** dla operacji wymagających autoryzacji
 2. **Utrzymywać sesję poprzez cookies** z API auth
 3. **Testować funkcjonalność poprzez API calls** zamiast UI symulacji
 4. **Weryfikować UI odzwierciedla zmiany API**
 
 ### **Korzyści Podejścia:**
+
 - ✅ **Działa w CI/CD** - API calls są niezawodne
 - ✅ **Szybsze testy** - mniej czekania na UI
 - ✅ **Bardziej niezawodne** - nie zależy od UI state
@@ -56,10 +62,15 @@ Zamiast symulować logowanie przez UI, będziemy:
 ## 📋 **Plan Działania - Fazy**
 
 ### **Faza 1: Przygotowanie i Analiza**
+
 ### **Faza 2: Implementacja API-First Testów**
+
 ### **Faza 3: Migracja Istniejących Testów**
+
 ### **Faza 4: Rozszerzenie Pokrycia**
+
 ### **Faza 5: Optymalizacja Infrastruktury**
+
 ### **Faza 6: Weryfikacja i Dokumentacja**
 
 ---
@@ -69,6 +80,7 @@ Zamiast symulować logowanie przez UI, będziemy:
 ### **Faza 1: Przygotowanie i Analiza** ⏱️ **1-2 dni**
 
 #### **Krok 1.1: Analiza Istniejącej Infrastruktury**
+
 ```bash
 # Uruchom analizę pokrycia testów
 npm run test:e2e:coverage
@@ -84,13 +96,16 @@ cat playwright.config.ts
 ```
 
 #### **Krok 1.2: Dokumentacja API Endpoints**
+
 Utwórz plik `docs/api-endpoints-for-testing.md` zawierający:
+
 - Lista wszystkich API endpoints
 - Wymagania autoryzacji
 - Struktury request/response
 - Przykłady użycia w testach
 
 #### **Krok 1.3: Test API Connectivity**
+
 ```bash
 # Test podstawowej funkcjonalności API
 curl -X POST http://localhost:3000/api/auth/signin \
@@ -108,6 +123,7 @@ curl -X POST http://localhost:3000/api/kb/entries \
 ### **Faza 2: Implementacja API-First Testów** ⏱️ **3-4 dni**
 
 #### **Krok 2.1: Utworzenie API Auth Helper**
+
 Utwórz `e2e/helpers/api-auth.helper.ts`:
 
 ```typescript
@@ -115,31 +131,37 @@ export class ApiAuthHelper {
   private cookies: string[] = [];
 
   async authenticate(page: Page, email: string, password: string) {
-    const response = await page.request.post('/api/auth/signin', {
-      data: { email, password }
+    const response = await page.request.post("/api/auth/signin", {
+      data: { email, password },
     });
-    this.cookies = response.headers()['set-cookie'] || [];
+    this.cookies = response.headers()["set-cookie"] || [];
     return this.cookies;
   }
 
   getAuthHeaders() {
-    return { cookie: this.cookies.join('; ') };
+    return { cookie: this.cookies.join("; ") };
   }
 
-  async makeAuthenticatedRequest(page: Page, method: string, url: string, data?: any) {
+  async makeAuthenticatedRequest(
+    page: Page,
+    method: string,
+    url: string,
+    data?: any,
+  ) {
     return page.request[method](url, {
       data,
-      headers: this.getAuthHeaders()
+      headers: this.getAuthHeaders(),
     });
   }
 }
 ```
 
 #### **Krok 2.2: Utworzenie API Test Suite dla KB**
+
 Utwórz `e2e/kb-api-crud.spec.ts`:
 
 ```typescript
-test.describe('KB API CRUD Operations', () => {
+test.describe("KB API CRUD Operations", () => {
   let authHelper: ApiAuthHelper;
   let testEntryId: string;
 
@@ -148,10 +170,12 @@ test.describe('KB API CRUD Operations', () => {
     await authHelper.authenticate(page, E2E_USERNAME, E2E_PASSWORD);
   });
 
-  test('should create entry via API', async ({ page }) => {
+  test("should create entry via API", async ({ page }) => {
     const response = await authHelper.makeAuthenticatedRequest(
-      page, 'post', '/api/kb/entries',
-      { title: 'Test Entry', url_original: 'https://example.com' }
+      page,
+      "post",
+      "/api/kb/entries",
+      { title: "Test Entry", url_original: "https://example.com" },
     );
     expect(response.ok()).toBe(true);
     const data = await response.json();
@@ -163,15 +187,16 @@ test.describe('KB API CRUD Operations', () => {
 ```
 
 #### **Krok 2.3: Test RLS (Row Level Security)**
+
 Utwórz `e2e/kb-api-rls.spec.ts`:
 
 ```typescript
-test.describe('KB RLS Isolation', () => {
-  test('should only return user own entries', async ({ page }) => {
+test.describe("KB RLS Isolation", () => {
+  test("should only return user own entries", async ({ page }) => {
     // Test że użytkownik widzi tylko swoje wpisy
   });
 
-  test('should prevent access to other users entries', async ({ page }) => {
+  test("should prevent access to other users entries", async ({ page }) => {
     // Test RLS protection
   });
 });
@@ -182,6 +207,7 @@ test.describe('KB RLS Isolation', () => {
 ### **Faza 3: Migracja Istniejących Testów** ⏱️ **2-3 dni**
 
 #### **Krok 3.1: Aktualizacja kb-public-access.spec.ts**
+
 Zamień pominięte testy na API-first wersje:
 
 ```typescript
@@ -198,12 +224,17 @@ test("should delete own entry via API", async ({ page }) => {
 
   // Create entry via API
   const createResponse = await authHelper.makeAuthenticatedRequest(
-    page, 'post', '/api/kb/entries', testData
+    page,
+    "post",
+    "/api/kb/entries",
+    testData,
   );
 
   // Delete via API
   const deleteResponse = await authHelper.makeAuthenticatedRequest(
-    page, 'delete', `/api/kb/entries/${entryId}`
+    page,
+    "delete",
+    `/api/kb/entries/${entryId}`,
   );
 
   expect(deleteResponse.status()).toBe(204);
@@ -211,6 +242,7 @@ test("should delete own entry via API", async ({ page }) => {
 ```
 
 #### **Krok 3.2: Aktualizacja kb-admin-restrictions.spec.ts**
+
 Dla testów admin:
 
 ```typescript
@@ -229,17 +261,20 @@ test("admin: can create public entries via API", async ({ page }) => {
 ```
 
 #### **Krok 3.3: Aktualizacja Form Validation Tests**
+
 Zamień UI validation na API validation:
 
 ```typescript
 test("should validate required fields via API", async ({ page }) => {
-  const response = await page.request.post('/api/kb/entries', {
-    data: { /* missing required fields */ }
+  const response = await page.request.post("/api/kb/entries", {
+    data: {
+      /* missing required fields */
+    },
   });
 
   expect(response.status()).toBe(400);
   const error = await response.json();
-  expect(error.error.code).toBe('VALIDATION_ERROR');
+  expect(error.error.code).toBe("VALIDATION_ERROR");
 });
 ```
 
@@ -248,37 +283,39 @@ test("should validate required fields via API", async ({ page }) => {
 ### **Faza 4: Rozszerzenie Pokrycia** ⏱️ **2-3 dni**
 
 #### **Krok 4.1: Testy Charters (Chronione Strony)**
+
 Utwórz `e2e/charters-access.spec.ts`:
 
 ```typescript
-test.describe('Charters Access Control', () => {
-  test('should redirect unauthenticated users', async ({ page }) => {
-    await page.goto('/charters');
+test.describe("Charters Access Control", () => {
+  test("should redirect unauthenticated users", async ({ page }) => {
+    await page.goto("/charters");
     await expect(page).toHaveURL(/\/auth\/login/);
   });
 
-  test('should allow authenticated users', async ({ page }) => {
+  test("should allow authenticated users", async ({ page }) => {
     const authHelper = new ApiAuthHelper();
     await authHelper.authenticate(page, E2E_USERNAME, E2E_PASSWORD);
 
     // Set cookies in browser
     await page.context().addCookies(authHelper.getCookies());
 
-    await page.goto('/charters');
+    await page.goto("/charters");
     await expect(page).not.toHaveURL(/\/auth\/login/);
   });
 });
 ```
 
 #### **Krok 4.2: Testy Feature Flags**
+
 Napraw `e2e/feature-flags.spec.ts`:
 
 ```typescript
-test.describe('Feature Flags Integration', () => {
-  test('should work in both environments', async ({ page }) => {
+test.describe("Feature Flags Integration", () => {
+  test("should work in both environments", async ({ page }) => {
     // Test tylko jeśli feature flags są włączone w konfiguracji
-    if (!isFeatureEnabled('featureFlags')) {
-      test.skip('Feature flags disabled');
+    if (!isFeatureEnabled("featureFlags")) {
+      test.skip("Feature flags disabled");
       return;
     }
 
@@ -288,6 +325,7 @@ test.describe('Feature Flags Integration', () => {
 ```
 
 #### **Krok 4.3: Testy Templates (jeśli istnieją)**
+
 Utwórz `e2e/templates-access.spec.ts` jeśli templates wymagają autoryzacji.
 
 ---
@@ -295,34 +333,36 @@ Utwórz `e2e/templates-access.spec.ts` jeśli templates wymagają autoryzacji.
 ### **Faza 5: Optymalizacja Infrastruktury** ⏱️ **1-2 dni**
 
 #### **Krok 5.1: Aktualizacja playwright.config.ts**
+
 ```typescript
 export default defineConfig({
   // Dodaj environment-based configuration
   projects: [
     {
-      name: 'chromium',
+      name: "chromium",
       use: {
-        baseURL: process.env.BASE_URL || 'http://localhost:3000',
+        baseURL: process.env.BASE_URL || "http://localhost:3000",
       },
     },
     // Dodaj projekt dla API-only tests
     {
-      name: 'api-only',
-      testMatch: '**/api-*.spec.ts',
+      name: "api-only",
+      testMatch: "**/api-*.spec.ts",
       use: {
-        baseURL: process.env.BASE_URL || 'http://localhost:3000',
+        baseURL: process.env.BASE_URL || "http://localhost:3000",
       },
-    }
+    },
   ],
 
   // Dodaj global setup dla API tests
   globalSetup: process.env.API_TESTS_ONLY
-    ? './e2e/setup/api-global.setup.ts'
-    : './e2e/setup/global.setup.ts',
+    ? "./e2e/setup/api-global.setup.ts"
+    : "./e2e/setup/global.setup.ts",
 });
 ```
 
 #### **Krok 5.2: Utworzenie API Global Setup**
+
 Utwórz `e2e/setup/api-global.setup.ts`:
 
 ```typescript
@@ -335,6 +375,7 @@ export default async function apiGlobalSetup() {
 ```
 
 #### **Krok 5.3: Aktualizacja CI/CD Workflow**
+
 Aktualizuj `.github/workflows/ci.yml`:
 
 ```yaml
@@ -352,6 +393,7 @@ Aktualizuj `.github/workflows/ci.yml`:
 ### **Faza 6: Weryfikacja i Dokumentacja** ⏱️ **1-2 dni**
 
 #### **Krok 6.1: Uruchomienie Testów w Różnych Środowiskach**
+
 ```bash
 # Local environment
 npm run test:e2e
@@ -364,6 +406,7 @@ npm run test:e2e:api
 ```
 
 #### **Krok 6.2: Coverage Analysis**
+
 ```bash
 # Sprawdź pokrycie po naprawach
 npm run test:e2e:coverage
@@ -373,12 +416,15 @@ npm run test:e2e:coverage
 ```
 
 #### **Krok 6.3: Dokumentacja**
+
 Utwórz/aktualizuj:
+
 - `TESTING_GUIDELINES.md` - guidelines dla API-first testing
 - `E2E_FIX_README.md` - podsumowanie zmian
 - Aktualizuj `README.md` z informacją o naprawionych testach
 
 #### **Krok 6.4: Performance Benchmarking**
+
 ```bash
 # Compare test execution times before/after
 time npm run test:e2e
@@ -391,12 +437,14 @@ time npm run test:e2e
 ## 🔍 **Metryki Sukcesu**
 
 ### **Quantitative Metrics:**
+
 - ✅ **0 pominiętych testów** wymagających autoryzacji
 - ✅ **Test execution time** < 10 minut w CI
 - ✅ **Test reliability** > 95% pass rate
 - ✅ **Code coverage** utrzymany lub zwiększony
 
 ### **Qualitative Metrics:**
+
 - ⚠️ **Częściowe pokrycie funkcjonalności** (40-50% - szczegóły poniżej)
 - ✅ **Testy działają** w CI/CD i lokalnie
 - ✅ **Łatwe debugowanie** - API calls są trace'owalne
@@ -407,12 +455,14 @@ time npm run test:e2e
 ## 🛠️ **Narzędzia i Technologie**
 
 ### **Podstawowe Narzędzia:**
+
 - **Playwright** - E2E testing framework
 - **Supabase** - Backend/Auth provider
 - **Astro** - Frontend framework
 - **Vitest** - Unit tests
 
 ### **MCP Tools do Wykorzystania:**
+
 ```bash
 # File operations
 read_file() - analiza kodu
@@ -428,6 +478,7 @@ run_terminal_cmd() - uruchamianie testów
 ```
 
 ### **Dokumentacja do Przeanalizowania:**
+
 - `backend-api.mdc` - Backend API guidelines
 - `frontend-coding.mdc` - Frontend standards
 - `planning.mdc` - Feature development guidelines
@@ -437,13 +488,16 @@ run_terminal_cmd() - uruchamianie testów
 ## ⚠️ **Ryzyka i Mitigation**
 
 ### **Ryzyka:**
+
 1. **API Changes Breaking Tests** - Mitigation: Contract tests
 2. **Environment Differences** - Mitigation: Environment-specific configs
 3. **Performance Impact** - Mitigation: Parallel execution
 4. **Maintenance Overhead** - Mitigation: Shared helpers
 
 ### **Fallback Plan:**
+
 Jeśli API-first approach nie zadziała:
+
 1. Wróć do UI tests z poprawioną session handling
 2. Zaimplementuj persistent sessions w CI
 3. Użyj browser context storage zamiast cookies
@@ -452,14 +506,14 @@ Jeśli API-first approach nie zadziała:
 
 ## 📅 **Timeline i Milestones**
 
-| Faza | Czas | Milestone |
-|------|------|-----------|
+| Faza   | Czas    | Milestone                            |
+| ------ | ------- | ------------------------------------ |
 | Faza 1 | 1-2 dni | Analiza kompletna, plan zatwierdzony |
-| Faza 2 | 3-4 dni | API-first framework gotowy |
-| Faza 3 | 2-3 dni | Wszystkie KB testy działają |
-| Faza 4 | 2-3 dni | Pełne pokrycie funkcjonalności |
-| Faza 5 | 1-2 dni | Infrastruktura zoptymalizowana |
-| Faza 6 | 1-2 dni | Testy passują w CI/CD |
+| Faza 2 | 3-4 dni | API-first framework gotowy           |
+| Faza 3 | 2-3 dni | Wszystkie KB testy działają          |
+| Faza 4 | 2-3 dni | Pełne pokrycie funkcjonalności       |
+| Faza 5 | 1-2 dni | Infrastruktura zoptymalizowana       |
+| Faza 6 | 1-2 dni | Testy passują w CI/CD                |
 
 **Całkowity czas: 10-16 dni**
 
@@ -468,14 +522,17 @@ Jeśli API-first approach nie zadziała:
 ## ❌ **Jeden Problemowy Test do Naprawy**
 
 ### **KB Public Access - "should see own private entries + existing public entries"**
+
 **Plik:** `e2e/kb-public-access.spec.ts:320`
 **Status:** ⏭️ SKIPPED (problem z API ↔ UI session handling)
 
 ### **KB Admin Restrictions - "non-admin: create/edit form hides is_public"**
+
 **Plik:** `e2e/kb-admin-restrictions.spec.ts:43`
 **Status:** ⏭️ SKIPPED (problem z detekcją ról między projektami Playwright)
 
 **Błąd w CI:**
+
 ```
 Error: expect(locator).toBeVisible() failed
 Locator: getByText('Private Entry 1761836410643')
@@ -484,8 +541,11 @@ Timeout: 5000ms
 ```
 
 **Aktualna Implementacja:**
+
 ```typescript
-test("should see own private entries + existing public entries", async ({ page }) => {
+test("should see own private entries + existing public entries", async ({
+  page,
+}) => {
   // Use API authentication instead of UI login for reliability in CI/CD
   const authResponse = await page.request.post("/api/auth/signin", {
     data: {
@@ -495,13 +555,19 @@ test("should see own private entries + existing public entries", async ({ page }
   });
 
   if (!authResponse.ok()) {
-    throw new Error(`Authentication failed: ${authResponse.status()} ${authResponse.statusText()}`);
+    throw new Error(
+      `Authentication failed: ${authResponse.status()} ${authResponse.statusText()}`,
+    );
   }
 
   // Get session cookies
-  const setCookieHeader = authResponse.headers()['set-cookie'];
-  const cookies = Array.isArray(setCookieHeader) ? setCookieHeader : (setCookieHeader ? [setCookieHeader] : []);
-  const cookieString = cookies.join('; ');
+  const setCookieHeader = authResponse.headers()["set-cookie"];
+  const cookies = Array.isArray(setCookieHeader)
+    ? setCookieHeader
+    : setCookieHeader
+      ? [setCookieHeader]
+      : [];
+  const cookieString = cookies.join("; ");
 
   // Create a private entry via API
   const timestamp = Date.now();
@@ -520,7 +586,9 @@ test("should see own private entries + existing public entries", async ({ page }
 
   if (!createResponse.ok()) {
     const errorText = await createResponse.text();
-    throw new Error(`Failed to create entry: ${createResponse.status()} ${createResponse.statusText()} - ${errorText}`);
+    throw new Error(
+      `Failed to create entry: ${createResponse.status()} ${createResponse.statusText()} - ${errorText}`,
+    );
   }
 
   const createData = await createResponse.json();
@@ -544,6 +612,7 @@ test("should see own private entries + existing public entries", async ({ page }
 
 **Diagnoza Problemu:**
 Test tworzy wpis przez API, ale gdy nawiguje do strony `/kb`, wpis nie jest widoczny w UI. To sugeruje problem z:
+
 1. **Sesją autoryzacji** - API cookies nie są przekazywane do UI
 2. **SSR Context Loss** - Server-side rendering nie rozpoznaje użytkownika
 3. **Database Isolation** - Wpis może być tworzony w innej bazie danych niż ta używana przez UI
@@ -564,15 +633,18 @@ Potrzebna zmiana podejścia - zamiast API authentication, użyć UI login lub na
 ## 📊 **Aktualny Stan Napraw E2E**
 
 ### **✅ Stan Pipeline (Aktualizacja: Październik 2025):**
+
 - **93/198 testów przechodzi** w pełnym suite E2E (~47% wszystkich testów)
 - **105 testów pominiętych** (skipnięte testy wymagające specjalnych warunków/danych)
 - **0 błędów** w pipeline - pipeline całkowicie zielony! 🎉
 - **Wszystkie aktywne testy przechodzą** - pełne pokrycie bez błędów
 
 ### **🎯 Cel Osiągnięty:**
+
 Wszystkie problemy z E2E testami zostały rozwiązane! Pipeline przechodzi bez żadnych błędów.
 
 ### **🔧 Aktualne Podejście:**
+
 Wszystkie testy działają w oryginalnej formie UI-first. Problemy z hydratacją komponentów zostały naprawione, co pozwoliło na pełne działanie wszystkich testów E2E.
 
 ---
@@ -582,6 +654,7 @@ Wszystkie testy działają w oryginalnej formie UI-first. Problemy z hydratacją
 ### **✅ Problem: Hydratacja Komponentu KbEntriesList - "Przycisk nie reaguje na kliknięcie"**
 
 #### **Objawy:**
+
 ```
 Error: expect(locator).toBeVisible() failed
 Locator: getByRole('heading', { name: /dodaj nowy wpis/i })
@@ -589,25 +662,31 @@ Error: element(s) not found
 ```
 
 #### **Przyczyna:**
+
 - Komponent `KbEntriesList` używał `DOMPurify` z `JSDOM` dla sanitizacji
 - Podczas hydratacji Astro, `JSDOM` powodował błędy: `ReferenceError: global is not defined`
 - Hydratacja komponentu kończyła się niepowodzeniem
 - Przycisk "Dodaj wpis" był renderowany, ale nie reagował na zdarzenia
 
 #### **Rozwiązanie:**
+
 1. **Zastąp `DOMPurify` + `JSDOM` prostym HTML escaping:**
+
 ```typescript
 // ZAMIAST:
-import DOMPurify from 'dompurify';
-import { JSDOM } from 'jsdom';
-const window = new JSDOM('').window;
+import DOMPurify from "dompurify";
+import { JSDOM } from "jsdom";
+const window = new JSDOM("").window;
 const DOMPurifyServer = DOMPurify(window as any);
 
 // UŻYJ:
 const escapeHtml = (text: string): string => {
   const map: Record<string, string> = {
-    '&': '&amp;', '<': '&lt;', '>': '&gt;',
-    '"': '&quot;', "'": '&#039;'
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;",
   };
   return text.replace(/[&<>"']/g, (m) => map[m]);
 };
@@ -618,6 +697,7 @@ export function sanitizeText(text: string): string {
 ```
 
 2. **Dodaj debugowanie dla testów:**
+
 ```typescript
 // W komponencie dodaj debugowanie
 if (typeof window !== "undefined" && window.location.search.includes("test")) {
@@ -626,6 +706,7 @@ if (typeof window !== "undefined" && window.location.search.includes("test")) {
 ```
 
 3. **Napraw nawigację w testach:**
+
 ```typescript
 // ZAMIAST: page.reload()
 await kbPage.navigate();
@@ -633,13 +714,16 @@ await kbPage.setup();
 ```
 
 #### **Rezultat:**
+
 - ✅ Komponent hydratuje się prawidłowo
 - ✅ Przycisk "Dodaj wpis" reaguje na kliknięcie
 - ✅ Wszystkie testy KB przechodzą
 - ✅ Wszystkie 93 aktywne testy E2E przechodzą
 
 #### **Wskazówka dla Przyszłości:**
+
 Jeśli komponenty Astro nie hydratują się prawidłowo, sprawdź:
+
 1. Czy importujesz Node.js-only biblioteki (`fs`, `JSDOM`, itp.)
 2. Czy funkcje są synchroniczne (async functions mogą powodować problemy)
 3. Czy używasz `client:load` zamiast `client:idle` dla komponentów z interaktywnością
@@ -648,6 +732,7 @@ Jeśli komponenty Astro nie hydratują się prawidłowo, sprawdź:
 ---
 
 ### **⚠️ Nadal Oczekujące Problemy:**
+
 1. **API ↔ UI Session Handling** - niektóre testy wymagają lepszego przekazywania sesji między API calls a UI navigation
 2. **Admin Credentials** - testy administratora wymagają specjalnych zmiennych środowiskowych
 3. **Seed Data** - niektóre testy wymagają przygotowanych danych testowych
@@ -689,40 +774,41 @@ Jeśli komponenty Astro nie hydratują się prawidłowo, sprawdź:
 1. **🗑️ Usuwanie wpisów KB**
    - `"should delete own entry when authenticated"` - SKIP (problem z UI login w CI/CD)
 
-3. **🔍 Zaawansowane wyszukiwanie/filtrowanie KB**
+2. **🔍 Zaawansowane wyszukiwanie/filtrowanie KB**
    - Brak testów dla filtrów tagów, wyszukiwania tekstowego
 
-4. **👑 Funkcje administratora KB**
+3. **👑 Funkcje administratora KB**
    - `"admin: sees and can toggle is_public in create/edit forms"` - SKIP
    - `"admin: can create public entries"` - SKIP
    - `"admin: can edit public entries"` - SKIP
    - `"admin: can toggle is_public on existing entries"` - SKIP
    - `"non-admin: create/edit form hides is_public"` - FAIL (ale funkcjonalność działa)
 
-5. **📋 Charters (chronione dokumenty)**
+4. **📋 Charters (chronione dokumenty)**
    - Brak testów tworzenia/edycji/usuwania charterów
    - Tylko podstawowy test dostępu
 
-6. **🎛️ Generators (IBAN, inne)**
+5. **🎛️ Generators (IBAN, inne)**
    - Wszystkie testy skipnięte
    - Brak pokrycia dla faktycznego generowania danych
 
-7. **🚩 Feature Flags**
+6. **🚩 Feature Flags**
    - Wszystkie testy skipnięte
    - Brak pokrycia dla włączania/wyłączania funkcjonalności
 
-8. **📝 Templates**
+7. **📝 Templates**
    - Brak jakichkolwiek testów
 
-9. **🔐 Zaawansowane scenariusze autoryzacji**
+8. **🔐 Zaawansowane scenariusze autoryzacji**
    - `"user cannot edit/delete other users' entries"` - SKIP
    - Brak testów dla różnych poziomów uprawnień
 
-10. **📊 Form validation**
-    - `"should show validation errors for empty required fields"` - SKIP
-    - `"should show validation error for invalid URL"` - SKIP
+9. **📊 Form validation**
+   - `"should show validation errors for empty required fields"` - SKIP
+   - `"should show validation error for invalid URL"` - SKIP
 
 ### **📊 Podsumowanie Pokrycia:**
+
 - **Aktualne pokrycie E2E: ~50-60%** funkcjonalności aplikacji (wzrost po naprawach)
 - **Skipnięte testy to głównie problemy techniczne** (CI/CD, session handling), nie brak implementacji funkcjonalności
 - **Większość podstawowych operacji CRUD jest pokryta** - wszystkie aktywne testy przechodzą
@@ -733,12 +819,15 @@ Jeśli komponenty Astro nie hydratują się prawidłowo, sprawdź:
 ## 🎯 **NOWY PLAN: Redukcja Testów E2E (Październik 2025)**
 
 ### **Kontekst i Wymagania:**
+
 Użytkownik zażądał maksymalnie 2-3 testów na najważniejsze funkcjonalności, ponieważ:
+
 - Obecne testy są trudne w utrzymaniu i czasochłonne
 - Duża liczba testów spowalnia development cycle
 - Większość funkcjonalności ma już wystarczające pokrycie
 
 ### **Strategia Redukcji:**
+
 1. **Zachować maksymalnie 2-3 testy** na każdą główną funkcjonalność
 2. **Usunąć/skipować** wszystkie problematyczne testy
 3. **Skupić się na krytycznych ścieżkach** (happy path + kluczowe błędy)
@@ -747,17 +836,21 @@ Użytkownik zażądał maksymalnie 2-3 testów na najważniejsze funkcjonalnośc
 ### **Planowane Funkcjonalności do Zachowania:**
 
 #### **1. Homepage** (✅ JUŻ DOBRZE POKRYTE - 3 testy)
+
 - `should display main title and navigation`
 - `should display login and register buttons for unauthenticated users`
 - `should have proper meta tags`
 
 #### **2. Rejestracja Użytkowników** (✅ JUŻ DOBRZE POKRYTE - ZREDUKOWAĆ DO 3 testów)
+
 Zachować tylko:
+
 - `should successfully register a new user and auto-login`
 - `should display validation errors for invalid email`
 - `should display validation errors for password without letters`
 
 **Usunąć:**
+
 - `should display validation errors for short password`
 - `should display validation errors for password without numbers`
 - `should display validation errors when passwords don't match`
@@ -765,26 +858,33 @@ Zachować tylko:
 - `should have link to login page`
 
 #### **3. Knowledge Base (KB)** (🔧 NAPRAWIĆ I ZREDUKOWAĆ DO 3 testów)
+
 Zachować tylko:
+
 - `should browse public entries without authentication`
 - `should create a new entry when authenticated` (po naprawieniu)
 - `should see own private entries + existing public entries` (po naprawieniu)
 
 **Usunąć wszystkie inne KB testy:**
+
 - Edycja/usuwanie wpisów
 - Walidacja formularzy
 - Testy RLS cross-user
 - Testy admin
 
 #### **4. RLS (Row Level Security)** (🔧 NAPRAWIĆ I ZREDUKOWAĆ DO 2 testów)
+
 Zachować tylko:
+
 - `should redirect to login when accessing protected charters page`
 - `user A should not be able to edit/delete entries of user B` (po naprawieniu)
 
 **Usunąć:**
+
 - Wszystkie inne testy RLS
 
 #### **5. Funkcjonalności do Całkowitego Usunięcia:**
+
 - **Feature Flags** - wszystkie testy (4 pliki) → USUNĄĆ
 - **Generators** - wszystkie testy (1 plik) → USUNĄĆ
 - **Admin KB** - wszystkie testy admin → USUNĄĆ
@@ -792,28 +892,33 @@ Zachować tylko:
 ### **Plan Implementacji Redukcji:**
 
 #### **Faza 1: Naprawa Kluczowych Testów** ⏱️ **1-2 dni**
+
 1. **Naprawić autoryzację API** w testach KB
 2. **Naprawić komponent KbEntriesList** (jeśli nadal problem)
 3. **Naprawić przerwane testy RLS**
 
 #### **Faza 2: Redukcja Testów** ⏱️ **1 dzień**
+
 1. **Usunąć pliki testów** dla feature flags i generators całkowicie
 2. **Oznaczyć jako skip** wszystkie admin testy KB
 3. **Usunąć nadmiarowe testy rejestracji**
 4. **Zachować tylko 2-3 testy KB** (happy path + RLS)
 
 #### **Faza 3: Weryfikacja i Optymalizacja** ⏱️ **1 dzień**
+
 1. **Uruchomić wszystkie pozostałe testy**
 2. **Upewnić się że pipeline przechodzi**
 3. **Zaktualizować dokumentację**
 
 ### **Oczekiwane Rezultaty:**
+
 - **10-15 testów** zamiast 144
 - **Wszystkie testy przechodzą** w CI/CD
 - **Łatwiejsze utrzymanie** i szybsze uruchamianie
 - **Zachowane krytyczne pokrycie** funkcjonalności MVP
 
 ### **Metryki Sukcesu:**
+
 - ✅ Maksymalnie 2-3 testy na funkcjonalność
 - ✅ Wszystkie aktywne testy przechodzą
 - ✅ Pipeline zielony
@@ -821,4 +926,4 @@ Zachować tylko:
 
 ---
 
-*Ten plan został stworzony na podstawie analizy kodu źródłowego QA Toolsmith, dokumentacji projektu oraz doświadczeń z podobnymi migracjami testów E2E. Aktualizacja: Październik 2025 - dodano plan redukcji testów E2E zgodnie z wymaganiami użytkownika. Wszystkie aktywne testy (93/93) przechodzą pomyślnie w CI/CD. Dodano sekcję z rozwiązanymi problemami i wskazówkami dla przyszłości.*
+_Ten plan został stworzony na podstawie analizy kodu źródłowego QA Toolsmith, dokumentacji projektu oraz doświadczeń z podobnymi migracjami testów E2E. Aktualizacja: Październik 2025 - dodano plan redukcji testów E2E zgodnie z wymaganiami użytkownika. Wszystkie aktywne testy (93/93) przechodzą pomyślnie w CI/CD. Dodano sekcję z rozwiązanymi problemami i wskazówkami dla przyszłości._

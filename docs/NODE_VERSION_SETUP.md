@@ -119,4 +119,3 @@ W CI/CD używamy `.nvmrc` do automatycznego ustawienia wersji Node.js. Wszystkie
 
 - [nvm dokumentacja](https://github.com/nvm-sh/nvm)
 - [Node.js releases](https://nodejs.org/en/about/releases/)
-

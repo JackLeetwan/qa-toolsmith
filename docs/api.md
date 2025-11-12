@@ -818,10 +818,10 @@ Cache-Control: public, max-age=300
 
 **Query Parameters:**
 
-| Parameter | Type   | Required | Description                                                      | Example                         |
-| --------- | ------ | -------- | ---------------------------------------------------------------- | ------------------------------- |
-| `after`   | string | ❌ No    | Cursor for keyset pagination (format: `"updated_at,id"`)        | `?after=2024-01-01T00:00:00Z,entry-id` |
-| `limit`   | number | ❌ No    | Number of items per page (1-100, default: 20)                     | `?limit=10`                      |
+| Parameter | Type   | Required | Description                                              | Example                                |
+| --------- | ------ | -------- | -------------------------------------------------------- | -------------------------------------- |
+| `after`   | string | ❌ No    | Cursor for keyset pagination (format: `"updated_at,id"`) | `?after=2024-01-01T00:00:00Z,entry-id` |
+| `limit`   | number | ❌ No    | Number of items per page (1-100, default: 20)            | `?limit=10`                            |
 
 ## Conditional Access Logic
 
@@ -829,7 +829,6 @@ The endpoint returns different results based on authentication:
 
 - **Unauthenticated users (anonymous):**
   - Only entries with `is_public = true` are returned
-  
 - **Authenticated users:**
   - Own entries (`user_id = auth.uid()`) + public entries (`is_public = true`)
 
@@ -955,10 +954,12 @@ fetch("https://example.com/api/kb/entries")
   .then((data) => {
     console.log("Entries:", data.items);
     console.log("Has next page:", !!data.next_cursor);
-    
+
     // Load next page if available
     if (data.next_cursor) {
-      return fetch(`https://example.com/api/kb/entries?after=${data.next_cursor}`);
+      return fetch(
+        `https://example.com/api/kb/entries?after=${data.next_cursor}`,
+      );
     }
   })
   .then((response) => response?.json())
@@ -1020,12 +1021,12 @@ Authorization: Bearer YOUR_JWT_TOKEN
 
 **Request Fields:**
 
-| Field        | Type           | Required | Description                                   |
-| ------------ | -------------- | -------- | --------------------------------------------- |
-| `title`      | string         | ✅ Yes   | Entry title (1-200 characters)                 |
-| `url_original` | string       | ✅ Yes   | Original URL (must be valid HTTP/HTTPS URL)   |
-| `tags`       | string[]       | ❌ No    | Array of tag strings (default: `[]`)          |
-| `is_public`  | boolean        | ❌ No    | Whether entry is publicly visible (default: `false`) |
+| Field          | Type     | Required | Description                                          |
+| -------------- | -------- | -------- | ---------------------------------------------------- |
+| `title`        | string   | ✅ Yes   | Entry title (1-200 characters)                       |
+| `url_original` | string   | ✅ Yes   | Original URL (must be valid HTTP/HTTPS URL)          |
+| `tags`         | string[] | ❌ No    | Array of tag strings (default: `[]`)                 |
+| `is_public`    | boolean  | ❌ No    | Whether entry is publicly visible (default: `false`) |
 
 ## Responses
 
@@ -1136,14 +1137,14 @@ fetch("https://example.com/api/kb/entries", {
   method: "POST",
   headers: {
     "Content-Type": "application/json",
-    "Authorization": "Bearer YOUR_JWT_TOKEN"
+    Authorization: "Bearer YOUR_JWT_TOKEN",
   },
   body: JSON.stringify({
     title: "React Documentation",
     url_original: "https://react.dev",
     tags: ["react", "frontend"],
-    is_public: true
-  })
+    is_public: true,
+  }),
 })
   .then((response) => response.json())
   .then((data) => console.log("Created entry:", data.data));
@@ -1158,7 +1159,11 @@ const res = await fetch("https://example.com/api/kb/entries", {
     "Content-Type": "application/json",
     Authorization: "Bearer NON_ADMIN_JWT",
   },
-  body: JSON.stringify({ title: "x", url_original: "https://x", is_public: true }),
+  body: JSON.stringify({
+    title: "x",
+    url_original: "https://x",
+    is_public: true,
+  }),
 });
 if (res.status === 403) {
   console.log("Only admins can create public KB entries");
@@ -1215,9 +1220,9 @@ assert resp.status_code == 403
 
 **URL Parameters:**
 
-| Parameter | Type   | Required | Description        |
+| Parameter | Type   | Required | Description       |
 | --------- | ------ | -------- | ----------------- |
-| `id`      | string | ✅ Yes   | UUID of the entry  |
+| `id`      | string | ✅ Yes   | UUID of the entry |
 
 ## Access Control
 
@@ -1251,6 +1256,7 @@ Note: Internal field `search_vector` is not included in the response.
 ### ❌ Error: Not Found (404 Not Found)
 
 Returned when:
+
 - Entry doesn't exist
 - User doesn't have access (RLS denies access)
 
@@ -1296,8 +1302,8 @@ curl -X GET "https://example.com/api/kb/entries/abc-123-def-456" \
 ```javascript
 fetch("https://example.com/api/kb/entries/abc-123-def-456", {
   headers: {
-    "Authorization": "Bearer YOUR_JWT_TOKEN"
-  }
+    Authorization: "Bearer YOUR_JWT_TOKEN",
+  },
 })
   .then((response) => response.json())
   .then((data) => console.log("Entry:", data.data))
@@ -1328,6 +1334,7 @@ print(f"Entry: {data['data']['title']}")
 **Purpose:** Update a KB entry (partial update supported).  
 **Authentication:** Required (Bearer JWT token)  
 **Authorization:**
+
 - Users can only update their own entries (RLS enforced)
 - Only admins can edit public entries or set `is_public: true`
 
@@ -1342,9 +1349,9 @@ Authorization: Bearer YOUR_JWT_TOKEN
 
 **URL Parameters:**
 
-| Parameter | Type   | Required | Description        |
+| Parameter | Type   | Required | Description       |
 | --------- | ------ | -------- | ----------------- |
-| `id`      | string | ✅ Yes   | UUID of the entry  |
+| `id`      | string | ✅ Yes   | UUID of the entry |
 
 **Body (all fields optional):**
 
@@ -1359,12 +1366,12 @@ Authorization: Bearer YOUR_JWT_TOKEN
 
 **Request Fields:**
 
-| Field        | Type           | Required | Description                                   |
-| ------------ | -------------- | -------- | --------------------------------------------- |
-| `title`      | string         | ❌ No    | Entry title (1-200 characters)                 |
-| `url_original` | string       | ❌ No    | Original URL (must be valid HTTP/HTTPS URL)   |
-| `tags`       | string[]       | ❌ No    | Array of tag strings                           |
-| `is_public`  | boolean        | ❌ No    | Whether entry is publicly visible             |
+| Field          | Type     | Required | Description                                 |
+| -------------- | -------- | -------- | ------------------------------------------- |
+| `title`        | string   | ❌ No    | Entry title (1-200 characters)              |
+| `url_original` | string   | ❌ No    | Original URL (must be valid HTTP/HTTPS URL) |
+| `tags`         | string[] | ❌ No    | Array of tag strings                        |
+| `is_public`    | boolean  | ❌ No    | Whether entry is publicly visible           |
 
 **Note:** At least one field must be provided for update.
 
@@ -1419,6 +1426,7 @@ Authorization: Bearer YOUR_JWT_TOKEN
 ### ❌ Error: Forbidden (403 Forbidden)
 
 Returned when a non-admin attempts to:
+
 - Edit a public entry
 - Set `is_public` to `true`
 
@@ -1435,6 +1443,7 @@ Returned when a non-admin attempts to:
 ### ❌ Error: Not Found (404 Not Found)
 
 Returned when:
+
 - Entry doesn't exist
 - User is not the owner (RLS denies access)
 
@@ -1495,12 +1504,12 @@ fetch("https://example.com/api/kb/entries/abc-123-def-456", {
   method: "PUT",
   headers: {
     "Content-Type": "application/json",
-    "Authorization": "Bearer YOUR_JWT_TOKEN"
+    Authorization: "Bearer YOUR_JWT_TOKEN",
   },
   body: JSON.stringify({
     title: "Updated Title",
-    is_public: true
-  })
+    is_public: true,
+  }),
 })
   .then((response) => response.json())
   .then((data) => console.log("Updated entry:", data.data));
@@ -1511,7 +1520,10 @@ Non-admin (403):
 ```javascript
 const res = await fetch("https://example.com/api/kb/entries/own-private-id", {
   method: "PUT",
-  headers: { "Content-Type": "application/json", Authorization: "Bearer NON_ADMIN_JWT" },
+  headers: {
+    "Content-Type": "application/json",
+    Authorization: "Bearer NON_ADMIN_JWT",
+  },
   body: JSON.stringify({ is_public: true }),
 });
 if (res.status === 403) {
@@ -1563,6 +1575,7 @@ assert resp.status_code == 403
 **Purpose:** Delete a KB entry.  
 **Authentication:** Required (Bearer JWT token)  
 **Authorization:**
+
 - Users can only delete their own private entries (RLS enforced)
 - Only admins can delete public entries
 
@@ -1576,9 +1589,9 @@ Authorization: Bearer YOUR_JWT_TOKEN
 
 **URL Parameters:**
 
-| Parameter | Type   | Required | Description        |
+| Parameter | Type   | Required | Description       |
 | --------- | ------ | -------- | ----------------- |
-| `id`      | string | ✅ Yes   | UUID of the entry  |
+| `id`      | string | ✅ Yes   | UUID of the entry |
 
 **Note:** Related notes are automatically cascade-deleted (foreign key constraint).
 
@@ -1628,6 +1641,7 @@ or
 ### ❌ Error: Not Found (404 Not Found)
 
 Returned when:
+
 - Entry doesn't exist
 - User is not the owner (RLS denies access)
 
@@ -1678,14 +1692,13 @@ curl -i -X DELETE "https://example.com/api/kb/entries/others-private-id" \
 fetch("https://example.com/api/kb/entries/abc-123-def-456", {
   method: "DELETE",
   headers: {
-    "Authorization": "Bearer YOUR_JWT_TOKEN"
+    Authorization: "Bearer YOUR_JWT_TOKEN",
+  },
+}).then((response) => {
+  if (response.status === 204) {
+    console.log("Entry deleted successfully");
   }
-})
-  .then((response) => {
-    if (response.status === 204) {
-      console.log("Entry deleted successfully");
-    }
-  });
+});
 ```
 
 ### Python (Requests)
