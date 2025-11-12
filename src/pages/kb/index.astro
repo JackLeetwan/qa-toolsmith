@@ -19,49 +19,65 @@ if (!isFeatureEnabled("collections.knowledgeBase")) {
 const user = Astro.locals.user || null;
 
 // Check if we're in E2E test environment (Node adapter with test env vars)
-const isTestEnvironment = process.env.NODE_ENV === 'test' ||
-  process.env.ENV_NAME === 'integration' ||
+const isTestEnvironment =
+  process.env.NODE_ENV === "test" ||
+  process.env.ENV_NAME === "integration" ||
   !!process.env.E2E_USERNAME;
 
 // Check if this is an authenticated E2E test (indicated by URL parameter or test environment)
-const isAuthenticatedTest = (isTestEnvironment && (
-  Astro.url.searchParams.has('authenticated') ||
-  process.env.E2E_FORCE_AUTH === 'true'
-)) || Astro.url.searchParams.has('test');
+const isAuthenticatedTest =
+  (isTestEnvironment &&
+    (Astro.url.searchParams.has("authenticated") ||
+      process.env.E2E_FORCE_AUTH === "true")) ||
+  Astro.url.searchParams.has("test");
 
 // For Playwright tests, also enable mock user if we have test indicators
-const isPlaywrightTest = Astro.url.searchParams.has('test') ||
-  Astro.url.searchParams.has('authenticated') ||
-  process.env.E2E_FORCE_AUTH === 'true' ||
+const isPlaywrightTest =
+  Astro.url.searchParams.has("test") ||
+  Astro.url.searchParams.has("authenticated") ||
+  process.env.E2E_FORCE_AUTH === "true" ||
   isTestEnvironment;
 
 // Mock user for E2E tests when SSR sessions don't work properly
 // Only use mock user for authenticated test scenarios
-const mockUser = (isPlaywrightTest && (
-  Astro.url.searchParams.has('authenticated') ||
-  process.env.E2E_FORCE_AUTH === 'true'
-))
-  ? { id: "951570d9-7a13-4bdc-8454-8013ee124d63", email: process.env.E2E_USERNAME || "test@example.com" }
-  : null;
+const mockUser =
+  isPlaywrightTest &&
+  (Astro.url.searchParams.has("authenticated") ||
+    process.env.E2E_FORCE_AUTH === "true")
+    ? {
+        id: "951570d9-7a13-4bdc-8454-8013ee124d63",
+        email: process.env.E2E_USERNAME || "test@example.com",
+      }
+    : null;
 
 // Debug logging for SSR
 console.log("🔍 KB Page SSR Debug:");
-console.log("   user from Astro.locals:", user ? { id: user.id.substring(0, 8) + "...", email: user.email } : null);
+console.log(
+  "   user from Astro.locals:",
+  user ? { id: user.id.substring(0, 8) + "...", email: user.email } : null,
+);
 console.log("   isTestEnvironment:", isTestEnvironment);
-console.log("   process.env.E2E_USERNAME:", process.env.E2E_USERNAME ? "SET" : "NOT SET");
-console.log("   mockUser:", mockUser ? { id: mockUser.id.substring(0, 8) + "...", email: mockUser.email } : null);
-
+console.log(
+  "   process.env.E2E_USERNAME:",
+  process.env.E2E_USERNAME ? "SET" : "NOT SET",
+);
+console.log(
+  "   mockUser:",
+  mockUser
+    ? { id: mockUser.id.substring(0, 8) + "...", email: mockUser.email }
+    : null,
+);
 
 // Only set mockRole='admin' for admin tests (when admin credentials are present and user matches admin email)
 // This allows admin tests to show admin UI controls while regular user tests use real roles
-const isAdminTest = isTestEnvironment &&
+const isAdminTest =
+  isTestEnvironment &&
   user &&
   process.env.E2E_ADMIN_USERNAME &&
   process.env.E2E_ADMIN_PASSWORD &&
   user.email === process.env.E2E_ADMIN_USERNAME;
 
-const mockRole = isAdminTest ? 'admin' : (isTestEnvironment ? 'user' : undefined);
-
+const mockRole = isAdminTest ? "admin" : isTestEnvironment ? "user" : undefined;
 ---
 
 <PublicLayout title="Knowledge Base" description="Zarządzaj swoją bazą wiedzy">
@@ -69,9 +85,11 @@ const mockRole = isAdminTest ? 'admin' : (isTestEnvironment ? 'user' : undefined
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-2">Knowledge Base</h1>
       <p class="text-muted-foreground">
-        {user
-          ? "Zarządzaj swoją bazą wiedzy - dodawaj linki, notatki i tagi."
-          : "Przeglądaj publiczną bazę wiedzy. Zaloguj się, aby dodać własne wpisy."}
+        {
+          user
+            ? "Zarządzaj swoją bazą wiedzy - dodawaj linki, notatki i tagi."
+            : "Przeglądaj publiczną bazę wiedzy. Zaloguj się, aby dodać własne wpisy."
+        }
       </p>
     </div>
 

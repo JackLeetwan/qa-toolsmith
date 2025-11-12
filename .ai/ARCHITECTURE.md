@@ -160,55 +160,14 @@ This document provides high-level architecture overview for QA Toolsmith MVP, co
 
 ## Technology Stack
 
-### Frontend
+**📚 Detailed technology documentation:** See `docs/tech-stack.md` for complete technology stack, versions, and deployment configuration.
 
-- **Astro 5** (v5.15.3): SSR with minimal JavaScript, API endpoints
-- **React 19** (v19.2.0): Interactive components with React Compiler
-- **TypeScript 5**: Static typing
-- **Tailwind 4** (v4.1.16): Utility-first CSS with native Vite integration
-- **Shadcn/ui**: Accessible React components on Radix UI
+**Key Technologies:**
+- **Astro 5 + React 19**: SSR framework with minimal JavaScript footprint
+- **Supabase**: PostgreSQL with Row Level Security and built-in authentication
+- **Cloudflare Pages**: Serverless hosting with Workers integration
+- **OpenRouter.ai**: Multi-model AI service for content improvement features
 
-### Backend
-
-- **Supabase**:
-  - PostgreSQL database with Row Level Security (RLS)
-  - `@supabase/supabase-js` (v2.78.0) - BaaS SDK
-  - `@supabase/ssr` (v0.7.0) - SSR support with cookie management
-  - Built-in JWT authentication
-
-### Environment Variables
-
-**Astro 5 typed environment system** (`astro:env`):
-
-- Server-side: `import { SUPABASE_URL, SUPABASE_KEY, ... } from 'astro:env/server'`
-- Client-side: `import { ENV_NAME } from 'astro:env/client'` (public only)
-- Priority: Cloudflare bindings → astro:env → Node.js fallback
-
-### AI Integration
-
-- **OpenRouter.ai**: Multi-model AI service
-  - Per-user daily usage limits
-  - Structured JSON responses with schema validation
-  - Comprehensive error handling
-
-### CI/CD & Hosting
-
-- **GitHub Actions**: Lint → Build → Unit Tests → E2E Tests
-- **Cloudflare Pages**: Production hosting with SSR via `@astrojs/cloudflare` adapter
-- **Browser**: Chromium only for E2E tests
-
----
-
-## Testing
-
-**📚 Detailed testing documentation:** See test files in `src/__tests__/` for unit tests and `e2e/` for E2E tests.
-
-**Testing Strategy:**
-
-- **Unit Tests**: Vitest (1,167 tests across 34 files)
-- **E2E Tests**: Playwright (10 tests covering full workflows)
-- **Test Principles**: No sleeps, stable selectors (data-testid), test isolation
-- **Diagnostics**: Traces, screenshots, videos (on failure only, 7-day retention)
 
 ---
 
